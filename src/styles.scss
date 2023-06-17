@@ -1,0 +1,50 @@
+/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  font-family: "Kanit";
+}
+
+@import "node_modules/@swimlane/ngx-datatable/themes/material.css";
+@import "node_modules/@swimlane/ngx-datatable/themes/bootstrap.css";
+@import "node_modules/@swimlane/ngx-datatable/assets/icons.css";
+@import "node_modules/@swimlane/ngx-datatable/index.css";
+
+@import "scss/variables";
+
+/* fonts-icon */
+@import "scss/fonts/fontawesome/scss/fontawesome";
+@import "scss/fonts/feather/iconfont";
+
+@import "scss/general";
+@import "scss/generic";
+@import "scss/mixins/function";
+
+/* important element */
+@import "scss/menu/menu-lite";
+
+/* basic elements */
+@import "scss/theme-elements/theme-elements";
+
+/* third party modules style*/
+@import "scss/plugins/plugins";
+
+@import "scss/custom";
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
+//แก้ไข Layout ของ mat-select
+.cdk-global-overlay-wrapper,
+.cdk-overlay-container {
+  z-index: 9999 !important;
+}
+
+.box-error {
+  position: relative;
+  top: -15px;
+  left: -15px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Kanit';
+}

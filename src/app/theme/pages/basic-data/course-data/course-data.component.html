@@ -1,0 +1,121 @@
+<div class="tw-w-full tw-bg-white tw-p-4">
+  <div class="tw-container">
+      <div class="tw-flex">
+          <span class="tw-text-3xl tw-font-bold tw-text-[#454545] tw-my-5">ข้อมูลคอร์ส</span>
+      </div>
+      <div class="tw-flex tw-justify-between tw-items-center">
+          <button
+              class="btn tw-px-3 tw-py-2 tw-m-0 tw-rounded-md tw-w-40 tw-border-0 tw-bg-green-500 tw-text-white tw-font-normal tw-select-none"
+              (click)="openModal(template)">
+              <i class="fa-solid fa-user-plus"></i>เพิ่มข้อมูล
+          </button>
+          <!-- <mat-form-field class="example-full-width tw-flex tw-flex-row" appearance="outline">
+        <mat-label>ค้นหาข้อมูลลูกค้า</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input type="search" (keyup)='serviceListFilter($event)' class="tw-text-xs" placeholder="ค้นหาเลขสมาชิกและชื่อลูกค้า" matInput>
+      </mat-form-field> -->
+      </div>
+  </div>
+</div>
+<div class="wrap-body">
+  <div class="container">
+    <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="5" [columnMode]="ColumnMode.force"
+      [footerHeight]="50" rowHeight="auto" [rows]="rows">
+      <ngx-datatable-column name="" [width]="50" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <img src="./assets/icons/edit.png" (click)="openModal(template,row)" width="25px" height="25px" />
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="" [width]="50" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <img src="./assets/icons/del.png" (click)="delete(row)" width="25px" height="25px" />
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="#" [canAutoResize]="false" [sortable]="false" [width]="50" [cellClass]="'cellColumn'">
+        <ng-template let-rowIndex="rowIndex" ngx-datatable-cell-template>
+          {{ rowIndex + 1 }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="รหัสคอร์ส" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row.course_code }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="ชื่อคอร์สภาษาอังกฤษ" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row.course_name_eng }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="ชื่อคอร์สภาษาไทย" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row.course_name_th }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="รายละเอียดคอร์ส" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row.course_detail }}
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
+  </div>
+</div>
+
+
+<!--Modal-->
+<ng-template #template>
+  <div class="modal-header">
+    <h4 *ngIf="!isAddMode" class="modal-title pull-left">เพิ่มข้อมูลคอร์ส</h4>
+    <h4 *ngIf="isAddMode" class="modal-title pull-left">แก้ไขข้อมูลคอร์ส</h4>
+    <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true" class="visually-hidden">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form role="form" [formGroup]="courseForm" (ngSubmit)="onSubmit()" #f="ngForm" novalidate>
+      <mat-form-field class="tw-w-full tw-mb-3" appearance="outline">
+        <mat-label>รหัสคอร์ส</mat-label>
+        <input type="text" matInput placeholder="กรุณาใส่รหัสคอร์ส" id="course_code" name="course_code"
+          [formControlName]="'course_code'">
+        <mat-error *ngIf="courseForm.get('course_code').hasError('required')">
+          <div class="box-error">
+            กรุณากรอกรหัสคอร์ส
+          </div>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="tw-w-full tw-mb-3" appearance="outline">
+        <mat-label>ชื่อคอร์สภาษาอังกฤษ</mat-label>
+        <input type="text" matInput placeholder="กรุณาใส่ชื่อคอร์สภาษาอังกฤษ" id="course_name_eng"
+          name="course_name_eng" [formControlName]="'course_name_eng'">
+        <mat-error *ngIf="courseForm.get('course_name_eng').hasError('required')">
+          <div class="box-error">
+            กรุณากรอกชื่อคอร์สภาษาอังกฤษ
+          </div>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="tw-w-full tw-mb-3" appearance="outline">
+        <mat-label>ชื่อคอร์สภาษาไทย</mat-label>
+        <input type="text" matInput placeholder="กรุณาใส่ชื่อคอร์สภาษาไทย" id="course_name_th" name="course_name_th"
+          [formControlName]="'course_name_th'">
+        <mat-error *ngIf="courseForm.get('course_name_th').hasError('required')">
+          <div class="box-error">
+            กรุณากรอกชื่อคอร์สภาษาไทย
+          </div>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="tw-w-full tw-mb-3" appearance="outline">
+        <mat-label>รายละเอียดคอร์ส</mat-label>
+        <textarea matInput placeholder="กรุณาใส่รายละเอียดคอร์ส" id="course_detail" name="course_detail"
+          [formControlName]="'course_detail'"></textarea>
+        <mat-error *ngIf="courseForm.get('course_detail').hasError('required')">
+          <div class="box-error">
+            กรุณากรอกรายละเอียดคอร์ส
+          </div>
+        </mat-error>
+      </mat-form-field>
+      <div class="modal-footer">
+        <button class="btn btn-save" type="submit">บันทึก</button>
+        <button class="btn btn-cancel" (click)="modalRef.hide()">ปิด</button>
+      </div>
+    </form>
+  </div>
+</ng-template>

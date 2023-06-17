@@ -1,0 +1,90 @@
+<div class="auth-wrapper">
+  <div class="auth-content">
+    <div class="auth-bg">
+      <ul class="circles">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+    </div>
+    <div class="card rounded">
+      <div class="card-body text-center">
+        <div class="mb-4">
+          <img src="../../../../../assets/basic/LogoZiimme-W.png" class="inline-block" width="150" alt="LogoZiimme">
+        </div>
+        <h2 class="mb-4 text-4xl font-bold">ยินดีต้อนรับ</h2>
+        <form [formGroup]="loginForm" name="form" (ngSubmit)="onSubmit()" #f="ngForm" novalidate>
+          <div class="box-login">
+
+            <div class="tw-mt-4 alert alert-{{alert.type}}" *ngIf="showAlert" role="alert">
+              {{ alert.message }}
+            </div>
+
+            <mat-form-field class="tw-w-full mb-3" appearance="outline">
+              <mat-label>ชื่อผู้ใช้งาน</mat-label>
+              <input id="username" matInput [formControlName]="'username'">
+              <mat-error *ngIf="loginForm.get('username').hasError('required')">
+                <div class="box-error">
+                  ต้องระบุชื่อผู้ใช้งาน
+                </div>
+              </mat-error>
+              <mat-error *ngIf="loginForm.get('username').hasError('username')">
+                <div class="box-error">
+                  โปรดระบุชื่อผู้ใช้งานให้ถูกต้อง
+                </div>
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="tw-w-full mb-2" appearance="outline">
+              <mat-label>รหัสผ่าน</mat-label>
+              <input id="password" matInput type="password" [formControlName]="'password'" #passwordField>
+              <button mat-icon-button class="tw-bg-transparent tw-border-none" type="button"
+                (click)="passwordField.type === 'password' ? passwordField.type = 'text' : passwordField.type = 'password'"
+                matSuffix>
+
+                <mat-icon class="icon-size-5" *ngIf="passwordField.type === 'password'">visibility</mat-icon>
+                <mat-icon class="icon-size-5" *ngIf="passwordField.type === 'text'">visibility_off</mat-icon>
+              </button>
+              <mat-error>
+                <div class="box-error">
+                  ต้องระบุรหัสผ่าน
+                </div>
+              </mat-error>
+            </mat-form-field>
+
+
+            <p class="mb-3 text-end">
+              <a [routerLink]="['/forgot-password']" style="text-decoration: underline;">ลืมรหัสผ่าน ?</a>
+            </p>
+            <!-- <div class="form-group text-start mb-4">
+            <div class="checkbox checkbox-fill d-inline">
+              <input type="checkbox" name="checkbox-fill-1" id="checkbox-fill-a1" checked="" />
+              <label for="checkbox-fill-a1" class="cr"> Save Details</label>
+            </div>
+          </div> -->
+            <!-- <button class="btn btn-navy m-0 p-0 mt-4"
+            style="background-color: #2B4498; color: #FFF; width: 420px; height: 44px; font-weight: 300; font-size: 18px;"><i
+              class="fa-solid fa-right-to-bracket" (click)="Login()"></i>เข้าสู่ระบบ</button> -->
+            <div class="box-button">
+              <button type="submit" class="btn btn-primary">
+                เข้าสู่ระบบ
+                <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
+              </button>
+            </div>
+            <!-- <div *ngIf="error" class="alert alert-danger mt-3 mb-0">{{error}}</div> -->
+            <!-- <p class="mb-0 text-muted">
+            Don’t have an account? <a [routerLink]="['/auth/signup']">Sign up</a>
+          </p> -->
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

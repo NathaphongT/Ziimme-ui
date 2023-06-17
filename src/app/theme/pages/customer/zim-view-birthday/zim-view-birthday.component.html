@@ -1,0 +1,52 @@
+<div class="tw-w-full tw-bg-white tw-p-4">
+    <div class="tw-flex">
+        <span class="tw-text-3xl tw-font-bold tw-text-[#454545] tw-my-5">ข้อมูลวันเกิดลูกค้า</span>
+    </div>
+    <!-- <div class="tw-flex tw-justify-between tw-items-center">
+        <mat-form-field class="example-full-width tw-flex tw-flex-row" appearance="outline">
+            <mat-label>ค้นหาข้อมูลลูกค้า</mat-label>
+            <mat-icon matPrefix>search</mat-icon>
+            (keyup)='serviceListFilter($event)'
+            <input type="search" class="tw-text-xs" placeholder="ค้นหาเลขสมาชิกและชื่อลูกค้า" matInput>
+        </mat-form-field>
+    </div> -->
+</div>
+<div class="wrap-body">
+    <div class="container">
+        <ngx-datatable #table class="bootstrap" [headerHeight]="50" [limit]="5" [columnMode]="ColumnMode.force"
+            [footerHeight]="50" rowHeight="auto" [rows]="basicRows" [sorts]="[{prop:
+          'cus_birthday',dir:
+          'desc'}]">
+            <ngx-datatable-column name="#" [canAutoResize]="false" [sortable]="false" [width]="50"
+                [cellClass]="'cellColumn'">
+                <ng-template let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                    {{ rowIndex + 1 }}
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="รหัสบัตรสมาชิก" [cellClass]="'cellColumn'">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    <!-- {{ row.cus_member }} -->
+                    {{row.cus_member }}
+                </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column name="ชื่อ-นามสกุล" [cellClass]="'cellColumn'">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{ row.cus_full_name }}
+                </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column name="เบอร์โทรศัพท์" [cellClass]="'cellColumn'">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{ row.cus_telephone }}
+                </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column name="วันเกิด" prop="cus_birthday" [cellClass]="'cellColumn'">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{ row.cus_birthday | dateTHPipe: 'day' }}
+                </ng-template>
+            </ngx-datatable-column>
+        </ngx-datatable>
+    </div>
+</div>

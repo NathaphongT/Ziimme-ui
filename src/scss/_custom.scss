@@ -1,0 +1,178 @@
+body {
+  line-height: 1.5;
+  background-color: #f4f7fa;
+  td,
+  th {
+    font-family: "Open Sans", sans-serif;
+  }
+}
+header {
+  width: 100%;
+}
+
+.form-control {
+  height: 37px;
+}
+
+.border-less-image-gallery ks-modal-gallery .plain-container .image {
+  border: none;
+}
+
+.h-back-user-list {
+  color: $primary-color !important;
+}
+
+@media only screen and (max-width: 575px) {
+  .pcoded-header .dropdown .dropdown-menu {
+    left: 0 !important;
+  }
+
+  wizard.vertical .vertical a {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 360px) {
+  .filter-bar .card-task .task-board {
+    float: none;
+    margin-top: 25px;
+  }
+}
+
+.pcoded-header .dropdown.show:before {
+  left: -10px !important;
+}
+
+div.horizontal-scroll {
+  overflow: auto;
+  white-space: nowrap;
+}
+
+#timer {
+  color: #ffffff;
+  b {
+    font-size: 24px;
+  }
+}
+
+pre code {
+  width: auto;
+  min-width: 100%;
+  margin-left: -80px !important;
+}
+
+.btn.btn-sm {
+  padding: 3px 12px;
+  border-radius: 0.15rem;
+}
+
+.btn.btn-lg {
+  padding: 12px 25px;
+  border-radius: 0.35rem;
+}
+
+.fixed-button {
+  position: fixed;
+  bottom: -50px;
+  right: 30px;
+  -webkit-box-shadow: 0 15px 50px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  z-index: 9;
+  -webkit-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+  .btn {
+    margin-bottom: 0;
+    margin-right: 0;
+  }
+}
+
+.fixed-button.active {
+  bottom: 50px;
+  opacity: 1;
+}
+
+//custom
+.navbar-background {
+  background-color: #212836;
+}
+
+.bg-container {
+  background-color: #fff;
+  height: 85px;
+  padding: 30px 5px 30px 5px;
+  .row {
+    max-width: 100%;
+    margin: 0;
+  }
+  .col-8 {
+    display: flex;
+    align-items: center;
+  }
+  .col-4 {
+    text-align: end;
+  }
+  .font-list {
+    color: #000;
+    font-size: 24px;
+    font-weight: 500;
+  }
+}
+
+.bg-containers {
+  padding: 30px;
+}
+
+.wrap-body {
+  padding: 20px;
+}
+
+//button Save && Cancel
+button.btn.layout {
+  margin: 0px 5px;
+  padding: 5px 20px;
+}
+.btn-save {
+  background-color: blue;
+  color: #f4f7fa;
+}
+.btn-save:hover {
+  background-color: blue;
+  opacity: 0.9;
+}
+.btn-cancel {
+  background-color: red;
+  color: #f4f7fa;
+}
+.btn-cancel:hover {
+  background-color: red;
+  opacity: 0.9;
+}
+
+.btn-views {
+  background-color: blue;
+  color: #fff;
+  padding: 5px 10px;
+}
+.btn-views:hover {
+  background-color: blue;
+  color: #fff;
+}
+.btn-edit {
+  background-color: #FFA500;
+  color: #fff;
+  padding: 5px 10px;
+}
+.btn-edit:hover {
+  background-color: #FFA500;
+  color: #fff;
+}
+.btn-delete {
+  background-color: red;
+  color: #fff;
+  padding: 5px 10px;
+}
+.btn-delete:hover {
+  background-color: red;
+  color: #fff;
+}

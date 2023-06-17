@@ -1,0 +1,234 @@
+<div class="wrap-body">
+    <div class="tw-grid tw-grid-cols-2">
+        <div class="card tw-p-4 tw-mx-1">
+            <label class="tw-my-1 tw-text-lg tw-font-bold" style="border-bottom: 1px solid #e2e2e2;">ข้อมูล</label>
+            <div class="tw-grid tw-grid-cols-2 tw-my-2" *ngFor="let item of Sales">
+                <div class="tw-mx-2">
+                    <label class="tw-font-semibold">รหัสสมาชิก :</label>
+                    <span class="tw-mx-1 tw-text-base">{{item?.sale_number}}</span>
+                </div>
+
+                <div class="tw-mx-2">
+                    <label class="tw-font-semibold">สินค้าและบริการ :</label>
+                    <span class="tw-mx-1 tw-text-base">{{getNameProduct(item?.sale_product)}}</span>
+                </div>
+            </div>
+            <!-- <div class="tw-mx-2">
+                    <label class="tw-font-semibold">ที่ปรึกษา :</label>
+                    <span class="tw-mx-1 tw-text-base">{{getNameEmployee(item?.sale_consultant)}}</span>
+                </div> -->
+        </div>
+        <div class="card tw-p-4 tw-mx-1">
+            <label class="tw-my-1 tw-text-lg tw-font-bold"
+                style="border-bottom: 1px solid #e2e2e2;">
+                ข้อมูลการเข้าใช้งานบริการ
+            </label>
+
+            <div class="tw-grid tw-grid-cols-3 tw-my-2">
+                <ng-container *ngFor="let item of Sales">
+                    <div class="tw-mx-2 tw-mb-2">
+                        <label class="tw-font-semibold">จำนวนทั้งหมด :</label>
+                        <span class="tw-mx-1 tw-text-base">{{item?.sale_count}} ครั้ง</span>
+
+                    </div>
+                </ng-container>
+                <ng-container *ngFor="let item of CutOder">
+                    <div class="tw-mx-2 tw-mb-2">
+                        <label class="tw-font-semibold">จำนวนล่าสุด :</label>
+                        <span class="tw-mx-1 tw-text-base">{{item?.sale_cut_count}} ครั้ง</span>
+
+                    </div>
+                    <!-- <div class="tw-mx-2">
+                        <label class="tw-font-semibold">วันที่เข้าใช้บริการล่าสุด :</label>
+                        <span class="tw-mx-1 tw-text-base">{{ item?.createdTime | dateTHPipe: 'day' }}</span>
+                    </div> -->
+                    <div class="tw-mx-2 tw-mb-2">
+                        <label class="tw-font-semibold">ยอดรวมล่าสุด :</label>
+                        <span class="tw-mx-1 tw-text-base">{{item?.sale_cut_pay_balance}}</span>
+                    </div>
+                    <div class="tw-mx-2 tw-mb-2">
+                        <label class="tw-font-semibold">ยอดชำระล่าสุด :</label>
+                        <span class="tw-mx-1 tw-text-base">{{item?.sale_cut_pay}}</span>
+                    </div>
+                    <div class="tw-mx-2 tw-mb-2">
+                        <label class="tw-font-semibold">ยอดคงเหลือ :</label>
+                        <span class="tw-mx-1 tw-text-base">{{item?.sale_cut_overdue}}</span>
+                    </div>
+
+                </ng-container>
+            </div>
+        </div>
+    </div>
+    <div class="tw-flex tw-justify-end tw-p-2">
+        <button class="btn btn-primary m-0" (click)="openModal(template)">ตัดยอดคอร์ส</button>
+    </div>
+    <div class="container">
+        <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="5" [columnMode]="ColumnMode.force"
+            [footerHeight]="50" rowHeight="auto" [rows]="rows">
+            <!-- <ngx-datatable-column name="#" [canAutoResize]="false" [sortable]="false" [width]="50"
+                [cellClass]="'cellColumn'">
+                <ng-template let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                    {{ rowIndex + 1 }}
+                </ng-template>
+            </ngx-datatable-column> -->
+            <ngx-datatable-column name="จำนวนครั้ง" [cellClass]="'cellColumn'" [canAutoResize]="false"
+                [sortable]="false" [width]="100">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    <b class="tw-text-center">{{row?.sale_cut_count}}</b>
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="วิตามิน" [cellClass]="'cellColumn'">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{row?.sale_cut_vitamin}}
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="มาร์ค" [cellClass]="'cellColumn'">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{ row?.sale_cut_mark }}
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="พนักงานนวด" [cellClass]="'cellColumn'">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{getNameEmployee(row?.sale_cut_therapist)}}
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="หมอ" [cellClass]="'cellColumn'" [canAutoResize]="false" [sortable]="false"
+                [width]="100">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{ row?.sale_cut_doctor }}
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="ยอดรวมล่าสุด" [cellClass]="'cellColumn'">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{ row?.sale_cut_pay_balance }}<br />
+                </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column name="ยอดชำระล่าสุด" [cellClass]="'cellColumn'">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{ row?.sale_cut_pay }}<br />
+                </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column name="ยอดคงเหลือ" [cellClass]="'cellColumn'">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{ row?.sale_cut_overdue }}<br />
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="รายละเอียด" [cellClass]="'cellColumn'">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{ row?.sale_cut_detail }}<br />
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="วันที่บันทึกข้อมูล" [cellClass]="'cellColumn'">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{ row?.createdTime | dateTHPipe: 'day' }}
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="" [width]="70" [canAutoResize]="false" [sortable]="false"
+                [cellClass]="'cellColumn'">
+                <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
+                    <button class="btn btn-views" [routerLink]="['../history', row.sale_id]">ข้อมูล</button>
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="" [width]="70" [canAutoResize]="false" [sortable]="false"
+                [cellClass]="'cellColumn'">
+                <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
+                    <a>
+                        <!-- <button class="btn btn-edit" (click)="openModal(template, row)">แก้ไข</button> -->
+                    </a>
+                </ng-template>
+            </ngx-datatable-column>
+            <!-- <ngx-datatable-column name="" [width]="70" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <button class="btn btn-delete" (click)="delete(row)">ลบ</button>
+          </ng-template>
+        </ngx-datatable-column> -->
+        </ngx-datatable>
+    </div>
+</div>
+
+<ng-template #template>
+    <div class="modal-header">
+        <h4 class="modal-title pull-left">บันทึกรายการคอร์ส</h4>
+        <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="ModalList.hide()">
+            <span aria-hidden="true" class="visually-hidden">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form role="form" [formGroup]="salecutForm" (ngSubmit)="onSubmit()" #f="ngForm" novalidate>
+            <div class="tw-flex tw-flex-wrap">
+                <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+                    <mat-label>จำนวนครั้ง</mat-label>
+                    <input type="number" matInput id="sale_cut_count" name="sale_cut_count"
+                        [formControlName]="'sale_cut_count'">
+
+                </mat-form-field>
+
+                <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+                    <mat-label>วิตามิน</mat-label>
+                    <input type="text" matInput id="sale_cut_vitamin" name="sale_cut_vitamin"
+                        [formControlName]="'sale_cut_vitamin'">
+                </mat-form-field>
+
+                <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+                    <mat-label>มาร์ค</mat-label>
+                    <input type="text" matInput id="sale_cut_mark" name="sale_cut_mark"
+                        [formControlName]="'sale_cut_mark'">
+
+                </mat-form-field>
+                <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+                    <mat-label>พนักงานนวดหน้า</mat-label>
+                    <mat-select [formControlName]="'sale_cut_therapist'" id="sale_cut_therapist"
+                        name="sale_cut_therapist">
+                        <ng-container *ngFor="let item of (employes$ | async)">
+                            <mat-option *ngIf="item.emp_position == 3" [value]="item.emp_id">
+                                {{item.emp_fullname}}
+                            </mat-option>
+                        </ng-container>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+                    <mat-label>หมอ</mat-label>
+                    <mat-select [formControlName]="'sale_cut_doctor'" id="sale_cut_doctor" name="sale_cut_doctor">
+                        <mat-option *ngFor="let item of Docter" [value]="item.name">
+                            {{item.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+                    <mat-label>ยอดค้างชำระ</mat-label>
+                    <input type="number" matInput id="sale_cut_pay" name="sale_cut_pay"
+                        [formControlName]="'sale_cut_pay_balance'">
+
+                </mat-form-field>
+
+                <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+                    <mat-label>ยอดรับชำระ</mat-label>
+                    <input type="number" matInput id="sale_cut_overdue" name="sale_cut_overdue"
+                        [formControlName]="'sale_cut_pay'">
+
+                </mat-form-field>
+
+                <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+                    <mat-label>ยอดคงเหลือ</mat-label>
+                    <input type="number" matInput id="sale_cut_product" name="sale_cut_product"
+                        [formControlName]="'sale_cut_overdue'">
+                </mat-form-field>
+
+                <mat-form-field class="tw-px-2 tw-mb-3 example-full-width tw-w-full" appearance="outline">
+                    <mat-label>รายละเอียด</mat-label>
+                    <textarea matInput placeholder="Ex. 100 Main St"
+                        [formControlName]="'sale_cut_detail'">1600 Amphitheatre Pkwy</textarea>
+                </mat-form-field>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-save" type="submit">บันทึก</button>
+                <a class="btn btn-cancel layout" (click)="ModalList.hide()">ปิด</a>
+            </div>
+        </form>
+    </div>
+
+</ng-template>

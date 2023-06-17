@@ -1,0 +1,205 @@
+<div class="tw-w-full tw-bg-white tw-p-4">
+  <div class="tw-container">
+    <div class="tw-flex">
+      <span class="tw-text-3xl tw-font-bold tw-text-[#454545] tw-my-5">รายชื่อพนักงาน ({{this.count}})</span>
+    </div>
+    <div class="tw-flex tw-justify-between tw-items-center">
+      <button
+        class="btn tw-px-3 tw-py-2 tw-m-0 tw-rounded-md tw-w-40 tw-border-0 tw-bg-green-500 tw-text-white tw-font-normal tw-select-none"
+        (click)="openModal(template)">
+        <i class="fa-solid fa-user-plus"></i>เพิ่มข้อมูล
+      </button>
+      <mat-form-field class="example-full-width tw-flex tw-flex-row" appearance="outline">
+        <mat-label>ค้นหาข้อมูลพนักงาน</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input type="search" (keyup)='serviceListFilter($event)' class="tw-text-xs"  matInput>
+      </mat-form-field>
+    </div>
+  </div>
+</div>
+<div class="wrap-body">
+  <div class="container">
+    <ngx-datatable #table class="bootstrap" [headerHeight]="50" [limit]="5" [columnMode]="ColumnMode.force"
+      [footerHeight]="50" rowHeight="auto" [rows]="basicRows" [sorts]="[{prop:
+        'emp_fullname,emp_nickname,emp_position,emp_branch,createdTime',dir:
+        'desc'}]">
+      <ngx-datatable-column name="" [width]="70" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
+        <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
+          <button class="btn btn-views" routerLink="./{{ row.emp_id }}">ข้อมูล</button>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="" [width]="70" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <button class="btn btn-edit" (click)="openModal(template, row)">แก้ไข</button>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="" [width]="70" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <button class="btn btn-delete" (click)="delete(row)">ลบ</button>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="#" [canAutoResize]="false" [sortable]="false" [width]="50" [cellClass]="'cellColumn'">
+        <ng-template let-rowIndex="rowIndex" ngx-datatable-cell-template>
+          {{ rowIndex + 1 }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="ชื่อ-นามสกุล" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row.emp_fullname }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="ชื่อเล่น" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row.emp_nickname }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="ตำแหน่ง" [cellClass]="'cellColumn'" [canAutoResize]="false" [width]="120">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{getNamePosition(row.emp_position)}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="สาขาประจำ" [cellClass]="'cellColumn'" [canAutoResize]="false" [width]="120">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{getNameBranch(row.emp_branch)}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="เบอร์โทรศัพท์" [cellClass]="'cellColumn'" [canAutoResize]="false" [width]="120">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row.emp_telephone }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="อีเมล" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row.emp_email }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="วันที่เพิ่มข้อมูล" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row.createdTime }}<br />
+          <b>โดย : </b>{{ row.createdBy }}
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
+  </div>
+</div>
+
+
+<!--Modal-->
+<ng-template #template>
+  <div class="modal-header">
+    <h4 *ngIf="!isAddMode" class="modal-title pull-left">เพิ่มข้อมูลพนักงาน</h4>
+    <h4 *ngIf="isAddMode" class="modal-title pull-left">แก้ไขข้อมูลพนักงาน</h4>
+    <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="ModalList.hide()">
+      <span aria-hidden="true" class="visually-hidden">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form role="form" [formGroup]="employeeForm" (ngSubmit)="onSubmit()" #f="ngForm" novalidate>
+      <div class="tw-flex tw-flex-wrap">
+        <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+          <mat-label>ชื่อ-นามสกุล</mat-label>
+          <input type="text" matInput placeholder="กรุณาใส่ชื่อ-นามสกุล" id="emp_fullname" name="emp_fullname"
+            [formControlName]="'emp_fullname'">
+          <mat-error *ngIf="employeeForm.get('emp_fullname').hasError('required')">
+            <div class="box-error">
+              กรุณาระบุผู้ใช้งานที่ต้องการ
+            </div>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+          <mat-label>ชื่อเล่น</mat-label>
+          <input type="text" matInput placeholder="กรุณาใส่ชื่อเล่น" id="emp_nickname" name="emp_nickname"
+            [formControlName]="'emp_nickname'">
+          <mat-error *ngIf="employeeForm.get('emp_nickname').hasError('required')">
+            <div class="box-error">
+              กรุณาระบุชื่อเล่น
+            </div>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+          <mat-label>วันเกิด</mat-label>
+          <input [matDatepicker]="picker" type="text" matInput id="emp_birthday" name="emp_birthday"
+            [formControlName]="'emp_birthday'">
+          <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="employeeForm.get('emp_birthday').hasError('required')">
+            <div class="box-error">
+              กรุณาระบุวันเกิด
+            </div>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+          <mat-label>เบอร์โทรศัพท์</mat-label>
+          <input type="text" matInput maxlength="10" placeholder="กรุณาใส่เบอร์โทรศัพท์" id="emp_telephone"
+            name="emp_telephone" [formControlName]="'emp_telephone'">
+          <mat-error *ngIf="employeeForm.get('emp_telephone').hasError('required')">
+            <div class="box-error">
+              กรุณาระบุเบอร์โทรศัพท์
+            </div>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+          <mat-label>อีเมล</mat-label>
+          <input id="emp_email" matInput [formControlName]="'emp_email'" required>
+          <mat-error *ngIf="employeeForm.get('emp_email').hasError('required')">
+            <div class="box-error">
+              กรุณากรอกที่อยู่อีเมล
+            </div>
+          </mat-error>
+          <mat-error *ngIf="employeeForm.get('emp_email').hasError('email')">
+            <div class="box-error">
+              กรุณาตรวจสอบที่อยู่อีเมลให้ถูกต้อง
+            </div>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+          <mat-label>สถานะภาพ</mat-label>
+          <mat-select [formControlName]="'emp_status'">
+            <mat-option *ngFor="let p of status" [value]="p">
+              {{p}}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="employeeForm.get('emp_status').hasError('required')">
+            <div class="box-error">
+              กรุณาเลือกสถานะภาพ
+            </div>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+          <mat-label>สิทธิ์ผู้ใช้งาน</mat-label>
+          <mat-select [formControlName]="'emp_position'">
+            <mat-option value="0">ไม่ระบุ</mat-option>
+            <mat-option *ngFor="let item of (positions$ | async)" [value]="item.position_id">
+              {{item.position_name_eng}}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="employeeForm.get('emp_position').hasError('required')">
+            <div class="box-error">
+              กรุณาเลือกสิทธิ์ผู้ใช้งาน
+            </div>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+          <mat-label>สาขาประจำ</mat-label>
+          <mat-select [formControlName]="'emp_branch'">
+            <mat-option value="0">ไม่ระบุ</mat-option>
+            <mat-option *ngFor="let item of (branchs$ | async)" [value]="item.branch_id">
+              {{item.branch_code}}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="employeeForm.get('emp_branch').hasError('required')">
+            <div class="box-error">
+              กรุณาเลือกสาขา
+            </div>
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-save">บันทึก</button>
+        <a class="btn btn-cancel" (click)="ModalList.hide()">ปิด</a>
+      </div>
+    </form>
+  </div>
+
+</ng-template>

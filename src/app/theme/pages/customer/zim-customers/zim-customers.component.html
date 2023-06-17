@@ -1,0 +1,191 @@
+<div class="bg-container">
+  <div class="row">
+    <div class="col-8">
+      <h4 *ngIf="this.Status_cus == false">เพิ่มข้อมูลลูกค้า</h4>
+      <h4 *ngIf="this.Status_cus == true">แก้ไขข้อมูลลูกค้า</h4>
+    </div>
+    <div class="col-4">
+      <button class="btn btn-info m-0" [routerLink]="['../']">ย้อนกลับ</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap-body">
+  <mat-card>
+    <mat-card-content>
+      <form [formGroup]="customerForm" (ngSubmit)="onSubmit()">
+        <div class="tw-container tw-px-4">
+          <!--ข้อมูลพื้นฐาน START-->
+          <label class="tw-text-2xl tw-py-3">ข้อมูลพื้นฐาน</label>
+          <div class="tw-grid tw-grid-cols-4 tw-gap-4">
+            <mat-form-field class="tw-w-full" appearance="outline">
+              <mat-label>คำนำหน้า</mat-label>
+              <mat-select [formControlName]="'cus_prefix'">
+                <mat-option *ngFor="let p of prefix" [value]="p">
+                  {{p}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="tw-w-full" appearance="outline">
+              <mat-label>ชื่อ-นามสกุล</mat-label>
+              <input [formControlName]="'cus_full_name'" matInput>
+            </mat-form-field>
+
+            <mat-form-field class="tw-w-full" appearance="outline">
+              <mat-label>ชื่อเล่น</mat-label>
+              <input [formControlName]="'cus_nick_name'" matInput>
+            </mat-form-field>
+
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>วันเกิด</mat-label>
+              <input [formControlName]="'cus_birthday'" matInput [matDatepicker]="picker">
+              <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
+              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker touchUi #picker></mat-datepicker>
+            </mat-form-field>
+
+          </div>
+
+          <div class="tw-grid tw-grid-cols-4 tw-gap-4">
+            <mat-form-field class="tw-w-full" appearance="outline">
+              <mat-label>เพศ</mat-label>
+              <mat-select [formControlName]="'cus_gender'">
+                <mat-option *ngFor="let p of gender" [value]="p">
+                  {{p}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="tw-w-full" appearance="outline">
+              <mat-label>อาชีพ</mat-label>
+              <input [formControlName]="'cus_occupation'" matInput>
+            </mat-form-field>
+
+            <mat-form-field class="tw-w-full" appearance="outline">
+              <mat-label>สถานะ</mat-label>
+              <mat-select [formControlName]="'cus_status'" id="cus_status" name="cus_status">
+                <mat-option *ngFor="let p of status" [value]="p">
+                  {{p}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="tw-w-full" appearance="outline">
+              <mat-label>เบอร์โทรศัพท์</mat-label>
+              <input [formControlName]="'cus_telephone'" maxlength="10" matInput>
+            </mat-form-field>
+          </div>
+
+          <div class="tw-grid tw-grid-cols-4 tw-gap-4">
+            <mat-form-field class="tw-w-full" appearance="outline">
+              <mat-label>เลขสมาชิก</mat-label>
+              <input [formControlName]="'cus_member'" maxlength="5" matInput>
+            </mat-form-field>
+
+            <mat-form-field class="tw-w-full" appearance="outline">
+              <mat-label>รายได้ลูกค้า</mat-label>
+              <mat-select [formControlName]="'cus_salary'">
+                <mat-option *ngFor="let p of salary" [value]="p.salary">
+                  {{p.salary}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="tw-w-full" appearance="outline">
+              <mat-label>การชำระเงิน</mat-label>
+              <mat-select [formControlName]="'cus_payment'">
+                <mat-option *ngFor="let p of payment" [value]="p">
+                  {{p}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="tw-container tw-px-4">
+          <label class="tw-text-2xl tw-py-3">ข้อมูลที่อาศัย</label>
+
+          <div class="tw-grid tw-grid-cols-4 tw-gap-4">
+            <mat-form-field class="tw-w-full" appearance="outline">
+              <mat-label>บ้านเลขที่</mat-label>
+              <input [formControlName]="'cus_house_number'" matInput>
+            </mat-form-field>
+
+            <mat-form-field class="tw-w-full" appearance="outline">
+              <mat-label>หมู่</mat-label>
+              <input [formControlName]="'cus_moo'" matInput>
+            </mat-form-field>
+
+            <mat-form-field class="tw-w-full" appearance="outline">
+              <mat-label>ตรอก/ซอย</mat-label>
+              <input [formControlName]="'cus_soi'" matInput>
+            </mat-form-field>
+
+            <mat-form-field class="tw-w-full" appearance="outline">
+              <mat-label>ถนน</mat-label>
+              <input [formControlName]="'cus_road'" matInput>
+            </mat-form-field>
+          </div>
+
+          <div class="tw-grid tw-grid-cols-4 tw-gap-4">
+            <mat-form-field class="tw-w-full mb-3" appearance="outline">
+              <mat-label>จังหวัด</mat-label>
+
+              <mat-select [formControlName]="'provinceID'" (ngModelChange)="onPrvince($event)">
+                <mat-option *ngFor="let item of (provinces$ | async)"
+                  [value]="item.province_id">{{item.province_name_th}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="tw-w-full mb-3" appearance="outline">
+              <mat-label>เขต/อำเภอ</mat-label>
+              <mat-select [formControlName]="'districtID'" (ngModelChange)="onDistricts($event)">
+                <mat-option *ngFor="let item of Districts"
+                  [value]="item.districts_id">{{item.districts_name_th}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="tw-w-full mb-3" appearance="outline">
+              <mat-label>แขวง/ตำบล</mat-label>
+              <mat-select [formControlName]="'sub_districtID'" (ngModelChange)="onSubDistricts($event)">
+                <mat-option *ngFor="let item of Sub_Districts"
+                  [value]="item.sub_districts_id">{{item.sub_districts_name_th}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="tw-w-full mb-3" appearance="outline">
+              <mat-label>รหัสไปรษณีย์</mat-label>
+              <mat-select [formControlName]="'postcodeID'">
+                <mat-option *ngFor="let item of Postcode" [value]="item.sub_districts_id">{{item.zip_code}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+        <!--ข้อมูลทางการแพทย์-->
+        <div class="tw-container tw-px-4">
+          <label class="tw-text-2xl tw-py-3">ข้อมูลทางการแพทย์</label>
+          <div class="tw-grid tw-grid-cols-4 tw-gap-4">
+            <mat-form-field class="tw-w-full" appearance="outline">
+              <mat-label>โรคประจำตัว</mat-label>
+              <input [formControlName]="'congenital_disease'" matInput>
+            </mat-form-field>
+
+            <mat-form-field class="tw-w-full" appearance="outline">
+              <mat-label>ประวัติการแพ้ยา</mat-label>
+              <input [formControlName]="'drug_allergy'" matInput>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!--ปุ่มบันทึก && ยกเลิกข้อมูล-->
+        <div class="tw-container tw-p-4">
+          <div class="tw-flex tw-justify-end">
+            <button class="btn btn-save layout" type="submit">บันทึก</button>
+            <a class="btn btn-cancel layout" [routerLink]="['/customer/list']">ยกเลิก</a>
+          </div>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

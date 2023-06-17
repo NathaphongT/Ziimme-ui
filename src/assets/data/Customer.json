@@ -1,0 +1,24 @@
+[
+  {
+    "customer_menber":"123456789",
+    "customer_id": 1,
+    "fullname": "ณฐพงศ์ ทองคำรอด",
+    "occupation":"Progrommer",
+    "birthday":"25 พฤษภาคม 2541",
+    "telephoe": "080-079-0345",
+    "email": "nathaphong.ice@gmail.com",
+    "date": "13/12/2022",
+    "create_by": "ผู้ดูแล"
+  },
+  {
+    "customer_menber":"223456789",
+    "customer_id": 1,
+    "fullname": "เครือวัลย์ แสงศรี",
+    "occupation":"Accounting",
+    "birthday":"29 มิถุนายน 2540",
+    "telephoe": "094-029-9915",
+    "email": "KN_beer@gmail.com",
+    "date": "13/12/2022",
+    "create_by": "ผู้ดูแล"
+  }
+]
