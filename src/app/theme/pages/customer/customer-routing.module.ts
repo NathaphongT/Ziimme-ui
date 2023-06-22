@@ -4,7 +4,7 @@ import { CustomerComponent } from './customer.component';
 import { ZimCustomerComponent } from './zim-customer/zim-customer.component';
 import { ZimCustomersComponent } from './zim-customers/zim-customers.component';
 import { ZimViewCustomerComponent } from './zim-view-customer/zim-view-customer.component';
-import { CourseResolver, CustomerIDResolver, CustomerResolver, DistrictsResolver, EmployeeResolver, ProvinceResolver, SaleByIdCusResolver, SaleByIdSlaeResolver, SaleCutOrderResolver, SaleCutResolver, SaleEmployeeResolver, SaleResolver, SubDistrictsResolver } from './customer.resolver';
+import { CourseResolver, CustomerIDResolver, CustomerResolver, DistrictsResolver, EmployeeResolver, ProvinceResolver, SaleByIdCusResolver, SaleByIdSlaeResolver, SaleCutOrderResolver, SaleCutResolver, SaleEmployeeResolver, SubDistrictsResolver } from './customer.resolver';
 import { ZimViewHistoryComponent } from './zim-view-history/zim-view-history.component';
 import { ZimViewBirthdayComponent } from './zim-view-birthday/zim-view-birthday.component';
 
@@ -20,16 +20,13 @@ const routes: Routes = [
       },
       {
         path: 'list',
-        resolve: {
-          saleemployee: SaleEmployeeResolver
-        },
         children: [
           {
             path: '',
             component: ZimCustomerComponent,
             resolve: {
               customeres: CustomerResolver,
-              saleemployee: SaleEmployeeResolver
+              // saleemployee: SaleEmployeeResolver
             },
           },
           {
@@ -57,7 +54,6 @@ const routes: Routes = [
               employees: EmployeeResolver,
               courses: CourseResolver,
               customersID: CustomerIDResolver,
-              sales: SaleResolver,
               saleById: SaleByIdCusResolver
             }
           },

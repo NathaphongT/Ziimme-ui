@@ -76,7 +76,7 @@ export class SaleService {
   }
 
   getSaleBYIDConsult(id): Observable<any> {
-    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sale_con/${id}`).pipe(
+    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sales/${id}/sale_employee`).pipe(
       tap((sale: any) => {
         this._sales.next(sale);
       })

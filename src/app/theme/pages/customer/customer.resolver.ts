@@ -143,7 +143,6 @@ export class ProvinceResolver implements Resolve<any> {
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Province[]> {
     return this._basicService.getAllProvince();
   }
-
 }
 
 @Injectable({

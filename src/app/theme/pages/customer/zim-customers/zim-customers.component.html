@@ -1,8 +1,8 @@
 <div class="bg-container">
   <div class="row">
     <div class="col-8">
-      <h4 *ngIf="this.Status_cus == false">เพิ่มข้อมูลลูกค้า</h4>
-      <h4 *ngIf="this.Status_cus == true">แก้ไขข้อมูลลูกค้า</h4>
+      <h4 *ngIf="!this.cus_id">เพิ่มข้อมูลลูกค้า</h4>
+      <h4 *ngIf="this.cus_id">แก้ไขข้อมูลลูกค้า</h4>
     </div>
     <div class="col-4">
       <button class="btn btn-info m-0" [routerLink]="['../']">ย้อนกลับ</button>

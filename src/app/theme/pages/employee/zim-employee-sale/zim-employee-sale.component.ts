@@ -25,6 +25,9 @@ export class ZimEmployeeSaleComponent implements OnInit {
   course$: Observable<Course[]>
   Courses: Course[] = [];
 
+  sale$: Observable<Sale[]>
+  Sales: Sale[] = [];
+
   isLoading: boolean;
   submitted: boolean;
 
@@ -38,51 +41,7 @@ export class ZimEmployeeSaleComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this._SerivceEmp.employees$.pipe(takeUntil(this._unsubscribeAll)).subscribe(employees => {
-      this.Employees = employees;
-    })
-
-    this._SerivceBasic.courses$.pipe(takeUntil(this._unsubscribeAll)).subscribe(courses => {
-      this.Courses = courses;
-    })
-
-    this.employeeSale$ = this._SerivceSale.sales$;
-
-    this.employeeSale$
-      .pipe(takeUntil(this._unsubscribeAll))
-      .subscribe((employees) => {
-
-        if (employees) {
-          this.rows = employees;
-
-          this.rows = [...this.rows];
-        }
-        else {
-          this.rows = [];
-        }
-
-        this.isLoading = false;
-
-      })
   }
 
-  getNameEmployee(id: number) {
-    let index = this.Employees.findIndex(type => type.emp_id === id);
-    if (index === -1) {
-      return "-";
-    }
-    else {
-      return this.Employees[index].emp_fullname;
-    }
-  }
-
-  getNameProduct(id: number) {
-    let index = this.Courses.findIndex(type => type.course_id === id);
-    if (index === -1) {
-      return "-";
-    }
-    else {
-      return this.Courses[index].course_name_eng;
-    }
-  }
+  
 }

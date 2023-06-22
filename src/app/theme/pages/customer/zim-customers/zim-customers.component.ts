@@ -62,10 +62,8 @@ export class ZimCustomersComponent {
 
   isLoading: boolean;
   submitted: boolean;
- 
-  cus_id = null;
 
-  Status_cus = false;
+  cus_id = null;
 
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -103,23 +101,19 @@ export class ZimCustomersComponent {
       provinceID: [],
       districtID: [],
       sub_districtID: [],
-      postcodeID: [''],
+      postcodeID: [],
       congenital_disease: [''],
       drug_allergy: [''],
     });
 
     this.provinces$ = this._Service.provinces$;
-    // this.districts$ = this._Service.districts$;
-    // this.subdistricts$ = this._Service.subdistricts$;
-
 
     if (this.cus_id) {
       this._SerivceCus.customer$.pipe(takeUntil(this._unsubscribeAll)).subscribe(customer => {
         this.customerForm.patchValue(customer);
-        this.Status_cus = true;
-        this.GetByIdCustomer(this.cus_id);
       })
     }
+    this.GetByIdCustomer(this.cus_id);
   }
 
   GetByIdCustomer(id) {
@@ -184,30 +178,27 @@ export class ZimCustomersComponent {
     }
   }
 
-  onPrvince(id) {
+  onPrvince(id: number) {
     this._Service
       .getProvinceBYID(id)
-      .pipe()
       .subscribe(data => {
         // console.log('อำเภอ', data);
         this.Districts = data
       });
   }
 
-  onDistricts(id) {
+  onDistricts(id: number) {
     this._Service
       .getDistrictsBYID(id)
-      .pipe()
       .subscribe(data => {
         // console.log('ตำบล', data);
         this.Sub_Districts = data
       });
   }
 
-  onSubDistricts(id) {
+  onSubDistricts(id: number) {
     this._Service
       .getSubDistrictsBYID(id)
-      .pipe()
       .subscribe(data => {
         // console.log('รหัสไปรษณีย์', data);
         this.Postcode = data

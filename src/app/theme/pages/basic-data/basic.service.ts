@@ -356,19 +356,19 @@ export class BasicService {
         );
     }
 
-    getProvinceBYID(id): Observable<any> {
+    getProvinceBYID(id: number): Observable<any> {
         return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/districts/${id}`).pipe(
             map((res: any) => res.data)
         );
     }
 
-    getDistrictsBYID(id): Observable<any> {
+    getDistrictsBYID(id: number): Observable<any> {
         return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sub_districts/${id}`).pipe(
             map((res: any) => res.data)
         );
     }
 
-    getSubDistrictsBYID(id): Observable<any> {
+    getSubDistrictsBYID(id: number): Observable<any> {
         return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sub/${id}`).pipe(
             map((res: any) => res.data)
         );

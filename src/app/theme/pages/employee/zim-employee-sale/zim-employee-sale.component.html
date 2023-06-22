@@ -37,21 +37,23 @@
                     {{ rowIndex + 1 }}
                 </ng-template>
             </ngx-datatable-column>
-            <ngx-datatable-column name="ชื่อ-นามสกุล" [cellClass]="'cellColumn'">
+            <ngx-datatable-column name="ชื่อสินค้า" [cellClass]="'cellColumn'">
                 <ng-template let-row="row" ngx-datatable-cell-template>
-                    {{getNameEmployee(row.sale_consultant)}}
+                    <!-- {{getNameEmployee(row.emp_id)}} -->
+                    {{row.emp_id}}
                 </ng-template>
             </ngx-datatable-column>
             <ngx-datatable-column name="ชื่อสินค้าและบริการ" [cellClass]="'cellColumn'">
                 <ng-template let-row="row" ngx-datatable-cell-template>
-                    {{getNameProduct(row.sale_product)}}
+                    <!-- {{getNameProduct(row.sale_id)}} -->
+                    {{row.sale_id}}
                 </ng-template>
             </ngx-datatable-column>
-            <ngx-datatable-column name="ยอดรวมทั้งหมด" [cellClass]="'cellColumn'">
+            <!-- <ngx-datatable-column name="ยอดรวมทั้งหมด" [cellClass]="'cellColumn'">
                 <ng-template let-row="row" ngx-datatable-cell-template>
                     {{row.sale_pay_balance}}
                 </ng-template>
-            </ngx-datatable-column>
+            </ngx-datatable-column> -->
             <!-- <ngx-datatable-column name="สาขาประจำ" [cellClass]="'cellColumn'" [canAutoResize]="false" [width]="120">
                 <ng-template let-row="row" ngx-datatable-cell-template>
                     {{getNameBranch(row.emp_branch)}}
@@ -68,11 +70,11 @@
                 </ng-template>
             </ngx-datatable-column> -->
             <ngx-datatable-column name="วันที่เพิ่มข้อมูล" [cellClass]="'cellColumn'">
-               <ng-template let-row="row" ngx-datatable-cell-template>
+                <ng-template let-row="row" ngx-datatable-cell-template>
                     {{ row.createdTime | dateTHPipe: 'dt' }}<br />
                     <b>โดย : </b>{{ row.createdBy }}
                 </ng-template>
-            </ngx-datatable-column> 
+            </ngx-datatable-column>
         </ngx-datatable>
     </div>
 </div>

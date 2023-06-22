@@ -66,7 +66,7 @@
     </ngx-datatable-column>
     <ngx-datatable-column name="ที่ปรึกษา" [cellClass]="'cellColumn'">
       <ng-template let-row="row" ngx-datatable-cell-template>
-        <!-- <b> {{getCategoryName(row.employee)}} </b> -->
+        <!-- <b> {{getCategoryName(row.categories)}} </b> -->
       </ng-template>
 
     </ngx-datatable-column>
@@ -197,7 +197,7 @@
 
     <mat-form-field [formGroup]="saleEmployeeForm" class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
       <mat-label>รายการสินค้า/บริการ</mat-label>
-      <mat-select [formControlName]="'emp_id'" id="emp_id" name="emp_id" multiple>
+      <mat-select [formControlName]="'emp_id'" [(ngModel)]="emp_detail" id="emp_id" name="emp_id" multiple>
         <mat-option *ngFor="let item of (employes$ | async)" [value]="item.emp_id">
           {{item.emp_fullname}}
         </mat-option>

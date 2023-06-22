@@ -46,7 +46,9 @@ export class ZimViewCustomerComponent implements OnInit {
   Courses: Course[] = [];
 
 
-  Eco: any = {};
+  emp_detail = [];
+
+  sales: any;
 
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -86,7 +88,6 @@ export class ZimViewCustomerComponent implements OnInit {
 
     this._SerivceEmp.employees$.pipe(takeUntil(this._unsubscribeAll)).subscribe(employees => {
       this.Employees = employees;
-      console.log('พนักงาน', this.Employees);
     })
 
     this.coures$ = this._SerivceBasic.courses$;
@@ -97,7 +98,6 @@ export class ZimViewCustomerComponent implements OnInit {
     this._ServiceSale.sales$
       .pipe(takeUntil(this._unsubscribeAll))
       .subscribe((sale) => {
-
         if (sale) {
           this.rows = sale;
 
@@ -229,6 +229,6 @@ export class ZimViewCustomerComponent implements OnInit {
     }
   }
 
- 
+
 
 }

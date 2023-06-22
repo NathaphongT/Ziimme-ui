@@ -9,7 +9,7 @@ import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import { Employee } from '@app/_service/user.types';
 import { EmployeeService } from '@app/_service/employee.service';
 import { SaleService } from '@app/_service/sale.service';
-import { Branch, Position, Sale } from '../basic-data/basic.model';
+import { Branch, Position, Sale, SaleEmployee } from '../basic-data/basic.model';
 
 @Injectable({
   providedIn: 'root'
@@ -58,7 +58,7 @@ export class SaleByIdConResolver implements Resolve<any> {
 
   constructor(private _saleService: SaleService) { }
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Sale[]> {
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | SaleEmployee[]> {
     return this._saleService.getSaleBYIDConsult(route.paramMap.get('id'));
   }
 
