@@ -69,36 +69,6 @@ export interface Salary {
     salary: string;
 }
 
-export interface Sale {
-    sale_id: number;
-    sale_number: number;
-    sale_consultant: number;
-    sale_product: number;
-    sale_count: number;
-    sale_pay_balance: number;
-    sale_pay: number;
-    sale_overdue: number;
-    cus_id: number;
-    recordStatus: string;
-    createdTime: Date;
-    createdBy: string;
-    updatedTime: Date;
-    updatedBy: string
-
-    emp_id?: SaleEmployee[];
-}
-
-export interface SaleEmployee {
-    consultant_id: number;
-    sale_id: number;
-    emp_id: number;
-    recordStatus: string;
-    createdTime: Date;
-    createdBy: string;
-    updatedTime: Date;
-    updatedBy: string
-}
-
 export interface SaleCut {
     sale_cut_id: number;
     sale_cut_count: number;

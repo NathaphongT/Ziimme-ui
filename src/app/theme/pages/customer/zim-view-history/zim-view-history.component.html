@@ -3,15 +3,15 @@
         <div class="card tw-p-4 tw-mx-1">
             <label class="tw-my-1 tw-text-lg tw-font-bold" style="border-bottom: 1px solid #e2e2e2;">ข้อมูล</label>
             <div class="tw-grid tw-grid-cols-2 tw-my-2" *ngFor="let item of Sales">
-                <div class="tw-mx-2">
+                <!-- <div class="tw-mx-2">
                     <label class="tw-font-semibold">รหัสสมาชิก :</label>
-                    <span class="tw-mx-1 tw-text-base">{{item?.sale_number}}</span>
+                    <span class="tw-mx-1 tw-text-base">{{item?.saleNumber}}</span>
                 </div>
 
                 <div class="tw-mx-2">
                     <label class="tw-font-semibold">สินค้าและบริการ :</label>
-                    <span class="tw-mx-1 tw-text-base">{{getNameProduct(item?.sale_product)}}</span>
-                </div>
+                    <span class="tw-mx-1 tw-text-base">{{getNameProduct(item?.saleProduct)}}</span>
+                </div> -->
             </div>
             <!-- <div class="tw-mx-2">
                     <label class="tw-font-semibold">ที่ปรึกษา :</label>
@@ -28,7 +28,7 @@
                 <ng-container *ngFor="let item of Sales">
                     <div class="tw-mx-2 tw-mb-2">
                         <label class="tw-font-semibold">จำนวนทั้งหมด :</label>
-                        <span class="tw-mx-1 tw-text-base">{{item?.sale_count}} ครั้ง</span>
+                        <span class="tw-mx-1 tw-text-base">{{item?.saleCount}} ครั้ง</span>
 
                     </div>
                 </ng-container>
@@ -182,8 +182,8 @@
                     <mat-select [formControlName]="'sale_cut_therapist'" id="sale_cut_therapist"
                         name="sale_cut_therapist">
                         <ng-container *ngFor="let item of (employes$ | async)">
-                            <mat-option *ngIf="item.emp_position == 3" [value]="item.emp_id">
-                                {{item.emp_fullname}}
+                            <mat-option *ngIf="item.empPosition == 3" [value]="item.empId">
+                                {{item.empFullname}}
                             </mat-option>
                         </ng-container>
                     </mat-select>

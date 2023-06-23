@@ -6,9 +6,9 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Observable, Subject, catchError, take, takeUntil, tap, throwError } from 'rxjs';
 import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import { EmployeeService } from 'src/app/_service/employee.service';
-import { Employee } from 'src/app/_service/user.types';
 import Swal from 'sweetalert2';
 import { Branch, Position } from '../../basic-data/basic.model';
+import { Employee } from '@app/_service/main.types';
 
 @Component({
   selector: 'app-zim-employee',
@@ -59,7 +59,7 @@ export class ZimEmployeeComponent implements OnInit {
   ngOnInit() {
     this.LoadEmployeALL();
     this.employeeForm = this._formBuilder.group({
-      emp_id: [null],
+      empId: [null],
       emp_fullname: ['', Validators.required],
       emp_nickname: ['', Validators.required],
       // emp_birthday: ['', Validators.required],
@@ -133,8 +133,8 @@ export class ZimEmployeeComponent implements OnInit {
 
     let saveData: Employee = this.employeeForm.getRawValue();
     // If there is an id, update it...
-    if (saveData.emp_id) {
-      this._Service.updateEmployee(saveData.emp_id, saveData)
+    if (saveData.empId) {
+      this._Service.updateEmployee(saveData.empId, saveData)
         .pipe()
         .subscribe((res) => {
           this.ModalList.hide();
@@ -184,7 +184,7 @@ export class ZimEmployeeComponent implements OnInit {
       cancelButtonText: 'ยกเลิก',
     }).then((result) => {
       if (result.isConfirmed) {
-        this._Service.deleteEmployee(row.emp_id).pipe(take(1))
+        this._Service.deleteEmployee(row.empId).pipe(take(1))
           .subscribe(() => {
             Swal.fire({
               icon: 'success',

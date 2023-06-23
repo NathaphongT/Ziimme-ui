@@ -57,8 +57,8 @@ const routes: Routes = [
               employees: EmployeeResolver,
               courses: CourseResolver,
               customersID: CustomerIDResolver,
-              sales: SaleResolver,
-              saleById: SaleByIdCusResolver
+              // sales: SaleResolver,
+              saleById: SaleByIdCusResolver,
             }
           },
           {

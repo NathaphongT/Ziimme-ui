@@ -2,10 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import { EmployeeService } from '@app/_service/employee.service';
 import { SaleService } from '@app/_service/sale.service';
-import { Employee } from '@app/_service/user.types';
 import { ColumnMode } from '@swimlane/ngx-datatable';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { Course, Sale } from '../../basic-data/basic.model';
+import { Course } from '../../basic-data/basic.model';
+import { Employee, Sale } from '@app/_service/main.types';
 
 @Component({
   selector: 'app-zim-employee-sale',
@@ -67,12 +67,12 @@ export class ZimEmployeeSaleComponent implements OnInit {
   }
 
   getNameEmployee(id: number) {
-    let index = this.Employees.findIndex(type => type.emp_id === id);
+    let index = this.Employees.findIndex(type => type.empId === id);
     if (index === -1) {
       return "-";
     }
     else {
-      return this.Employees[index].emp_fullname;
+      return this.Employees[index].empFullname;
     }
   }
 

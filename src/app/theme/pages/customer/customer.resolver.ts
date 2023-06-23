@@ -7,10 +7,13 @@ import {
 import { CustomerService } from '@app/theme/pages/customer/customer.service';
 import { EmployeeService } from '@app/_service/employee.service';
 import { SaleService } from '@app/_service/sale.service';
-import { Customer, Employee } from '@app/_service/user.types';
+import { Customer } from '@app/_service/user.types';
 import { Observable, forkJoin } from 'rxjs';
 import { BasicService } from '@app/theme/pages/basic-data/basic.service';
-import { Course, Districts, PostCode, Province, Sale, SaleCut, SubDistricts } from '../basic-data/basic.model';
+import { Course, Districts, PostCode, Province, SaleCut, SubDistricts } from '../basic-data/basic.model';
+import { Employee, Sale } from '@app/_service/main.types';
+import { ManageService } from '@app/_service/manage.service';
+import { SalePagination } from '@app/_service/pagination.types';
 
 
 
@@ -185,17 +188,16 @@ export class SaleEmployeeResolver implements Resolve<any> {
 
 }
 
-// export class SaleEmployeeResolver implements Resolve<any> {
+// @Injectable({
+//   providedIn: 'root'
+// })
+// export class SocialWarehousesResolver implements Resolve<any> {
 
-//   constructor(
-//     private _saleService: SaleService,
-//     private _empService: EmployeeService
-//     ) { }
+//   constructor(private _socialManageService: ManageService) { }
 
 //   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<{ warehouses: Sale[] } | any> {
 //     return forkJoin([
-//       this._saleService.getAllSale(),
-//       this._empService.getAllEmployee()
+//       this._socialManageService.getSale,
 //     ]);
 //   }
 
