@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Employee } from './user.types';
 import { BehaviorSubject, Observable, ReplaySubject, map, switchMap, take, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { Employee } from './main.types';
 
 @Injectable({
   providedIn: 'root'
@@ -65,7 +65,7 @@ export class EmployeeService {
             map((updatedEmployee: Employee) => {
               // Find the index of the updated employees
               const index = employees.findIndex(
-                (item) => item.emp_id === id
+                (item) => item.empId === id
               );
 
               // Update the employees
@@ -92,7 +92,7 @@ export class EmployeeService {
             map((isDeleted: boolean) => {
               // Find the index of the deleted user
               const index = employees.findIndex(
-                (item) => item.emp_id === id
+                (item) => item.empId === id
               );
 
               // Delete the user

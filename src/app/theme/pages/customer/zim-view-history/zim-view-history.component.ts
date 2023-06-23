@@ -5,12 +5,12 @@ import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import { CustomerService } from '@app/theme/pages/customer/customer.service';
 import { EmployeeService } from '@app/_service/employee.service';
 import { SaleService } from '@app/_service/sale.service';
-import { Employee } from '@app/_service/user.types';
 import { ColumnMode } from '@swimlane/ngx-datatable';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import Swal from 'sweetalert2';
-import { Branch, Course, Sale, SaleCut } from '../../basic-data/basic.model';
+import { Branch, Course, SaleCut } from '../../basic-data/basic.model';
+import { Employee, Sale } from '@app/_service/main.types';
 
 @Component({
   selector: 'app-zim-view-history',
@@ -227,7 +227,7 @@ export class ZimViewHistoryComponent implements OnInit {
     this.salecutForm.reset();
     if (this.sale_cut_pay_balance >= 0) {
       this.salecutForm.patchValue({ sale_cut_pay_balance: this.sale_cut_pay_balance })
-      this.salecutForm.patchValue({ sale_cut_count: this.sale_cut_count+1 })
+      this.salecutForm.patchValue({ sale_cut_count: this.sale_cut_count + 1 })
     } else {
       this.salecutForm.patchValue({ sale_cut_pay_balance: this.sale_pay_balance })
       this.salecutForm.patchValue({ sale_cut_count: this.sale_cut })
@@ -249,12 +249,12 @@ export class ZimViewHistoryComponent implements OnInit {
   }
 
   getNameEmployee(id: number) {
-    let index = this.Employees.findIndex(type => type.emp_id === id);
+    let index = this.Employees.findIndex(type => type.empId === id);
     if (index === -1) {
       return "-";
     }
     else {
-      return this.Employees[index].emp_fullname;
+      return this.Employees[index].empFullname;
     }
   }
 

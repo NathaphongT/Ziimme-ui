@@ -23,24 +23,6 @@ export interface User {
 // }
 
 
-export interface Employee {
-  sale_id: any;
-  emp_id: number;
-  emp_fullname: string;
-  emp_nickname: string;
-  emp_birthday: Date;
-  emp_telephone: string;
-  emp_email: string;
-  emp_status: string;
-  emp_position: number;
-  emp_branch: number;
-  recordStatus: string;
-  createdTime: Date;
-  createdBy: string;
-  updatedTime: Date;
-  updatedBy: string
-}
-
 export interface Customer {
   cus_id: number;
   cus_member: string;

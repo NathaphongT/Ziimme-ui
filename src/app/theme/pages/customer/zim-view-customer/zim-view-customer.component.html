@@ -60,7 +60,7 @@
     </ngx-datatable-column>
     <ngx-datatable-column name="เลขสมาชิก" [canAutoResize]="false" [width]="100" [cellClass]="'cellColumn'">
       <ng-template let-row="row" ngx-datatable-cell-template>
-        {{row?.sale_number}}
+        {{row?.saleNumber}}
       </ng-template>
 
     </ngx-datatable-column>
@@ -72,33 +72,33 @@
     </ngx-datatable-column>
     <ngx-datatable-column name="ชื่อสินค้าและบริการ" [cellClass]="'cellColumn'">
       <ng-template let-row="row" ngx-datatable-cell-template>
-        {{getNameProduct(row?.sale_product)}}
+        {{getNameProduct(row?.saleProduct)}}
       </ng-template>
     </ngx-datatable-column>
     <ngx-datatable-column name="จำนวนครั้ง" [canAutoResize]="false" [sortable]="false" [width]="100"
       [cellClass]="'cellColumn'">
       <ng-template let-row="row" ngx-datatable-cell-template>
-        {{ row?.sale_count }}
+        {{ row?.saleCount }}
       </ng-template>
     </ngx-datatable-column>
     <ngx-datatable-column name="ราคารวม" [sortable]="false" [cellClass]="'cellColumn'">
       <ng-template let-row="row" ngx-datatable-cell-template>
-        {{ row?.sale_pay_balance }}
+        {{ row?.salePayBalance }}
       </ng-template>
     </ngx-datatable-column>
     <ngx-datatable-column name="ชำระเงินแล้ว" [sortable]="false" [cellClass]="'cellColumn'">
       <ng-template let-row="row" ngx-datatable-cell-template>
-        {{ row?.sale_pay }}
+        {{ row?.salePay }}
       </ng-template>
     </ngx-datatable-column>
     <ngx-datatable-column name="ยอดคงเหลือ" [sortable]="false" [cellClass]="'cellColumn'">
       <ng-template let-row="row" ngx-datatable-cell-template>
-        {{ row?.sale_overdue }}
+        {{ row?.saleOverdue }}
       </ng-template>
     </ngx-datatable-column>
     <ngx-datatable-column name="" [width]="120" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
       <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
-        <button class="btn btn-views" routerLink="../history/{{ row.sale_id }}">ตัดคอร์ส</button>
+        <button class="btn btn-views" routerLink="../history/{{ row.saleId }}">ตัดคอร์ส</button>
       </ng-template>
     </ngx-datatable-column>
     <ngx-datatable-column name="" [width]="120" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
@@ -132,8 +132,8 @@
     <div class="tw-flex tw-flex-wrap" [formGroup]="saleForm">
       <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>เลขสมาชิก</mat-label>
-        <input #postalCode maxlength="5" id="sale_number" name="sale_number" [formControlName]="'sale_number'" matInput>
-        <mat-error *ngIf="saleForm.get('sale_number').hasError('required')">
+        <input #postalCode maxlength="5" id="saleNumber" name="saleNumber" [formControlName]="'saleNumber'" matInput>
+        <mat-error *ngIf="saleForm.get('saleNumber').hasError('required')">
           <div class="box-error">
             กรุณากรอกเลขสมาชิก
           </div>
@@ -142,12 +142,12 @@
 
       <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>รายการสินค้า/บริการ</mat-label>
-        <mat-select [formControlName]="'sale_product'" id="sale_product" name="sale_product">
+        <mat-select [formControlName]="'saleProduct'" id="saleProduct" name="saleProduct">
           <mat-option *ngFor="let item of (coures$ | async)" [value]="item.course_id">
             {{item.course_name_th || item.course_name_eng }} ({{item.course_code}})
           </mat-option>
         </mat-select>
-        <mat-error *ngIf="saleForm.get('sale_product').hasError('required')">
+        <mat-error *ngIf="saleForm.get('saleProduct').hasError('required')">
           <div class="box-error">
             กรุณากรอกสินค้า/บริการ
           </div>
@@ -156,8 +156,8 @@
 
       <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>จำนวนครั้ง</mat-label>
-        <input type="number" matInput id="sale_count" name="sale_count" [formControlName]="'sale_count'">
-        <mat-error *ngIf="saleForm.get('sale_count').hasError('required')">
+        <input type="number" matInput id="saleCount" name="saleCount" [formControlName]="'saleCount'">
+        <mat-error *ngIf="saleForm.get('saleCount').hasError('required')">
           <div class="box-error">
             กรุณากรอกจำนวนครั้ง
           </div>
@@ -165,9 +165,9 @@
       </mat-form-field>
       <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>ราคารวม</mat-label>
-        <input type="number" matInput id="sale_pay_balance" name="sale_pay_balance"
-          [formControlName]="'sale_pay_balance'">
-        <mat-error *ngIf="saleForm.get('sale_pay_balance').hasError('required')">
+        <input type="number" matInput id="salePayBalance" name="salePayBalance"
+          [formControlName]="'salePayBalance'">
+        <mat-error *ngIf="saleForm.get('salePayBalance').hasError('required')">
           <div class="box-error">
             กรุณากรอกยอดราคารวม
           </div>
@@ -176,8 +176,8 @@
 
       <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>ชำระแล้ว</mat-label>
-        <input type="number" matInput id="sale_pay" name="sale_pay" [formControlName]="'sale_pay'">
-        <mat-error *ngIf="saleForm.get('sale_pay').hasError('required')">
+        <input type="number" matInput id="salePay" name="salePay" [formControlName]="'salePay'">
+        <mat-error *ngIf="saleForm.get('salePay').hasError('required')">
           <div class="box-error">
             กรุณากรอกยอดชำระแล้ว
           </div>
@@ -186,8 +186,8 @@
 
       <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>ค้างชำระ</mat-label>
-        <input type="number" matInput id="sale_overdue" name="sale_overdue" [formControlName]="'sale_overdue'">
-        <mat-error *ngIf="saleForm.get('sale_overdue').hasError('required')">
+        <input type="number" matInput id="saleOverdue" name="saleOverdue" [formControlName]="'saleOverdue'">
+        <mat-error *ngIf="saleForm.get('saleOverdue').hasError('required')">
           <div class="box-error">
             กรุณากรอกยอดค้างชำระ
           </div>
@@ -197,12 +197,12 @@
 
     <mat-form-field [formGroup]="saleEmployeeForm" class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
       <mat-label>รายการสินค้า/บริการ</mat-label>
-      <mat-select [formControlName]="'emp_id'" [(ngModel)]="emp_detail" id="emp_id" name="emp_id" multiple>
-        <mat-option *ngFor="let item of (employes$ | async)" [value]="item.emp_id">
-          {{item.emp_fullname}}
+      <mat-select [formControlName]="'empId'" id="empId" name="empId" multiple>
+        <mat-option *ngFor="let item of (employes$ | async)" [value]="item.empId">
+          {{item.empFullname}}
         </mat-option>
       </mat-select>
-      <mat-error *ngIf="saleEmployeeForm.get('emp_id').hasError('required')">
+      <mat-error *ngIf="saleEmployeeForm.get('empId').hasError('required')">
         <div class="box-error">
           กรุณาเลือกประเภทข้อมูล
         </div>

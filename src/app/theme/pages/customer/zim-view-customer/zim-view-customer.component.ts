@@ -4,13 +4,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ColumnMode } from '@swimlane/ngx-datatable';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subject, catchError, map, take, takeUntil, throwError } from 'rxjs';
-import { Customer, Employee } from '@app/_service/user.types';
 import { EmployeeService } from '@app/_service/employee.service';
 import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import { SaleService } from '@app/_service/sale.service';
 import Swal from 'sweetalert2';
 import { CustomerService } from '@app/theme/pages/customer/customer.service';
-import { Course, Sale } from '../../basic-data/basic.model';
+import { Course} from '../../basic-data/basic.model';
+import { Employee, Sale } from '@app/_service/main.types';
 @Component({
   selector: 'app-zim-view-customer',
   templateUrl: './zim-view-customer.component.html',
@@ -69,18 +69,18 @@ export class ZimViewCustomerComponent implements OnInit {
   ngOnInit(): void {
 
     this.saleForm = this._formBuilder.group({
-      sale_id: [this.cus_id],
-      sale_number: [{ value: '', enabled: !!this.cus_id }, Validators.required],
-      sale_product: [{ value: '', enabled: !!this.cus_id }, Validators.required],
-      sale_count: [{ value: '', enabled: !!this.cus_id }, Validators.required],
-      sale_pay_balance: [{ value: '', enabled: !!this.cus_id }, Validators.required],
-      sale_pay: [{ value: '', enabled: !!this.cus_id }, Validators.required],
-      sale_overdue: [{ value: '', enabled: !!this.cus_id }, Validators.required],
-      cus_id: [this.cus_id],
+      saleId: [this.cus_id],
+      saleNumber: [{ value: '', enabled: !!this.cus_id }, Validators.required],
+      saleProduct: [{ value: '', enabled: !!this.cus_id }, Validators.required],
+      saleCount: [{ value: '', enabled: !!this.cus_id }, Validators.required],
+      salePayBalance: [{ value: '', enabled: !!this.cus_id }, Validators.required],
+      salePay: [{ value: '', enabled: !!this.cus_id }, Validators.required],
+      saleOverdue: [{ value: '', enabled: !!this.cus_id }, Validators.required],
+      cusId: [this.cus_id],
     });
 
     this.saleEmployeeForm = this._formBuilder.group({
-      emp_id: [{ value: '', enabled: !!this.cus_id }, Validators.required]
+      empId: [{ value: '', enabled: !!this.cus_id }, Validators.required]
     })
 
     this.sales$ = this._ServiceSale.sales$;
@@ -119,7 +119,7 @@ export class ZimViewCustomerComponent implements OnInit {
 
 
     this.saleForm.reset();
-    this.saleForm.patchValue({ cus_id: this.cus_id })
+    this.saleForm.patchValue({ cusId: this.cus_id })
     this.saleForm.markAsPristine();
 
     if (data) {
@@ -161,14 +161,14 @@ export class ZimViewCustomerComponent implements OnInit {
       }
       else {
         this._ServiceSale.saveAll(
-          overviewData.sale_number,
-          overviewData.sale_product,
-          overviewData.sale_count,
-          overviewData.sale_pay_balance,
-          overviewData.sale_pay,
-          overviewData.sale_overdue,
-          overviewData.cus_id,
-          platformData.emp_id)
+          overviewData.saleNumber,
+          overviewData.saleProduct,
+          overviewData.saleCount,
+          overviewData.salePayBalance,
+          overviewData.salePay,
+          overviewData.saleOverdue,
+          overviewData.cusId,
+          platformData.empId)
           .pipe(
             catchError((err) => {
               Swal.fire({
@@ -200,22 +200,6 @@ export class ZimViewCustomerComponent implements OnInit {
           );
       }
     }
-  }
-
-  onCategorySelectionChange(checked: boolean, emp_id: number): void {
-    if (checked) {
-      this.selectedSaleEmp.push(emp_id);
-    } else {
-      const index = this.selectedSaleEmp.indexOf(emp_id);
-      if (index !== -1) {
-        this.selectedSaleEmp.splice(index, 1);
-      }
-    }
-  }
-
-  // You might also need a function to pre-select certain categories when the component loads
-  selectCategories(emp_ids: number[]): void {
-    this.selectedSaleEmp = emp_ids;
   }
 
 
