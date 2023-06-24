@@ -170,8 +170,8 @@
           <mat-label>สิทธิ์ผู้ใช้งาน</mat-label>
           <mat-select [formControlName]="'emp_position'">
             <mat-option value="0">ไม่ระบุ</mat-option>
-            <mat-option *ngFor="let item of (positions$ | async)" [value]="item.position_id">
-              {{item.position_name_eng}}
+            <mat-option *ngFor="let item of (positions$ | async)" [value]="item.positionId">
+              {{item.positionNameEng}}
             </mat-option>
           </mat-select>
           <mat-error *ngIf="employeeForm.get('emp_position').hasError('required')">
@@ -184,8 +184,8 @@
           <mat-label>สาขาประจำ</mat-label>
           <mat-select [formControlName]="'emp_branch'">
             <mat-option value="0">ไม่ระบุ</mat-option>
-            <mat-option *ngFor="let item of (branchs$ | async)" [value]="item.branch_id">
-              {{item.branch_code}}
+            <mat-option *ngFor="let item of (branchs$ | async)" [value]="item.branchId">
+              {{item.branchCode}}
             </mat-option>
           </mat-select>
           <mat-error *ngIf="employeeForm.get('emp_branch').hasError('required')">

@@ -16,6 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BranchDataComponent } from './branch-data/branch-data.component';
+import { DateTHPipeModule } from '@app/theme/shared/dateTHPipe/date-th-pipe.module';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { BranchDataComponent } from './branch-data/branch-data.component';
     MatIconModule,
     MatChipsModule,
     MatButtonModule,
-    MatSelectModule
+    MatSelectModule,
+    DateTHPipeModule
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'outline' } }

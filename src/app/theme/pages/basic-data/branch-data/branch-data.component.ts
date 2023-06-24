@@ -1,11 +1,12 @@
 import { ChangeDetectorRef, Component, OnInit, TemplateRef } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, UntypedFormControl, Validators } from '@angular/forms';
 import { ColumnMode } from '@swimlane/ngx-datatable';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Observable, Subject, catchError, take, takeUntil, tap, throwError } from 'rxjs';
 import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import Swal from 'sweetalert2';
 import { Branch } from '../basic.model';
+import { BranchPagination } from '@app/_service/pagination.types';
 
 @Component({
   selector: 'app-branch-data',
@@ -13,54 +14,56 @@ import { Branch } from '../basic.model';
   styleUrls: ['./branch-data.component.scss']
 })
 export class BranchDataComponent implements OnInit {
-  public branchs: Branch[];
-  branchs$: Observable<Branch[]>;
+
+  public branchs: Branch;
+
 
   branchForm: FormGroup;
-
   rows = [];
+  ColumnMode = ColumnMode;
 
   isAddMode: boolean;
 
-  ColumnMode = ColumnMode;
 
   modalRef?: BsModalRef;
 
   isLoading: boolean;
   submitted: boolean;
 
+  branchsPagination: BranchPagination;
+  searchInputControl: UntypedFormControl = new UntypedFormControl();
+  
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
-  constructor(private modalService: BsModalService, private _formBuilder: FormBuilder, private _Service: BasicService, private _changeDetectorRef: ChangeDetectorRef) { }
+  constructor(private modalService: BsModalService,
+    private _formBuilder: FormBuilder,
+    private _Service: BasicService,
+    private _changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit() {
 
-    this.GetAllBranch();
-
     this.branchForm = this._formBuilder.group({
-      branch_id: [null],
+      branchId: [null],
       branch_code: ['', Validators.required],
       branch_name_th: ['', Validators.required],
       branch_name_eng: ['', Validators.required],
     });
 
-    this.branchs$ = this._Service.branchs$;
+    this._Service.branchsPagination$
+      .pipe(takeUntil(this._unsubscribeAll)).subscribe(pagination => {
+        this.branchsPagination = pagination;
 
-    this.branchs$
-      .pipe(takeUntil(this._unsubscribeAll))
-      .subscribe((branchs) => {
+        this._changeDetectorRef.markForCheck();
 
-        if (branchs) {
-          this.rows = branchs;
+      });
 
-          this.rows = [...this.rows];
-        }
-        else {
-          this.rows = [];
-        }
+    this._Service.branchs$
+      .pipe(takeUntil(this._unsubscribeAll)).subscribe(branchs => {
+        this.rows = branchs;
+
+        this.rows = [...this.rows];
 
         this.isLoading = false;
-
       })
   }
 
@@ -91,8 +94,8 @@ export class BranchDataComponent implements OnInit {
 
     let saveData: Branch = this.branchForm.getRawValue();
     // If there is an id, update it...
-    if (saveData.branch_id) {
-      this._Service.updateBranch(saveData.branch_id, saveData)
+    if (saveData.branchId) {
+      this._Service.updateBranch(saveData.branchId, saveData)
         .pipe(
           catchError((err) => {
             console.log(err);
@@ -157,14 +160,14 @@ export class BranchDataComponent implements OnInit {
     Swal.fire({
       title: 'คุณแน่ใจหรือว่าต้องการลบ?',
       text:
-        'คุณจะไม่สามารถกู้คืนตำแหน่ง ' + row.position_name_th + ' ได้!',
+        'คุณจะไม่สามารถกู้คืนตำแหน่ง ' + row.positionNameTh + ' ได้!',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'ยืนยัน',
       cancelButtonText: 'ยกเลิก',
     }).then((result) => {
       if (result.isConfirmed) {
-        this._Service.deletePosition(row.branch_id).pipe(take(1))
+        this._Service.deletePosition(row.branchId).pipe(take(1))
           .subscribe(() => {
             Swal.fire({
               icon: 'success',
@@ -179,12 +182,20 @@ export class BranchDataComponent implements OnInit {
     });
   }
 
-  GetAllBranch() {
-    this._Service
-      .getAllBranch()
-      .pipe(tap((branch) => (this.branchs = branch)))
-      .subscribe(data => {
-        // console.log('รายการสาขา', data);
-      });
+  setPage(pageInfo) {
+    this.branchsPagination.page = pageInfo.offset + 1;
+    this._Service.getBranch(this.searchInputControl.value || "", this.branchsPagination.page, this.branchsPagination.size).subscribe();
   }
+
+  sorting(event) {
+    if (event.sorts && event.sorts.length) {
+      this.isLoading = true;
+
+      this.branchsPagination.page = 1;
+      this._Service.getBranch(this.searchInputControl.value || "", this.branchsPagination.page, this.branchsPagination.size, event.sorts[0].prop, event.sorts[0].dir).subscribe(() => {
+        this.isLoading = false;
+      });
+    }
+  }
+
 }

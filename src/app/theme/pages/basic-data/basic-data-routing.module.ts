@@ -5,6 +5,7 @@ import { CourseDataComponent } from './course-data/course-data.component';
 import { PositionDataComponent } from './position-data/position-data.component';
 import { UserDataComponent } from './user-data/user-data.component';
 import { BranchDataComponent } from './branch-data/branch-data.component';
+import { BranchResolver, CourseResolver, PositionResolver } from './basic.resolver';
 
 const routes: Routes = [
   {
@@ -18,14 +19,23 @@ const routes: Routes = [
       {
         path: 'course',
         component: CourseDataComponent,
+        resolve: {
+          courses: CourseResolver
+        }
       },
       {
         path: 'position',
         component: PositionDataComponent,
+        resolve: {
+          positions: PositionResolver
+        }
       },
       {
         path: 'branch',
         component: BranchDataComponent,
+        resolve: {
+          branchs: BranchResolver
+        }
       }
     ]
   }

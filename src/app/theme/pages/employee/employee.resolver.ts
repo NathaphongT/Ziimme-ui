@@ -9,7 +9,7 @@ import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import { EmployeeService } from '@app/_service/employee.service';
 import { SaleService } from '@app/_service/sale.service';
 import { Branch, Position} from '../basic-data/basic.model';
-import { Employee, Sale } from '@app/_service/main.types';
+import { Employee, Sale, SaleEmployee } from '@app/_service/main.types';
 
 @Injectable({
   providedIn: 'root'

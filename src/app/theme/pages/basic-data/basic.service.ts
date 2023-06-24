@@ -3,19 +3,23 @@ import { BehaviorSubject, Observable, ReplaySubject, map, switchMap, take, tap }
 import { Branch, Course, Districts, Position, PostCode, Province, Salary, SubDistricts } from "./basic.model";
 import { HttpClient } from "@angular/common/http";
 import { environment } from 'src/environments/environment';
+import { BranchPagination, CoursePagination, PaginationResponse, PositionPagination } from "@app/_service/pagination.types";
 @Injectable({
     providedIn: 'root'
 })
 
 export class BasicService {
-    private _course: ReplaySubject<Course> = new ReplaySubject<Course>(1);
-    private _courses: BehaviorSubject<Course[]> = new BehaviorSubject<Course[]>(null);
 
-    private _position: ReplaySubject<Position> = new ReplaySubject<Position>(1);
-    private _positions: BehaviorSubject<Position[]> = new BehaviorSubject<Position[]>(null);
+    private _apiPath = environment.APIURL_LOCAL + '/api/v1.0';
 
-    private _branch: ReplaySubject<Branch> = new ReplaySubject<Branch>(1);
-    private _branchs: BehaviorSubject<Branch[]> = new BehaviorSubject<Branch[]>(null);
+    private _courses: BehaviorSubject<Course[] | null> = new BehaviorSubject(null);
+    private _coursesPagination: BehaviorSubject<CoursePagination | null> = new BehaviorSubject(null);
+
+    private _positions: BehaviorSubject<Position[] | null> = new BehaviorSubject(null);
+    private _positionsPagination: BehaviorSubject<PositionPagination | null> = new BehaviorSubject(null);
+
+    private _branchs: BehaviorSubject<Branch[] | null> = new BehaviorSubject(null);
+    private _branchsPagination: BehaviorSubject<BranchPagination | null> = new BehaviorSubject(null);
 
     private _province: ReplaySubject<Province> = new ReplaySubject<Province>(1);
     private _provinces: BehaviorSubject<Province[]> = new BehaviorSubject<Province[]>(null);
@@ -37,43 +41,31 @@ export class BasicService {
    *
    * @param value
    */
-    set course(value: Course) {
-        // Store the value
-        this._course.next(value);
-    }
-
-    get course$(): Observable<Course> {
-        return this._course.asObservable();
-    }
-
+    //Course
     get courses$(): Observable<Course[]> {
         return this._courses.asObservable();
     }
 
-    set position(value: Position) {
-        // Store the value
-        this._position.next(value);
+    get coursesPagination$(): Observable<CoursePagination> {
+        return this._coursesPagination.asObservable();
     }
 
-    get position$(): Observable<Position> {
-        return this._position.asObservable();
-    }
-
+    //Positions
     get positions$(): Observable<Position[]> {
         return this._positions.asObservable();
     }
 
-    set branch(value: Branch) {
-        // Store the value
-        this._branch.next(value);
+    get positionsPagination$(): Observable<PositionPagination> {
+        return this._positionsPagination.asObservable();
     }
 
+    //Branchs
     get branchs$(): Observable<Branch[]> {
         return this._branchs.asObservable();
     }
 
-    get branch$(): Observable<Branch> {
-        return this._branch.asObservable();
+    get branchsPagination$(): Observable<BranchPagination> {
+        return this._branchsPagination.asObservable();
     }
 
     get provinces$(): Observable<Province[]> {
@@ -105,10 +97,51 @@ export class BasicService {
     }
 
 
-    getAllCourse(): Observable<Course[]> {
-        return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/course/`).pipe(
-            tap((course: Course[]) => {
-                this._courses.next(course)
+    // ignored pagination
+    getAllCourse(): Observable<Position[]> {
+        return this._httpClient.get(this._apiPath + '/courses', {
+            params: {
+                q: '',
+                page: '1',
+                limit: 300
+            }
+        }).pipe(
+            map((res: any) => res.data),
+            tap((courses: any) => {
+                this._courses.next(courses);
+            })
+        );
+    }
+
+    getCourse(search: string = "", page: number = 1, limit: number = 10, sort: string = 'createdTime', order: 'asc' | 'desc' | '' = 'asc'): Observable<{ pagination: CoursePagination, courses: Course[] }> {
+        return this._httpClient.get<PaginationResponse>(this._apiPath + '/courses', {
+            params: {
+                q: search,
+                page: page.toString(),
+                limit: limit.toString(),
+                sort,
+                order
+            }
+        }).pipe(
+            map(response => {
+
+                const ret: { pagination: CoursePagination, courses: Course[] } = {
+                    pagination: {
+                        length: response.totalItems,
+                        size: limit,
+                        page: response.currentPage - 1,
+                        lastPage: response.totalPages,
+                        startIndex: response.currentPage > 1 ? (response.currentPage - 1) * limit : 0,
+                        endIndex: Math.min(response.currentPage * limit, response.totalItems)
+                    },
+                    courses: response.data
+                };
+
+                this._coursesPagination.next(ret.pagination);
+                this._courses.next(ret.courses);
+
+                return ret;
+
             })
         );
     }
@@ -118,7 +151,7 @@ export class BasicService {
             take(1),
             switchMap((courses) =>
                 this._httpClient
-                    .post<Course>(`${environment.APIURL_LOCAL}/api/v1.0/course`, data)
+                    .post<Course>(`${environment.APIURL_LOCAL}/api/v1.0/courses`, data)
                     .pipe(
                         map((newCourse) => {
                             // Update the course with the new course
@@ -137,14 +170,14 @@ export class BasicService {
             take(1),
             switchMap((courses) =>
                 this._httpClient
-                    .put<Course>(`${environment.APIURL_LOCAL}/api/v1.0/course/${id}`,
+                    .put<Course>(`${environment.APIURL_LOCAL}/api/v1.0/courses/${id}`,
                         data
                     )
                     .pipe(
                         map((updatedCourse: Course) => {
                             // Find the index of the updated courses
                             const index = courses.findIndex(
-                                (item) => item.course_id === id
+                                (item) => item.courseId === id
                             );
 
                             // Update the courses
@@ -166,12 +199,12 @@ export class BasicService {
             take(1),
             switchMap((courses) =>
                 this._httpClient
-                    .delete<boolean>(`${environment.APIURL_LOCAL}/api/v1.0/course/${id}`)
+                    .delete<boolean>(`${environment.APIURL_LOCAL}/api/v1.0/courses/${id}`)
                     .pipe(
                         map((isDeleted: boolean) => {
                             // Find the index of the deleted user
                             const index = courses.findIndex(
-                                (item) => item.course_id === id
+                                (item) => item.courseId === id
                             );
 
                             // Delete the user
@@ -188,10 +221,51 @@ export class BasicService {
         );
     }
 
+    // ignored pagination
     getAllPosition(): Observable<Position[]> {
-        return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/position/`).pipe(
-            tap((position: Position[]) => {
-                this._positions.next(position)
+        return this._httpClient.get(this._apiPath + '/positions', {
+            params: {
+                q: '',
+                page: '1',
+                limit: 300
+            }
+        }).pipe(
+            map((res: any) => res.data),
+            tap((positions: any) => {
+                this._positions.next(positions);
+            })
+        );
+    }
+
+    getPosition(search: string = "", page: number = 1, limit: number = 10, sort: string = 'createdTime', order: 'asc' | 'desc' | '' = 'asc'): Observable<{ pagination: PositionPagination, positions: Position[] }> {
+        return this._httpClient.get<PaginationResponse>(this._apiPath + '/positions', {
+            params: {
+                q: search,
+                page: page.toString(),
+                limit: limit.toString(),
+                sort,
+                order
+            }
+        }).pipe(
+            map(response => {
+
+                const ret: { pagination: PositionPagination, positions: Position[] } = {
+                    pagination: {
+                        length: response.totalItems,
+                        size: limit,
+                        page: response.currentPage - 1,
+                        lastPage: response.totalPages,
+                        startIndex: response.currentPage > 1 ? (response.currentPage - 1) * limit : 0,
+                        endIndex: Math.min(response.currentPage * limit, response.totalItems)
+                    },
+                    positions: response.data
+                };
+
+                this._positionsPagination.next(ret.pagination);
+                this._positions.next(ret.positions);
+
+                return ret;
+
             })
         );
     }
@@ -201,7 +275,7 @@ export class BasicService {
             take(1),
             switchMap((positions) =>
                 this._httpClient
-                    .post<Position>(`${environment.APIURL_LOCAL}/api/v1.0/position`, data)
+                    .post<Position>(`${environment.APIURL_LOCAL}/api/v1.0/positions`, data)
                     .pipe(
                         map((newPosition) => {
                             // Update the course with the new course
@@ -220,14 +294,14 @@ export class BasicService {
             take(1),
             switchMap((positions) =>
                 this._httpClient
-                    .put<Position>(`${environment.APIURL_LOCAL}/api/v1.0/position/${id}`,
+                    .put<Position>(`${environment.APIURL_LOCAL}/api/v1.0/positions/${id}`,
                         data
                     )
                     .pipe(
                         map((updatedPosition: Position) => {
                             // Find the index of the updated positions
                             const index = positions.findIndex(
-                                (item) => item.position_id === id
+                                (item) => item.positionId === id
                             );
 
                             // Update the positions
@@ -250,12 +324,12 @@ export class BasicService {
             take(1),
             switchMap((positions) =>
                 this._httpClient
-                    .delete<boolean>(`${environment.APIURL_LOCAL}/api/v1.0/position/${id}`)
+                    .delete<boolean>(`${environment.APIURL_LOCAL}/api/v1.0/positions/${id}`)
                     .pipe(
                         map((isDeleted: boolean) => {
                             // Find the index of the deleted user
                             const index = positions.findIndex(
-                                (item) => item.position_id === id
+                                (item) => item.positionId === id
                             );
 
                             // Delete the user
@@ -272,10 +346,51 @@ export class BasicService {
         );
     }
 
+    // ignored pagination
     getAllBranch(): Observable<Branch[]> {
-        return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/branch/`).pipe(
-            tap((branch: Branch[]) => {
-                this._branchs.next(branch)
+        return this._httpClient.get(this._apiPath + '/branchs', {
+            params: {
+                q: '',
+                page: '1',
+                limit: 300
+            }
+        }).pipe(
+            map((res: any) => res.data),
+            tap((branchs: any) => {
+                this._branchs.next(branchs);
+            })
+        );
+    }
+
+    getBranch(search: string = "", page: number = 1, limit: number = 10, sort: string = 'createdTime', order: 'asc' | 'desc' | '' = 'asc'): Observable<{ pagination: BranchPagination, branchs: Branch[] }> {
+        return this._httpClient.get<PaginationResponse>(this._apiPath + '/branchs', {
+            params: {
+                q: search,
+                page: page.toString(),
+                limit: limit.toString(),
+                sort,
+                order
+            }
+        }).pipe(
+            map(response => {
+
+                const ret: { pagination: BranchPagination, branchs: Branch[] } = {
+                    pagination: {
+                        length: response.totalItems,
+                        size: limit,
+                        page: response.currentPage - 1,
+                        lastPage: response.totalPages,
+                        startIndex: response.currentPage > 1 ? (response.currentPage - 1) * limit : 0,
+                        endIndex: Math.min(response.currentPage * limit, response.totalItems)
+                    },
+                    branchs: response.data
+                };
+
+                this._branchsPagination.next(ret.pagination);
+                this._branchs.next(ret.branchs);
+
+                return ret;
+
             })
         );
     }
@@ -285,13 +400,13 @@ export class BasicService {
             take(1),
             switchMap((branchs) =>
                 this._httpClient
-                    .post<Branch>(`${environment.APIURL_LOCAL}/api/v1.0/branch`, data)
+                    .post<Branch>(this._apiPath + '/branchs', data)
                     .pipe(
                         map((newBranch) => {
-                            // Update the branch with the new branch
+                            // Update the branchs with the new branchs
                             this._branchs.next([...branchs, newBranch]);
 
-                            // Return the new branch from observable
+                            // Return the new branchs from observable
                             return newBranch;
                         })
                     )
@@ -304,14 +419,14 @@ export class BasicService {
             take(1),
             switchMap((branchs) =>
                 this._httpClient
-                    .put<Branch>(`${environment.APIURL_LOCAL}/api/v1.0/branch/${id}`,
+                    .put<Branch>(`${environment.APIURL_LOCAL}/api/v1.0/branchs/${id}`,
                         data
                     )
                     .pipe(
                         map((updatedBranch: Branch) => {
                             // Find the index of the updated branchs
                             const index = branchs.findIndex(
-                                (item) => item.branch_id === id
+                                (item) => item.branchId === id
                             );
 
                             // Update the branchs
@@ -334,12 +449,12 @@ export class BasicService {
             take(1),
             switchMap((branchs) =>
                 this._httpClient
-                    .delete<boolean>(`${environment.APIURL_LOCAL}/api/v1.0/branch/${id}`)
+                    .delete<boolean>(`${environment.APIURL_LOCAL}/api/v1.0/branchs/${id}`)
                     .pipe(
                         map((isDeleted: boolean) => {
                             // Find the index of the deleted branch
                             const index = branchs.findIndex(
-                                (item) => item.branch_id === id
+                                (item) => item.branchId === id
                             );
 
                             // Delete the branch

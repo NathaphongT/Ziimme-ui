@@ -1,26 +1,28 @@
 <div class="tw-w-full tw-bg-white tw-p-4">
   <div class="tw-container">
-      <div class="tw-flex">
-          <span class="tw-text-3xl tw-font-bold tw-text-[#454545] tw-my-5">ข้อมูลตำแหน่ง</span>
-      </div>
-      <div class="tw-flex tw-justify-between tw-items-center">
-          <button
-              class="btn tw-px-3 tw-py-2 tw-m-0 tw-rounded-md tw-w-40 tw-border-0 tw-bg-green-500 tw-text-white tw-font-normal tw-select-none"
-              (click)="openModal(template)">
-              <i class="fa-solid fa-user-plus"></i>เพิ่มข้อมูล
-          </button>
-          <!-- <mat-form-field class="example-full-width tw-flex tw-flex-row" appearance="outline">
+    <div class="tw-flex">
+      <span class="tw-text-3xl tw-font-bold tw-text-[#454545] tw-my-5">ข้อมูลตำแหน่ง</span>
+    </div>
+    <div class="tw-flex tw-justify-between tw-items-center">
+      <button
+        class="btn tw-px-3 tw-py-2 tw-m-0 tw-rounded-md tw-w-40 tw-border-0 tw-bg-green-500 tw-text-white tw-font-normal tw-select-none"
+        (click)="openModal(template)">
+        <i class="fa-solid fa-user-plus"></i>เพิ่มข้อมูล
+      </button>
+      <!-- <mat-form-field class="example-full-width tw-flex tw-flex-row" appearance="outline">
         <mat-label>ค้นหาข้อมูลลูกค้า</mat-label>
         <mat-icon matPrefix>search</mat-icon>
         <input type="search" (keyup)='serviceListFilter($event)' class="tw-text-xs" placeholder="ค้นหาเลขสมาชิกและชื่อลูกค้า" matInput>
       </mat-form-field> -->
-      </div>
+    </div>
   </div>
 </div>
 <div class="wrap-body">
   <div class="container">
-    <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="5" [columnMode]="ColumnMode.force"
-      [footerHeight]="50" rowHeight="auto" [rows]="rows">
+    <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
+      [footerHeight]="50" [rowHeight]="50" [rows]="rows" [loadingIndicator]="isLoading" [externalPaging]="true"
+      [count]="positionPagination.length" [offset]="positionPagination.page" [limit]="positionPagination.size"
+      (page)="setPage($event)" (sort)="sorting($event)">
       <ngx-datatable-column name="" [width]="50" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <img src="./assets/icons/edit.png" (click)="openModal(template, row)" width="25px" height="25px" />
@@ -38,17 +40,17 @@
       </ngx-datatable-column>
       <ngx-datatable-column name="ชื่อตำแหน่งภาษาไทย" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          {{ row.position_name_th }}
+          {{ row.positionNameTh }}
         </ng-template>
       </ngx-datatable-column>
       <ngx-datatable-column name="ชื่อตำแหน่งภาษาอังกฤษ" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          {{ row.position_name_eng }}
+          {{ row.positionNameEng }}
         </ng-template>
       </ngx-datatable-column>
       <ngx-datatable-column name="วันที่เพิ่มข้อมูล" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          {{ row.createdTime }}
+          {{ row.createdTime | dateTHPipe: 'day' }}<br />
         </ng-template>
       </ngx-datatable-column>
     </ngx-datatable>
@@ -68,9 +70,9 @@
     <form role="form" [formGroup]="positionForm" (ngSubmit)="onSubmit()" #f="ngForm" novalidate>
       <mat-form-field class="tw-w-full tw-mb-3" appearance="outline">
         <mat-label>ชื่อตำแหน่งภาษาไทย</mat-label>
-        <input type="text" matInput placeholder="กรุณาใส่ชื่อตำแหน่งภาษาไทย" id="position_name_th"
-          name="position_name_th" [formControlName]="'position_name_th'">
-        <mat-error *ngIf="positionForm.get('position_name_th').hasError('required')">
+        <input type="text" matInput placeholder="กรุณาใส่ชื่อตำแหน่งภาษาไทย" id="positionNameTh" name="positionNameTh"
+          [formControlName]="'positionNameTh'">
+        <mat-error *ngIf="positionForm.get('positionNameTh').hasError('required')">
           <div class="box-error">
             กรุณากรอกชื่อตำแหน่งภาษาไทย
           </div>
@@ -78,9 +80,9 @@
       </mat-form-field>
       <mat-form-field class="tw-w-full tw-mb-3" appearance="outline">
         <mat-label>ชื่อตำแหน่งภาษาอังกฤษ</mat-label>
-        <input type="text" matInput placeholder="กรุณาใส่ชื่อตำแหน่งภาษาอังกฤษ" id="position_name_eng"
-          name="position_name_eng" [formControlName]="'position_name_eng'">
-        <mat-error *ngIf="positionForm.get('position_name_eng').hasError('required')">
+        <input type="text" matInput placeholder="กรุณาใส่ชื่อตำแหน่งภาษาอังกฤษ" id="positionNameEng"
+          name="positionNameEng" [formControlName]="'positionNameEng'">
+        <mat-error *ngIf="positionForm.get('positionNameEng').hasError('required')">
           <div class="box-error">
             กรุณากรอกชื่อตำแหน่งภาษาอังกฤษ
           </div>

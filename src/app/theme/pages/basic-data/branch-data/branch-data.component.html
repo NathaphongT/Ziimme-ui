@@ -19,8 +19,10 @@
 </div>
 <div class="wrap-body">
     <div class="container">
-        <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="5" [columnMode]="ColumnMode.force"
-            [footerHeight]="50" rowHeight="auto" [rows]="rows">
+        <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
+            [footerHeight]="50" [rowHeight]="50" [rows]="rows" [loadingIndicator]="isLoading" [externalPaging]="true"
+            [count]="branchsPagination.length" [offset]="branchsPagination.page" [limit]="branchsPagination.size"
+            (page)="setPage($event)" (sort)="sorting($event)">
             <ngx-datatable-column name="" [width]="50" [canAutoResize]="false" [sortable]="false"
                 [cellClass]="'cellColumn'">
                 <ng-template let-row="row" ngx-datatable-cell-template>
@@ -41,22 +43,22 @@
             </ngx-datatable-column>
             <ngx-datatable-column name="รหัสสาขา" [cellClass]="'cellColumn'">
                 <ng-template let-row="row" ngx-datatable-cell-template>
-                    {{ row.branch_code }}
+                    {{ row.branchCode }}
                 </ng-template>
             </ngx-datatable-column>
             <ngx-datatable-column name="ชื่อสาขาภาษาอังกฤษ" [cellClass]="'cellColumn'">
                 <ng-template let-row="row" ngx-datatable-cell-template>
-                    {{ row.branch_name_eng }}
+                    {{ row.branchNameEng }}
                 </ng-template>
             </ngx-datatable-column>
             <ngx-datatable-column name="ชื่อสาขาภาษาไทย" [cellClass]="'cellColumn'">
                 <ng-template let-row="row" ngx-datatable-cell-template>
-                    {{ row.branch_name_th }}
+                    {{ row.branchNameTh }}
                 </ng-template>
             </ngx-datatable-column>
             <ngx-datatable-column name="วันที่เพิ่มข้อมูล" [cellClass]="'cellColumn'">
                 <ng-template let-row="row" ngx-datatable-cell-template>
-                    {{ row.createdTime }}
+                    {{ row.createdTime | dateTHPipe: 'day' }}<br />
                 </ng-template>
             </ngx-datatable-column>
         </ngx-datatable>

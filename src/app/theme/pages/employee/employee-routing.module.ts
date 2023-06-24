@@ -4,7 +4,7 @@ import { EmployeeComponent } from './employee.component';
 import { ZimEmployeeComponent } from './zim-employee/zim-employee.component';
 import { BranchResolver, EmployeeResolver, PositionResolver, SaleByIdConResolver } from './employee.resolver';
 import { ZimEmployeeSaleComponent } from './zim-employee-sale/zim-employee-sale.component';
-import { CourseResolver } from '../customer/customer.resolver';
+// import { CourseResolver } from '../customer/customer.resolver';
 import { ZimEmployeeTotalComponent } from './zim-employee-total/zim-employee-total.component';
 import { ZimEmployeePromotionComponent } from './zim-employee-promotion/zim-employee-promotion.component';
 
@@ -37,7 +37,7 @@ const routes: Routes = [
               // sales: SaleResolver,
               slaeByIDConsult: SaleByIdConResolver,
               employees: EmployeeResolver,
-              courses: CourseResolver,
+              // courses: CourseResolver,
             }
           },
         ]

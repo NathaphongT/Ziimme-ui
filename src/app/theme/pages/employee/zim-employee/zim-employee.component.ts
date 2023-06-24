@@ -201,22 +201,22 @@ export class ZimEmployeeComponent implements OnInit {
 
 
   getNamePosition(id: number) {
-    let index = this.Positions.findIndex(item => item.position_id === id);
+    let index = this.Positions.findIndex(item => item.positionId === id);
     if (index === -1) {
       return "-";
     }
     else {
-      return this.Positions[index].position_name_eng;
+      return this.Positions[index].positionNameEng;
     }
   }
 
   getNameBranch(id: number) {
-    let index = this.Branchs.findIndex(item => item.branch_id === id);
+    let index = this.Branchs.findIndex(item => item.branchId === id);
     if (index === -1) {
       return "-";
     }
     else {
-      return this.Branchs[index].branch_code;
+      return this.Branchs[index].branchCode;
     }
   }
 

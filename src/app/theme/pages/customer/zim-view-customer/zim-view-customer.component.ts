@@ -204,12 +204,12 @@ export class ZimViewCustomerComponent implements OnInit {
 
 
   getNameProduct(id: number) {
-    let index = this.Courses.findIndex(type => type.course_id === id);
+    let index = this.Courses.findIndex(type => type.courseId === id);
     if (index === -1) {
       return "-";
     }
     else {
-      return this.Courses[index].course_name_eng;
+      return this.Courses[index].courseNameEng;
     }
   }
 

@@ -143,8 +143,8 @@
       <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>รายการสินค้า/บริการ</mat-label>
         <mat-select [formControlName]="'saleProduct'" id="saleProduct" name="saleProduct">
-          <mat-option *ngFor="let item of (coures$ | async)" [value]="item.course_id">
-            {{item.course_name_th || item.course_name_eng }} ({{item.course_code}})
+          <mat-option *ngFor="let item of (coures$ | async)" [value]="item.courseId">
+            {{item.courseNameTh || item.courseNameEng }} ({{item.courseCode}})
           </mat-option>
         </mat-select>
         <mat-error *ngIf="saleForm.get('saleProduct').hasError('required')">

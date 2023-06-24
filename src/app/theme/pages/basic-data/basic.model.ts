@@ -1,9 +1,9 @@
 export interface Course {
-    course_id: number;
-    course_code: string;
-    course_name_th: string;
-    course_name_eng: string;
-    course_detail: string;
+    courseId: number;
+    courseCode: string;
+    courseNameTh: string;
+    courseNameEng: string;
+    courseDetail: string;
     recordStatus: string;
     createdTime: Date;
     createdBy: string;
@@ -12,9 +12,9 @@ export interface Course {
 }
 
 export interface Position {
-    position_id: number;
-    position_name_th: string;
-    position_name_eng: string;
+    positionId: number;
+    positionNameTh: string;
+    positionNameEng: string;
     recordStatus: string;
     createdTime: Date;
     createdBy: string;
@@ -23,10 +23,10 @@ export interface Position {
 }
 
 export interface Branch {
-    branch_id: number;
-    branch_code: string;
-    branch_name_th: string;
-    branch_name_eng: string;
+    branchId: number;
+    branchCode: string;
+    branchNameTh: string;
+    branchNameEng: string;
     recordStatus: string;
     createdTime: Date;
     createdBy: string;

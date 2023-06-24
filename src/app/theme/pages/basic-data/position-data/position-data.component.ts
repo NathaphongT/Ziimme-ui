@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, TemplateRef } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, UntypedFormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ColumnMode } from '@swimlane/ngx-datatable';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
@@ -7,6 +7,7 @@ import { Observable, Subject, catchError, take, takeUntil, tap, throwError } fro
 import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import Swal from 'sweetalert2';
 import { Position } from '../basic.model';
+import { PositionPagination } from '@app/_service/pagination.types';
 
 @Component({
   selector: 'app-position-data',
@@ -15,21 +16,23 @@ import { Position } from '../basic.model';
 })
 export class PositionDataComponent implements OnInit {
 
-  public positions: Position[];
-  positions$: Observable<Position[]>;
+  public positions: Position;
+
 
   positionForm: FormGroup;
-
+  ColumnMode = ColumnMode;
   rows = [];
 
-  isAddMode: boolean;
 
-  ColumnMode = ColumnMode;
+  isAddMode: boolean;
 
   modalRef?: BsModalRef;
 
   isLoading: boolean;
   submitted: boolean;
+
+  positionPagination: PositionPagination;
+  searchInputControl: UntypedFormControl = new UntypedFormControl();
 
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -37,31 +40,27 @@ export class PositionDataComponent implements OnInit {
 
   ngOnInit() {
 
-    this.GetAllPosition();
-
     this.positionForm = this._formBuilder.group({
-      position_id: [null],
-      position_name_th: ['', Validators.required],
-      position_name_eng: ['', Validators.required],
+      positionId: [null],
+      positionNameTh: ['', Validators.required],
+      positionNameEng: ['', Validators.required],
     });
 
-    this.positions$ = this._Service.positions$;
+    this._Service.positionsPagination$
+      .pipe(takeUntil(this._unsubscribeAll)).subscribe(pagination => {
+        this.positionPagination = pagination;
 
-    this.positions$
-      .pipe(takeUntil(this._unsubscribeAll))
-      .subscribe((positions) => {
+        this._changeDetectorRef.markForCheck();
 
-        if (positions) {
-          this.rows = positions;
+      });
 
-          this.rows = [...this.rows];
-        }
-        else {
-          this.rows = [];
-        }
+    this._Service.positions$
+      .pipe(takeUntil(this._unsubscribeAll)).subscribe(positions => {
+        this.rows = positions;
+
+        this.rows = [...this.rows];
 
         this.isLoading = false;
-
       })
   }
 
@@ -92,8 +91,8 @@ export class PositionDataComponent implements OnInit {
 
     let saveData: Position = this.positionForm.getRawValue();
     // If there is an id, update it...
-    if (saveData.position_id) {
-      this._Service.updatePosition(saveData.position_id, saveData)
+    if (saveData.positionId) {
+      this._Service.updatePosition(saveData.positionId, saveData)
         .pipe(
           catchError((err) => {
             console.log(err);
@@ -158,14 +157,14 @@ export class PositionDataComponent implements OnInit {
     Swal.fire({
       title: 'คุณแน่ใจหรือว่าต้องการลบ?',
       text:
-        'คุณจะไม่สามารถกู้คืนตำแหน่ง ' + row.position_name_th + ' ได้!',
+        'คุณจะไม่สามารถกู้คืนตำแหน่ง ' + row.positionNameTh + ' ได้!',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'ยืนยัน',
       cancelButtonText: 'ยกเลิก',
     }).then((result) => {
       if (result.isConfirmed) {
-        this._Service.deletePosition(row.position_id).pipe(take(1))
+        this._Service.deletePosition(row.positionId).pipe(take(1))
           .subscribe(() => {
             Swal.fire({
               icon: 'success',
@@ -180,12 +179,21 @@ export class PositionDataComponent implements OnInit {
     });
   }
 
-  GetAllPosition() {
-    this._Service
-      .getAllPosition()
-      .pipe(tap((position) => (this.positions = position)))
-      .subscribe(data => {
-        // console.log('ชื่อผู้ใช้งาน', data);
-      });
+  setPage(pageInfo) {
+    this.positionPagination.page = pageInfo.offset + 1;
+    this._Service.getPosition(this.searchInputControl.value || "", this.positionPagination.page, this.positionPagination.size).subscribe();
   }
+
+  sorting(event) {
+    if (event.sorts && event.sorts.length) {
+      this.isLoading = true;
+
+      this.positionPagination.page = 1;
+      this._Service.getPosition(this.searchInputControl.value || "", this.positionPagination.page, this.positionPagination.size, event.sorts[0].prop, event.sorts[0].dir).subscribe(() => {
+        this.isLoading = false;
+      });
+    }
+  }
+
+
 }

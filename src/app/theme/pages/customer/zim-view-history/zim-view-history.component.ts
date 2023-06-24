@@ -259,22 +259,22 @@ export class ZimViewHistoryComponent implements OnInit {
   }
 
   getNameProduct(id: number) {
-    let index = this.Courses.findIndex(type => type.course_id === id);
+    let index = this.Courses.findIndex(type => type.courseId === id);
     if (index === -1) {
       return "-";
     }
     else {
-      return this.Courses[index].course_name_eng;
+      return this.Courses[index].courseNameEng;
     }
   }
 
   getNameBranch(id: number) {
-    let index = this.Branchs.findIndex(item => item.branch_id === id);
+    let index = this.Branchs.findIndex(item => item.branchId === id);
     if (index === -1) {
       return "-";
     }
     else {
-      return this.Branchs[index].branch_code;
+      return this.Branchs[index].branchCode;
     }
   }
 }

@@ -56,18 +56,18 @@ export class EmployeeResolver implements Resolve<any> {
 
 }
 
-@Injectable({
-  providedIn: 'root'
-})
-export class CourseResolver implements Resolve<any> {
+// @Injectable({
+//   providedIn: 'root'
+// })
+// export class CourseResolver implements Resolve<any> {
 
-  constructor(private _basicService: BasicService) { }
+//   constructor(private _basicService: BasicService) { }
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Course[]> {
-    return this._basicService.getAllCourse();
-  }
+//   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Course[]> {
+//     return this._basicService.getAllCourse();
+//   }
 
-}
+// }
 
 @Injectable({
   providedIn: 'root'

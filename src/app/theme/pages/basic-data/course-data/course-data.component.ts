@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, TemplateRef } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, UntypedFormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ColumnMode } from '@swimlane/ngx-datatable';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
@@ -7,6 +7,7 @@ import { Observable, Subject, catchError, take, takeUntil, tap, throwError } fro
 import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import Swal from 'sweetalert2';
 import { Course } from '../basic.model';
+import { CoursePagination } from '@app/_service/pagination.types';
 @Component({
   selector: 'app-course-data',
   templateUrl: './course-data.component.html',
@@ -27,39 +28,38 @@ export class CourseDataComponent implements OnInit {
   isLoading: boolean;
   submitted: boolean;
 
+  coursePagination: CoursePagination;
+  searchInputControl: UntypedFormControl = new UntypedFormControl();
+
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
   constructor(private _Service: BasicService, private modalService: BsModalService, private _formBuilder: FormBuilder, private _changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit() {
 
-    this.GetAll();
-
     this.courseForm = this._formBuilder.group({
-      course_id: [null],
-      course_code: ['', Validators.required],
-      course_name_th: ['', Validators.required],
-      course_name_eng: ['', Validators.required],
-      course_detail: [''],
+      courseId: [null],
+      courseCode: ['', Validators.required],
+      courseNameTh: ['', Validators.required],
+      courseNameEng: ['', Validators.required],
+      courseDetail: [''],
     });
 
-    this.courses$ = this._Service.courses$;
+    this._Service.coursesPagination$
+      .pipe(takeUntil(this._unsubscribeAll)).subscribe(pagination => {
+        this.coursePagination = pagination;
 
-    this.courses$
-      .pipe(takeUntil(this._unsubscribeAll))
-      .subscribe((users) => {
+        this._changeDetectorRef.markForCheck();
 
-        if (users) {
-          this.rows = users;
+      });
 
-          this.rows = [...this.rows];
-        }
-        else {
-          this.rows = [];
-        }
+    this._Service.courses$
+      .pipe(takeUntil(this._unsubscribeAll)).subscribe(courses => {
+        this.rows = courses;
+
+        this.rows = [...this.rows];
 
         this.isLoading = false;
-
       })
   }
 
@@ -91,8 +91,8 @@ export class CourseDataComponent implements OnInit {
 
     let saveData: Course = this.courseForm.getRawValue();
     // If there is an id, update it...
-    if (saveData.course_id) {
-      this._Service.updateCourse(saveData.course_id, saveData)
+    if (saveData.courseId) {
+      this._Service.updateCourse(saveData.courseId, saveData)
         .pipe(
         // catchError((err) => {
         //   console.log(err);
@@ -164,7 +164,7 @@ export class CourseDataComponent implements OnInit {
       cancelButtonText: 'ยกเลิก',
     }).then((result) => {
       if (result.isConfirmed) {
-        this._Service.deleteCourse(row.course_id).pipe(take(1))
+        this._Service.deleteCourse(row.courseId).pipe(take(1))
           .subscribe(() => {
             Swal.fire({
               icon: 'success',
@@ -179,13 +179,19 @@ export class CourseDataComponent implements OnInit {
     });
   }
 
-  GetAll() {
-    this._Service
-      .getAllCourse()
-      .pipe(tap((course) => (this.courses = course)))
-      .subscribe(data => {
-        // console.log('ชื่อผู้ใช้งาน', data);
-        this.rows = data;
+  setPage(pageInfo) {
+    this.coursePagination.page = pageInfo.offset + 1;
+    this._Service.getCourse(this.searchInputControl.value || "", this.coursePagination.page, this.coursePagination.size).subscribe();
+  }
+
+  sorting(event) {
+    if (event.sorts && event.sorts.length) {
+      this.isLoading = true;
+
+      this.coursePagination.page = 1;
+      this._Service.getCourse(this.searchInputControl.value || "", this.coursePagination.page, this.coursePagination.size, event.sorts[0].prop, event.sorts[0].dir).subscribe(() => {
+        this.isLoading = false;
       });
+    }
   }
 }
