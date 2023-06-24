@@ -3,7 +3,8 @@ import { BehaviorSubject, Observable, ReplaySubject, map, switchMap, take, tap }
 import { Branch, Course, Districts, Position, PostCode, Province, Salary, SubDistricts } from "./basic.model";
 import { HttpClient } from "@angular/common/http";
 import { environment } from 'src/environments/environment';
-import { BranchPagination, CoursePagination, PaginationResponse, PositionPagination } from "@app/_service/pagination.types";
+import { BranchPagination, CoursePagination, PaginationResponse, PositionPagination, UserPagination } from "@app/_service/pagination.types";
+import { User } from "@app/_service/user.types";
 @Injectable({
     providedIn: 'root'
 })
@@ -41,6 +42,7 @@ export class BasicService {
    *
    * @param value
    */
+
     //Course
     get courses$(): Observable<Course[]> {
         return this._courses.asObservable();
@@ -95,7 +97,6 @@ export class BasicService {
     get postcode$(): Observable<PostCode> {
         return this._postcode.asObservable();
     }
-
 
     // ignored pagination
     getAllCourse(): Observable<Position[]> {

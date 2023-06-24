@@ -6,8 +6,24 @@ import {
 } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { BasicService } from './basic.service';
-import { BranchPagination, CoursePagination, PositionPagination } from '@app/_service/pagination.types';
+import { BranchPagination, CoursePagination, PositionPagination, UserPagination } from '@app/_service/pagination.types';
 import { Branch, Course, Position } from './basic.model';
+import { User } from '@app/_service/user.types';
+import { UserService } from '@app/_service/user.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserResolver implements Resolve<any> {
+
+  constructor(private _service: UserService) {
+
+  }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<{ pagination: UserPagination, users: User[] }> {
+    return this._service.getUser();
+  }
+}
 
 
 @Injectable({

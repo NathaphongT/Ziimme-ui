@@ -3,15 +3,18 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, map, Observable, ReplaySubject, switchMap, take, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { User } from './user.types';
+import { PaginationResponse, UserPagination } from './pagination.types';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
+  private _apiPath = environment.APIURL_LOCAL + '/api/v1.0';
+
   private _user: ReplaySubject<User> = new ReplaySubject<User>(1);
-  private _users: BehaviorSubject<User[]> = new BehaviorSubject<User[]>(null);
-  // private _pagination: BehaviorSubject<UserPagination | null> = new BehaviorSubject(null);
+  private _users: BehaviorSubject<User[] | null> = new BehaviorSubject(null);
+  private _usersPagination: BehaviorSubject<UserPagination | null> = new BehaviorSubject(null);
 
   /**
    * Constructor
@@ -33,12 +36,17 @@ export class UserService {
     this._user.next(value);
   }
 
+  //Users
+  get users$(): Observable<User[]> {
+    return this._users.asObservable();
+  }
+
   get user$(): Observable<User> {
     return this._user.asObservable();
   }
 
-  get users$(): Observable<User[]> {
-    return this._users.asObservable();
+  get usersPagination$(): Observable<UserPagination> {
+    return this._usersPagination.asObservable();
   }
 
   // get pagination$(): Observable<UserPagination> {
@@ -53,6 +61,54 @@ export class UserService {
     return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/authentication`).pipe(
       tap((user: User) => {
         this._user.next(user);
+      })
+    );
+  }
+
+  getAllUser(): Observable<User[]> {
+    return this._httpClient.get(this._apiPath + '/users', {
+      params: {
+        q: '',
+        page: '1',
+        limit: 300
+      }
+    }).pipe(
+      map((res: any) => res.data),
+      tap((users: any) => {
+        this._users.next(users);
+      })
+    );
+  }
+
+  getUser(search: string = "", page: number = 1, limit: number = 10, sort: string = 'createdTime', order: 'asc' | 'desc' | '' = 'asc'): Observable<{ pagination: UserPagination, users: User[] }> {
+    return this._httpClient.get<PaginationResponse>(this._apiPath + '/users', {
+      params: {
+        q: search,
+        page: page.toString(),
+        limit: limit.toString(),
+        sort,
+        order
+      }
+    }).pipe(
+      map(response => {
+
+        const ret: { pagination: UserPagination, users: User[] } = {
+          pagination: {
+            length: response.totalItems,
+            size: limit,
+            page: response.currentPage - 1,
+            lastPage: response.totalPages,
+            startIndex: response.currentPage > 1 ? (response.currentPage - 1) * limit : 0,
+            endIndex: Math.min(response.currentPage * limit, response.totalItems)
+          },
+          users: response.data
+        };
+
+        this._usersPagination.next(ret.pagination);
+        this._users.next(ret.users);
+
+        return ret;
+
       })
     );
   }
@@ -132,44 +188,5 @@ export class UserService {
     );
   }
 
-  getEmployee(): Observable<User[]> {
-    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/users/`).pipe(
-      tap((users: User[]) => {
-        this._users.next(users)
-      })
-    );
-  }
-
-
-  // getAll(search: string = "", page: number = 1, limit: number = 10): Observable<{ pagination: UserPagination, users: User[] }> {
-  //   return this._httpClient.get<PaginationResponse>(`${environment.APIURL_LOCAL}/api/v1.0/users`, {
-  //     params: {
-  //       q: search,
-  //       page: page.toString(),
-  //       limit: limit.toString()
-  //     }
-  //   }).pipe(
-  //     map(response => {
-
-  //       const ret: { pagination: UserPagination, users: User[] } = {
-  //         pagination: {
-  //           length: response.totalItems,
-  //           size: limit,
-  //           page: response.currentPage - 1,
-  //           lastPage: response.totalPages,
-  //           startIndex: response.currentPage > 1 ? (response.currentPage - 1) * limit : 0,
-  //           endIndex: Math.min(response.currentPage * limit, response.totalItems)
-  //         },
-  //         users: response.data
-  //       };
-
-  //       this._pagination.next(ret.pagination);
-  //       this._users.next(ret.users);
-
-  //       return ret;
-
-  //     })
-  //   );
-  // }
 
 }

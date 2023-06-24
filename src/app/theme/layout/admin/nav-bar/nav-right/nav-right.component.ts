@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { UserService } from 'src/app/_service/user.service';
 import { Subject, takeUntil } from 'rxjs';
 import { User } from 'src/app/_service/user.types';
+import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 
 @Component({
   selector: 'app-nav-right',
@@ -44,18 +45,19 @@ export class NavRightComponent {
 
   private _unsubscribeAll: Subject<any> = new Subject();
 
-  constructor(config: NgbDropdownConfig, private tokenStorageService: TokenStorageService, private _userService: UserService, private _changeDetectorRef: ChangeDetectorRef) {
+  constructor(config: NgbDropdownConfig, private tokenStorageService: TokenStorageService, private _Service: UserService, private _changeDetectorRef: ChangeDetectorRef) {
     config.placement = 'bottom-right';
     this.visibleUserList = false;
     this.chatMessage = false;
   }
 
   ngOnInit(): void {
-    this._userService.user$
+    this._Service.user$
       .pipe(takeUntil(this._unsubscribeAll))
       .subscribe((user: User) => {
         this.user = user;
-
+        console.log(this.user);
+        
         // Mark for check
         this._changeDetectorRef.markForCheck();
       });

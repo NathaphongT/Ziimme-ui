@@ -19,8 +19,10 @@
 </div>
 <div class="wrap-body">
   <div class="container">
-    <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="5" [columnMode]="ColumnMode.force"
-      [footerHeight]="50" rowHeight="auto" [rows]="rows">
+    <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
+    [footerHeight]="50" [rowHeight]="50" [rows]="rows" [loadingIndicator]="isLoading" [externalPaging]="true"
+    [count]="userPagination.length" [offset]="userPagination.page" [limit]="userPagination.size"
+    (page)="setPage($event)" (sort)="sorting($event)">
       <ngx-datatable-column name="" [width]="50" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <img src="./assets/icons/edit.png" (click)="openModal(template, row)" width="25px" height="25px" />
@@ -53,7 +55,7 @@
       </ngx-datatable-column>
       <ngx-datatable-column name="สาขา" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          {{ row.branch_name}}
+          {{ row.branchName}}
         </ng-template>
       </ngx-datatable-column>
     </ngx-datatable>
@@ -119,12 +121,12 @@
 
         <mat-form-field class="tw-w-full tw-mb-3" appearance="outline">
           <mat-label>ประจำสาขา</mat-label>
-          <mat-select [formControlName]="'branch_name'">
+          <mat-select [formControlName]="'branchName'">
             <mat-option *ngFor="let p of branch" [value]="p">
               {{p}}
             </mat-option>
           </mat-select>
-          <mat-error *ngIf="userForm.get('branch_name').hasError('required')">
+          <mat-error *ngIf="userForm.get('branchName').hasError('required')">
             <div class="box-error">
               กรุณาเลือกสาขาที่ประจำอยู่
             </div>
