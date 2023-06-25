@@ -13,33 +13,23 @@ export interface User {
   updatedBy: string
 }
 
-// export interface UserPagination {
-//   length: number;
-//   size: number;
-//   page: number;
-//   lastPage: number;
-//   startIndex: number;
-//   endIndex: number;
-// }
-
-
 export interface Customer {
-  cus_id: number;
-  cus_member: string;
-  cus_prefix: string;
-  cus_full_name: string;
-  cus_nick_name: string;
-  cus_telephone: string
-  cus_birthday: Date;
-  cus_gender: string;
-  cus_occupation: string;
-  cus_status: string;
-  cus_salary: string;
-  cus_payment: string;
-  cus_house_number: string;
-  cus_moo: string;
-  cus_soi: string;
-  cus_road: string;
+  cusId: number;
+  cusMember: string;
+  cusPrefix: string;
+  cusFullName: string;
+  cusNickName: string;
+  cusTelephone: string
+  cusBirthday: Date;
+  cusGender: string;
+  cusOccupation: string;
+  cusStatus: string;
+  cusSalary: string;
+  cusPayment: string;
+  cusHouseNumber: string;
+  cusMoo: string;
+  cusSoi: string;
+  cusRoad: string;
   provinceID: number;
   districtID: number;
   sub_districtID: number;
@@ -51,14 +41,4 @@ export interface Customer {
   createdBy: string;
   updatedTime: Date;
   updatedBy: string
-}
-
-
-export interface CustomerPagination {
-  length: number;
-  size: number;
-  page: number;
-  lastPage: number;
-  startIndex: number;
-  endIndex: number;
 }

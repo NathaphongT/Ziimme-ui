@@ -39,6 +39,7 @@ export interface SaleEmployee {
     consultantId: number;
     saleId: number;
     empId: number;
+    cusId: number;
     recordStatus: string;
     createdTime: Date;
     createdBy: string;

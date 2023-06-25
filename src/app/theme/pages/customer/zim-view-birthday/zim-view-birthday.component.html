@@ -15,7 +15,7 @@
     <div class="container">
         <ngx-datatable #table class="bootstrap" [headerHeight]="50" [limit]="5" [columnMode]="ColumnMode.force"
             [footerHeight]="50" rowHeight="auto" [rows]="basicRows" [sorts]="[{prop:
-          'cus_birthday',dir:
+          'cusBirthday',dir:
           'desc'}]">
             <ngx-datatable-column name="#" [canAutoResize]="false" [sortable]="false" [width]="50"
                 [cellClass]="'cellColumn'">
@@ -25,26 +25,26 @@
             </ngx-datatable-column>
             <ngx-datatable-column name="รหัสบัตรสมาชิก" [cellClass]="'cellColumn'">
                 <ng-template let-row="row" ngx-datatable-cell-template>
-                    <!-- {{ row.cus_member }} -->
-                    {{row.cus_member }}
+                    <!-- {{ row.cusMember }} -->
+                    {{row.cusMember }}
                 </ng-template>
             </ngx-datatable-column>
 
             <ngx-datatable-column name="ชื่อ-นามสกุล" [cellClass]="'cellColumn'">
                 <ng-template let-row="row" ngx-datatable-cell-template>
-                    {{ row.cus_full_name }}
+                    {{ row.cusFullName }}
                 </ng-template>
             </ngx-datatable-column>
 
             <ngx-datatable-column name="เบอร์โทรศัพท์" [cellClass]="'cellColumn'">
                 <ng-template let-row="row" ngx-datatable-cell-template>
-                    {{ row.cus_telephone }}
+                    {{ row.cusTelephone }}
                 </ng-template>
             </ngx-datatable-column>
 
-            <ngx-datatable-column name="วันเกิด" prop="cus_birthday" [cellClass]="'cellColumn'">
+            <ngx-datatable-column name="วันเกิด" prop="cusBirthday" [cellClass]="'cellColumn'">
                 <ng-template let-row="row" ngx-datatable-cell-template>
-                    {{ row.cus_birthday | dateTHPipe: 'day' }}
+                    {{ row.cusBirthday | dateTHPipe: 'day' }}
                 </ng-template>
             </ngx-datatable-column>
         </ngx-datatable>

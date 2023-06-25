@@ -21,11 +21,11 @@
   <div class="container">
     <ngx-datatable #table class="bootstrap" [headerHeight]="50" [limit]="5" [columnMode]="ColumnMode.force"
       [footerHeight]="50" rowHeight="auto" [rows]="basicRows" [sorts]="[{prop:
-        'emp_fullname,emp_nickname,emp_position,emp_branch,createdTime',dir:
+        'empFullname,empNickname,empPosition,empBranch,createdTime',dir:
         'desc'}]">
       <ngx-datatable-column name="" [width]="70" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
         <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
-          <button class="btn btn-views" routerLink="./{{ row.emp_id }}">ข้อมูล</button>
+          <button class="btn btn-views" routerLink="./{{ row.empId }}">ข้อมูล</button>
         </ng-template>
       </ngx-datatable-column>
       <ngx-datatable-column name="" [width]="70" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
@@ -45,32 +45,32 @@
       </ngx-datatable-column>
       <ngx-datatable-column name="ชื่อ-นามสกุล" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          {{ row.emp_fullname }}
+          {{ row.empFullname }}
         </ng-template>
       </ngx-datatable-column>
       <ngx-datatable-column name="ชื่อเล่น" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          {{ row.emp_nickname }}
+          {{ row.empNickname }}
         </ng-template>
       </ngx-datatable-column>
       <ngx-datatable-column name="ตำแหน่ง" [cellClass]="'cellColumn'" [canAutoResize]="false" [width]="120">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          {{getNamePosition(row.emp_position)}}
+          {{getNamePosition(row.empPosition)}}
         </ng-template>
       </ngx-datatable-column>
       <ngx-datatable-column name="สาขาประจำ" [cellClass]="'cellColumn'" [canAutoResize]="false" [width]="120">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          {{getNameBranch(row.emp_branch)}}
+          {{getNameBranch(row.empBranch)}}
         </ng-template>
       </ngx-datatable-column>
       <ngx-datatable-column name="เบอร์โทรศัพท์" [cellClass]="'cellColumn'" [canAutoResize]="false" [width]="120">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          {{ row.emp_telephone }}
+          {{ row.empTelephone }}
         </ng-template>
       </ngx-datatable-column>
       <ngx-datatable-column name="อีเมล" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          {{ row.emp_email }}
+          {{ row.empEmail }}
         </ng-template>
       </ngx-datatable-column>
       <ngx-datatable-column name="วันที่เพิ่มข้อมูล" [cellClass]="'cellColumn'">
@@ -98,9 +98,9 @@
       <div class="tw-flex tw-flex-wrap">
         <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
           <mat-label>ชื่อ-นามสกุล</mat-label>
-          <input type="text" matInput placeholder="กรุณาใส่ชื่อ-นามสกุล" id="emp_fullname" name="emp_fullname"
-            [formControlName]="'emp_fullname'">
-          <mat-error *ngIf="employeeForm.get('emp_fullname').hasError('required')">
+          <input type="text" matInput placeholder="กรุณาใส่ชื่อ-นามสกุล" id="empFullname" name="empFullname"
+            [formControlName]="'empFullname'">
+          <mat-error *ngIf="employeeForm.get('empFullname').hasError('required')">
             <div class="box-error">
               กรุณาระบุผู้ใช้งานที่ต้องการ
             </div>
@@ -108,9 +108,9 @@
         </mat-form-field>
         <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
           <mat-label>ชื่อเล่น</mat-label>
-          <input type="text" matInput placeholder="กรุณาใส่ชื่อเล่น" id="emp_nickname" name="emp_nickname"
-            [formControlName]="'emp_nickname'">
-          <mat-error *ngIf="employeeForm.get('emp_nickname').hasError('required')">
+          <input type="text" matInput placeholder="กรุณาใส่ชื่อเล่น" id="empNickname" name="empNickname"
+            [formControlName]="'empNickname'">
+          <mat-error *ngIf="employeeForm.get('empNickname').hasError('required')">
             <div class="box-error">
               กรุณาระบุชื่อเล่น
             </div>
@@ -118,12 +118,12 @@
         </mat-form-field>
         <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
           <mat-label>วันเกิด</mat-label>
-          <input [matDatepicker]="picker" type="text" matInput id="emp_birthday" name="emp_birthday"
-            [formControlName]="'emp_birthday'">
+          <input [matDatepicker]="picker" type="text" matInput id="empBirthday" name="empBirthday"
+            [formControlName]="'empBirthday'">
           <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
           <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
-          <mat-error *ngIf="employeeForm.get('emp_birthday').hasError('required')">
+          <mat-error *ngIf="employeeForm.get('empBirthday').hasError('required')">
             <div class="box-error">
               กรุณาระบุวันเกิด
             </div>
@@ -131,9 +131,9 @@
         </mat-form-field>
         <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
           <mat-label>เบอร์โทรศัพท์</mat-label>
-          <input type="text" matInput maxlength="10" placeholder="กรุณาใส่เบอร์โทรศัพท์" id="emp_telephone"
-            name="emp_telephone" [formControlName]="'emp_telephone'">
-          <mat-error *ngIf="employeeForm.get('emp_telephone').hasError('required')">
+          <input type="text" matInput maxlength="10" placeholder="กรุณาใส่เบอร์โทรศัพท์" id="empTelephone"
+            name="empTelephone" [formControlName]="'empTelephone'">
+          <mat-error *ngIf="employeeForm.get('empTelephone').hasError('required')">
             <div class="box-error">
               กรุณาระบุเบอร์โทรศัพท์
             </div>
@@ -141,13 +141,13 @@
         </mat-form-field>
         <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
           <mat-label>อีเมล</mat-label>
-          <input id="emp_email" matInput [formControlName]="'emp_email'" required>
-          <mat-error *ngIf="employeeForm.get('emp_email').hasError('required')">
+          <input id="empEmail" matInput [formControlName]="'empEmail'" required>
+          <mat-error *ngIf="employeeForm.get('empEmail').hasError('required')">
             <div class="box-error">
               กรุณากรอกที่อยู่อีเมล
             </div>
           </mat-error>
-          <mat-error *ngIf="employeeForm.get('emp_email').hasError('email')">
+          <mat-error *ngIf="employeeForm.get('empEmail').hasError('email')">
             <div class="box-error">
               กรุณาตรวจสอบที่อยู่อีเมลให้ถูกต้อง
             </div>
@@ -155,12 +155,12 @@
         </mat-form-field>
         <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
           <mat-label>สถานะภาพ</mat-label>
-          <mat-select [formControlName]="'emp_status'">
+          <mat-select [formControlName]="'empStatus'">
             <mat-option *ngFor="let p of status" [value]="p">
               {{p}}
             </mat-option>
           </mat-select>
-          <mat-error *ngIf="employeeForm.get('emp_status').hasError('required')">
+          <mat-error *ngIf="employeeForm.get('empStatus').hasError('required')">
             <div class="box-error">
               กรุณาเลือกสถานะภาพ
             </div>
@@ -168,13 +168,13 @@
         </mat-form-field>
         <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
           <mat-label>สิทธิ์ผู้ใช้งาน</mat-label>
-          <mat-select [formControlName]="'emp_position'">
+          <mat-select [formControlName]="'empPosition'">
             <mat-option value="0">ไม่ระบุ</mat-option>
             <mat-option *ngFor="let item of (positions$ | async)" [value]="item.positionId">
               {{item.positionNameEng}}
             </mat-option>
           </mat-select>
-          <mat-error *ngIf="employeeForm.get('emp_position').hasError('required')">
+          <mat-error *ngIf="employeeForm.get('empPosition').hasError('required')">
             <div class="box-error">
               กรุณาเลือกสิทธิ์ผู้ใช้งาน
             </div>
@@ -182,13 +182,13 @@
         </mat-form-field>
         <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
           <mat-label>สาขาประจำ</mat-label>
-          <mat-select [formControlName]="'emp_branch'">
+          <mat-select [formControlName]="'empBranch'">
             <mat-option value="0">ไม่ระบุ</mat-option>
             <mat-option *ngFor="let item of (branchs$ | async)" [value]="item.branchId">
               {{item.branchCode}}
             </mat-option>
           </mat-select>
-          <mat-error *ngIf="employeeForm.get('emp_branch').hasError('required')">
+          <mat-error *ngIf="employeeForm.get('empBranch').hasError('required')">
             <div class="box-error">
               กรุณาเลือกสาขา
             </div>

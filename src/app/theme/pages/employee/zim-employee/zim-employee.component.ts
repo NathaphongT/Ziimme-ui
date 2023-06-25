@@ -60,17 +60,17 @@ export class ZimEmployeeComponent implements OnInit {
     this.LoadEmployeALL();
     this.employeeForm = this._formBuilder.group({
       empId: [null],
-      emp_fullname: ['', Validators.required],
-      emp_nickname: ['', Validators.required],
+      empFullname: ['', Validators.required],
+      empNickname: ['', Validators.required],
       // emp_birthday: ['', Validators.required],
-      emp_birthday: [''],
-      emp_telephone: [''],
+      empBirthday: [''],
+      empTelephone: [''],
       // emp_telephone: ['', Validators.required],
-      emp_email: [''],
+      empEmail: [''],
       // emp_email: ['', [Validators.required, Validators.email]],
-      emp_status: [[], Validators.required],
-      emp_position: ['', Validators.required],
-      emp_branch: ['', Validators.required],
+      empStatus: [[], Validators.required],
+      empPosition: ['', Validators.required],
+      empBranch: ['', Validators.required],
     });
 
     this.positions$ = this._SerivceBasic.positions$;
@@ -177,7 +177,7 @@ export class ZimEmployeeComponent implements OnInit {
     Swal.fire({
       title: 'คุณแน่ใจหรือว่าต้องการลบ?',
       text:
-        'คุณจะไม่สามารถกู้พนักงาน ' + row.emp_fullname + ' ได้!',
+        'คุณจะไม่สามารถกู้พนักงาน ' + row.empFullname + ' ได้!',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'ยืนยัน',
@@ -225,8 +225,8 @@ export class ZimEmployeeComponent implements OnInit {
     this.key = event.target.value.toLowerCase();
     const temp = this.basicSort.filter(function (d) {
       return (
-        d.emp_fullname.toLowerCase().indexOf(val) !== -1 ||
-        d.emp_fullname.toLowerCase().indexOf(val) !== -1 ||
+        d.empFullname.toLowerCase().indexOf(val) !== -1 ||
+        d.empFullname.toLowerCase().indexOf(val) !== -1 ||
         d.emp_nickname.toLowerCase().indexOf(val) !== -1 ||
         d.emp_nickname.toLowerCase().indexOf(val) !== -1 ||
         !val

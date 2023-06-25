@@ -58,8 +58,13 @@ export class SaleByIdConResolver implements Resolve<any> {
 
   constructor(private _saleService: SaleService) { }
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | SaleEmployee[]> {
-    return this._saleService.getSaleBYIDConsult(route.paramMap.get('id'));
-  }
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
+    return forkJoin([
+      // this._saleService.getWareHouseById(route.paramMap.get('id')),
+      this._saleService.getSaleBYIDSale(route.paramMap.get('id')),
+      this._saleService.getSaleBYIDConsult(route.paramMap.get('id'))
+      
 
+    ]);
+  }
 }

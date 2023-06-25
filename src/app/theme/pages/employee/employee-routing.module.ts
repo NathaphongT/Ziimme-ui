@@ -34,10 +34,8 @@ const routes: Routes = [
             path: ':id',
             component: ZimEmployeeSaleComponent,
             resolve: {
-              // sales: SaleResolver,
               slaeByIDConsult: SaleByIdConResolver,
               employees: EmployeeResolver,
-              // courses: CourseResolver,
             }
           },
         ]

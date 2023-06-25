@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, ReplaySubject, concatMap, map, switchMap, take, tap } from 'rxjs';
+import { BehaviorSubject, Observable, ReplaySubject, concatMap, forkJoin, map, of, switchMap, take, tap, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@environments/environment';
 import { SaleCut } from '@app/theme/pages/basic-data/basic.model';
-import { Sale } from './main.types';
+import { Sale, SaleEmployee } from './main.types';
 
 @Injectable({
   providedIn: 'root'
@@ -52,13 +52,7 @@ export class SaleService {
     );
   }
 
-  getSaleBYIDSale(id): Observable<Sale[]> {
-    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sales/${id}`).pipe(
-      tap((sale: Sale[]) => {
-        this._sales.next(sale);
-      })
-    );
-  }
+
 
   getSaleBYIDCus(id): Observable<any> {
     return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sale_cus/${id}`).pipe(
@@ -68,8 +62,16 @@ export class SaleService {
     );
   }
 
+  getSaleBYIDSale(id): Observable<Sale[]> {
+    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sales/${id}`).pipe(
+      tap((sale: Sale[]) => {
+        this._sales.next(sale);
+      })
+    );
+  }
+
   getSaleBYIDConsult(id): Observable<any> {
-    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sales/${id}/sale_employee`).pipe(
+    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/salese/${id}/sale_employee`).pipe(
       tap((sale: any) => {
         this._sales.next(sale);
       })
@@ -97,9 +99,9 @@ export class SaleService {
 
 
 
-  saveSaleEmployee(saleId, consultantList): Observable<any> {
+  saveSaleEmployee(saleId, cusId, consultantList): Observable<any> {
     return this._httpClient.post(`${environment.APIURL_LOCAL}/api/v1.0/sales/${saleId}/sale_employee`, consultantList.map(empId => {
-      return { saleId, empId: empId }
+      return { saleId, cusId, empId: empId }
     })).pipe(
       tap((v) => console.log("saveAllConsultant", v))
     )
@@ -129,7 +131,7 @@ export class SaleService {
       saleOverdue,
       cusId,
     ).pipe(
-      concatMap(wh => this.saveSaleEmployee(wh.saleId, consultantList).pipe(
+      concatMap(wh => this.saveSaleEmployee(wh.saleId, wh.saleId, consultantList).pipe(
         map(() => wh)
       ))
     )
@@ -260,6 +262,40 @@ export class SaleService {
             })
           )
       )
+    );
+  }
+
+  getWareHouseById(id): Observable<Sale | boolean> {
+    return this._httpClient.get<Sale>(`${environment.APIURL_LOCAL}/api/v1.0/sales/${id}`).pipe(
+
+      switchMap(warehouse => {
+
+        const requests = forkJoin([
+          this._httpClient.get<SaleEmployee[]>(`${environment.APIURL_LOCAL}/api/v1.0/salese/${warehouse.empId}/sale_employee`)
+        ]);
+
+        return forkJoin(requests).pipe(
+
+          map((responses: [
+            SaleEmployee[]
+          ][]) => {
+
+            warehouse.empId = responses[0][0];
+
+            this._sale.next(warehouse);
+
+            return warehouse;
+          })
+        );
+      }),
+      switchMap(warehouse => {
+
+        if (!warehouse) {
+          return throwError(() => 'Could not found Warehouse with id of ' + id + '!');
+        }
+
+        return of(warehouse)
+      })
     );
   }
 
