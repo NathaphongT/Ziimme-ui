@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import { CustomerService } from '@app/theme/pages/customer/customer.service';
-import { EmployeeService } from '@app/_service/employee.service';
 import { SaleService } from '@app/_service/sale.service';
 import { ColumnMode } from '@swimlane/ngx-datatable';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
@@ -11,6 +10,7 @@ import { Observable, Subject, takeUntil } from 'rxjs';
 import Swal from 'sweetalert2';
 import { Branch, Course, SaleCut } from '../../basic-data/basic.model';
 import { Employee, Sale } from '@app/_service/main.types';
+import { EmployeeService } from '../../employee/employee.service';
 
 @Component({
   selector: 'app-zim-view-history',

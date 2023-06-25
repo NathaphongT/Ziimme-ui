@@ -3,15 +3,23 @@ import { BehaviorSubject, Observable, ReplaySubject, concatMap, forkJoin, map, o
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@environments/environment';
 import { SaleCut } from '@app/theme/pages/basic-data/basic.model';
-import { Sale, SaleEmployee } from './main.types';
+import { Employee, Sale, SaleEmployee } from './main.types';
+import { PaginationResponse, SalePagination } from './pagination.types';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SaleService {
 
+  private _apiPath = environment.APIURL_LOCAL + '/api/v1.0';
+
   private _sales: BehaviorSubject<Sale[] | null> = new BehaviorSubject(null);
   private _sale: BehaviorSubject<Sale | null> = new BehaviorSubject(null);
+  private _warehousePagination: BehaviorSubject<SalePagination | null> = new BehaviorSubject(null);
+
+
+  private _saleemps: BehaviorSubject<SaleEmployee[] | null> = new BehaviorSubject(null);
+  private _saleemp: BehaviorSubject<SaleEmployee | null> = new BehaviorSubject(null);
 
   private _salecut: ReplaySubject<SaleCut> = new ReplaySubject<SaleCut>(1);
   private _salescut: BehaviorSubject<SaleCut[]> = new BehaviorSubject<SaleCut[]>(null);
@@ -137,7 +145,38 @@ export class SaleService {
     )
   }
 
-  updateSale(id: number, data: Sale): Observable<Sale> {
+  updateSale(saleId, saleNumber, saleProduct, saleCount, salePayBalance, salePay, saleOverdue, cusId): Observable<any> {
+    return this._httpClient.post(`${this._apiPath}/warehouses/${saleId}`, {
+      saleNumber,
+      saleProduct,
+      saleCount,
+      salePayBalance,
+      salePay,
+      saleOverdue,
+      cusId,
+    }).pipe(
+      tap((v) => console.log("updateSale", v))
+    )
+  }
+
+
+  updateAll(saleId, saleNumber, saleProduct, saleCount, salePayBalance, salePay, saleOverdue, cusId, consultantList): Observable<any> {
+    return this.updateSale(saleId,
+      saleNumber,
+      saleProduct,
+      saleCount,
+      salePayBalance,
+      salePay,
+      saleOverdue,
+      cusId,
+    ).pipe(
+      concatMap(wh => this.saveSaleEmployee(wh.saleId, wh.saleId, consultantList).pipe(
+        map(() => wh)
+      ))
+    )
+  }
+
+  updateSales(id: number, data: Sale): Observable<Sale> {
     return this.sales$.pipe(
       take(1),
       switchMap((sales) =>
@@ -265,39 +304,11 @@ export class SaleService {
     );
   }
 
-  getWareHouseById(id): Observable<Sale | boolean> {
-    return this._httpClient.get<Sale>(`${environment.APIURL_LOCAL}/api/v1.0/sales/${id}`).pipe(
-
-      switchMap(warehouse => {
-
-        const requests = forkJoin([
-          this._httpClient.get<SaleEmployee[]>(`${environment.APIURL_LOCAL}/api/v1.0/salese/${warehouse.empId}/sale_employee`)
-        ]);
-
-        return forkJoin(requests).pipe(
-
-          map((responses: [
-            SaleEmployee[]
-          ][]) => {
-
-            warehouse.empId = responses[0][0];
-
-            this._sale.next(warehouse);
-
-            return warehouse;
-          })
-        );
-      }),
-      switchMap(warehouse => {
-
-        if (!warehouse) {
-          return throwError(() => 'Could not found Warehouse with id of ' + id + '!');
-        }
-
-        return of(warehouse)
+  getCategoryByWarehouseId(id): Observable<any> {
+    return this._httpClient.get(this._apiPath + '/salescus/' + id + '/sale_employee').pipe(
+      tap((category: any) => {
+        this._saleemps.next(category);
       })
     );
   }
-
-
 }

@@ -5,7 +5,6 @@ import {
   ActivatedRouteSnapshot
 } from '@angular/router';
 import { CustomerService } from '@app/theme/pages/customer/customer.service';
-import { EmployeeService } from '@app/_service/employee.service';
 import { SaleService } from '@app/_service/sale.service';
 import { Customer } from '@app/_service/user.types';
 import { Observable, forkJoin } from 'rxjs';
@@ -13,6 +12,7 @@ import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import { Course, Districts, PostCode, Province, SaleCut, SubDistricts } from '../basic-data/basic.model';
 import { Employee, Sale, SaleEmployee } from '@app/_service/main.types';
 import { CustomerPagination, SalePagination } from '@app/_service/pagination.types';
+import { EmployeeService } from '../employee/employee.service';
 
 @Injectable({
   providedIn: 'root'
@@ -174,3 +174,38 @@ export class SaleEmployeeResolver implements Resolve<any> {
   }
 
 }
+
+// S
+
+// @Injectable({
+//   providedIn: 'root'
+// })
+// export class SocialResolver implements Resolve<any> {
+
+//   constructor(private _socialManageService: SaleService) {}
+
+//   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<{ pagination: SalePagination, warehouses: Sale[]} | any> {
+//     return forkJoin([
+//       this._socialManageService.getWareHouse(),
+//     ]);
+//   }
+  
+// }
+
+
+// @Injectable({
+//   providedIn: 'root'
+// })
+// export class SocialResolver implements Resolve<any> {
+
+//   constructor(private _socialManageService: SaleService) { }
+
+//   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
+//     return forkJoin([
+//       this._socialManageService.getCategoryByWarehouseId(route.paramMap.get('id')),
+//       // this._socialManageService.getSocial(route.paramMap.get('id'))
+//       //this._socialManageService.getCategoryByWarehouseId(route.paramMap.get('id')) // รวม categories ไปไว้ใน getWareHouseById แล้ว
+//     ]);
+//   }
+
+// }

@@ -53,11 +53,11 @@ const routes: Routes = [
             path: 'views/:id',
             component: ZimViewCustomerComponent,
             resolve: {
+
               employees: EmployeeResolver,
               courses: CourseResolver,
               customersID: CustomerIDResolver,
               saleById: SaleByIdCusResolver,
-              // saleByIdCon: SaleEmployeeByIdCusResolver,
             }
           },
           {

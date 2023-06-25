@@ -4,13 +4,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ColumnMode } from '@swimlane/ngx-datatable';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subject, catchError, map, take, takeUntil, throwError } from 'rxjs';
-import { EmployeeService } from '@app/_service/employee.service';
 import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import { SaleService } from '@app/_service/sale.service';
 import Swal from 'sweetalert2';
 import { CustomerService } from '@app/theme/pages/customer/customer.service';
 import { Course } from '../../basic-data/basic.model';
 import { Employee, Sale } from '@app/_service/main.types';
+import { EmployeeService } from '../../employee/employee.service';
 @Component({
   selector: 'app-zim-view-customer',
   templateUrl: './zim-view-customer.component.html',
@@ -154,16 +154,55 @@ export class ZimViewCustomerComponent implements OnInit {
 
     let saveData: Sale = this.saleForm.getRawValue();
 
+
     if (saveData) {
       const overviewData = this.saleForm.getRawValue();
       const platformData = this.saleEmployeeForm.getRawValue();
 
-      if (overviewData.warehouseId) {
+      if (overviewData.saleId) {
         // no need to update anymore
-        /* this._socialService.updateAll(overviewData.warehouseId, overviewData.warehouseName, this.myDropDown, platformData.categories, socialData).subscribe((v) => {
-          console.log(v)
-        }
-        ); */
+        this._ServiceSale.updateAll(
+          overviewData.saleId,
+          overviewData.saleNumber,
+          overviewData.saleProduct,
+          overviewData.saleCount,
+          overviewData.salePayBalance,
+          overviewData.salePay,
+          overviewData.saleOverdue,
+          overviewData.cusId,
+          platformData.empId)
+          .pipe(
+            catchError((err) => {
+              console.log(err);
+
+              Swal.fire({
+                icon: 'error',
+                title: 'ชื่อผู้ใช้งานนี้มีอยู่ในระบบแล้ว',
+                showConfirmButton: false,
+                timer: 2000,
+              });
+              return throwError(err);
+            })
+          )
+          .subscribe((res) => {
+            this.ModalList.hide();
+            if (res) {
+              Swal.fire({
+                icon: 'success',
+                title: 'แก้ไขข้อมูลสำเร็จ',
+                showConfirmButton: false,
+                timer: 2000,
+              });
+            }
+          },
+            () => {
+              Swal.fire({
+                icon: 'error',
+                title: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้',
+                showConfirmButton: false,
+                timer: 2000,
+              });
+            });
       }
       else {
         this._ServiceSale.saveAll(
@@ -187,6 +226,7 @@ export class ZimViewCustomerComponent implements OnInit {
             })
           )
           .subscribe((v) => {
+            this.ModalList.hide();
             console.log('กรอกเรียบร้อย', v);
             Swal.fire({
               icon: 'success',

@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, ReplaySubject, map, switchMap, take, tap } from 'rxjs';
+import { BehaviorSubject, Observable, ReplaySubject, forkJoin, map, of, switchMap, take, tap, throwError } from 'rxjs';
 import { Customer } from '../../../_service/user.types';
 import { environment } from '@environments/environment';
 import { CustomerPagination, PaginationResponse } from '@app/_service/pagination.types';
+import { Sale, SaleEmployee } from '@app/_service/main.types';
 
 @Injectable({
   providedIn: 'root'
