@@ -144,6 +144,14 @@ export class ZimViewCustomerComponent implements OnInit {
     console.log('คลังข้อมูล', this.saleForm.value);
     console.log('หมวดหมู่', this.saleEmployeeForm.value);
 
+    // Return if the form is invalid
+    if (this.saleForm.invalid) {
+      return;
+    }
+
+    this.submitted = true;
+    this.isLoading = true;
+
     let saveData: Sale = this.saleForm.getRawValue();
 
     if (saveData) {
