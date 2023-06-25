@@ -11,17 +11,17 @@
     <mat-form-field class="example-full-width tw-flex tw-flex-row" appearance="outline">
       <mat-label>ค้นหาข้อมูลลูกค้า</mat-label>
       <mat-icon matPrefix>search</mat-icon>
-      <input type="search" (keyup)='serviceListFilter($event)' class="tw-text-xs"
+      <input type="search" [formControl]="searchInputControl" class="tw-text-xs"
         placeholder="ค้นหาเลขสมาชิกและชื่อลูกค้า" matInput>
     </mat-form-field>
   </div>
 </div>
 <div class="wrap-body">
   <div class="container">
-    <ngx-datatable #table class="bootstrap" [headerHeight]="50" [limit]="5" [columnMode]="ColumnMode.force"
-      [footerHeight]="50" rowHeight="auto" [rows]="basicRows" [sorts]="[{prop:
-        'cus_member,cus_full_name,cus_telephone,cus_birthday,createdTime',dir:
-        'desc'}]">
+    <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
+      [footerHeight]="50" [rowHeight]="50" [rows]="basicRows" [loadingIndicator]="isLoading" [externalPaging]="true"
+      [count]="customerPagination.length" [offset]="customerPagination.page" [limit]="customerPagination.size"
+      (page)="setPage($event)" (sort)="sorting($event)">
       <ngx-datatable-column name="#" [canAutoResize]="false" [sortable]="false" [width]="50" [cellClass]="'cellColumn'">
         <ng-template let-rowIndex="rowIndex" ngx-datatable-cell-template>
           {{ rowIndex + 1 }}
@@ -29,27 +29,27 @@
       </ngx-datatable-column>
       <ngx-datatable-column name="รหัสบัตรสมาชิก" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          <!-- {{ row.cus_member }} -->
-          <div [innerHTML]="highLight(row.cus_member)">{{
-            row.cus_member }}</div>
+          <!-- {{ row.cusMember }} -->
+          <div [innerHTML]="highLight(row.cusMember)">{{
+            row.cusMember }}</div>
         </ng-template>
       </ngx-datatable-column>
 
       <ngx-datatable-column name="ชื่อ-นามสกุล" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          {{ row.cus_full_name }}
+          {{ row.cusFullName }}
         </ng-template>
       </ngx-datatable-column>
 
       <ngx-datatable-column name="เบอร์โทรศัพท์" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          {{ row.cus_telephone }}
+          {{ row.cusTelephone }}
         </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column name="วันเกิด"  [cellClass]="'cellColumn'">
+      <ngx-datatable-column name="วันเกิด" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          {{ row.cus_birthday | dateTHPipe: 'day' }}
+          {{ row.cusBirthday | dateTHPipe: 'day' }}
         </ng-template>
       </ngx-datatable-column>
 
@@ -62,13 +62,13 @@
 
       <ngx-datatable-column name="" [width]="80" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
         <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
-          <a class="btn btn-views" routerLink="./views/{{ row?.cus_id }}">ประวัติ</a>
+          <a class="btn btn-views" routerLink="./views/{{ row?.cusId }}">ประวัติ</a>
         </ng-template>
       </ngx-datatable-column>
 
       <ngx-datatable-column name="" [width]="80" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
         <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
-          <button class="btn btn-edit" routerLink="./{{ row.cus_id }}">แก้ไข</button>
+          <button class="btn btn-edit" routerLink="./{{ row.cusId }}">แก้ไข</button>
         </ng-template>
       </ngx-datatable-column>
 

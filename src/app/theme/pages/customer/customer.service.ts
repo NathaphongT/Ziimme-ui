@@ -3,14 +3,19 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, ReplaySubject, map, switchMap, take, tap } from 'rxjs';
 import { Customer } from '../../../_service/user.types';
 import { environment } from '@environments/environment';
+import { CustomerPagination, PaginationResponse } from '@app/_service/pagination.types';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CustomerService {
 
+  private _apiPath = environment.APIURL_LOCAL + '/api/v1.0';
+
   private _customer: ReplaySubject<Customer> = new ReplaySubject<Customer>(1);
-  private _customers: BehaviorSubject<Customer[]> = new BehaviorSubject<Customer[]>(null);
+  private _customers: BehaviorSubject<Customer[] | null> = new BehaviorSubject(null);
+  private _customersPagination: BehaviorSubject<CustomerPagination | null> = new BehaviorSubject(null);
+
   customerss$: any;
 
   constructor(private _httpClient: HttpClient) { }
@@ -20,6 +25,8 @@ export class CustomerService {
     this._customer.next(value);
   }
 
+
+  //Customer
   get customer$(): Observable<Customer> {
     return this._customer.asObservable();
   }
@@ -28,14 +35,58 @@ export class CustomerService {
     return this._customers.asObservable();
   }
 
+  get customersPagination$(): Observable<CustomerPagination> {
+    return this._customersPagination.asObservable();
+  }
+
+  // ignored pagination
   getAllCustomer(): Observable<Customer[]> {
-    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/customer/`).pipe(
-      tap((customer: Customer[]) => {
-        this._customers.next(customer)
+    return this._httpClient.get(this._apiPath + '/customer', {
+      params: {
+        q: '',
+        page: '1',
+        limit: 300
+      }
+    }).pipe(
+      map((res: any) => res.data),
+      tap((customers: any) => {
+        this._customers.next(customers);
       })
     );
   }
 
+  getCustomer(search: string = "", page: number = 1, limit: number = 10, sort: string = 'createdTime', order: 'asc' | 'desc' | '' = 'asc'): Observable<{ pagination: CustomerPagination, customers: Customer[] }> {
+    return this._httpClient.get<PaginationResponse>(this._apiPath + '/customer', {
+      params: {
+        q: search,
+        page: page.toString(),
+        limit: limit.toString(),
+        sort,
+        order
+      }
+    }).pipe(
+      map(response => {
+
+        const ret: { pagination: CustomerPagination, customers: Customer[] } = {
+          pagination: {
+            length: response.totalItems,
+            size: limit,
+            page: response.currentPage - 1,
+            lastPage: response.totalPages,
+            startIndex: response.currentPage > 1 ? (response.currentPage - 1) * limit : 0,
+            endIndex: Math.min(response.currentPage * limit, response.totalItems)
+          },
+          customers: response.data
+        };
+
+        this._customersPagination.next(ret.pagination);
+        this._customers.next(ret.customers);
+
+        return ret;
+
+      })
+    );
+  }
 
   getByIdCustomer(id): Observable<Customer> {
     return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/customer/${id}`).pipe(
@@ -76,7 +127,7 @@ export class CustomerService {
             map((updatedCustomer: Customer) => {
               // Find the index of the updated customerss
               const index = customers.findIndex(
-                (item) => item.cus_id === id
+                (item) => item.cusId === id
               );
 
               // Update the customerss
@@ -103,7 +154,7 @@ export class CustomerService {
             map((isDeleted: boolean) => {
               // Find the index of the deleted user
               const index = customer.findIndex(
-                (item) => item.cus_id === id
+                (item) => item.cusId === id
               );
 
               // Delete the user

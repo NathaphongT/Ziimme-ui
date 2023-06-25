@@ -63,7 +63,7 @@ export class ZimCustomersComponent {
   isLoading: boolean;
   submitted: boolean;
 
-  cus_id = null;
+  cusId = null;
 
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -75,29 +75,29 @@ export class ZimCustomersComponent {
     private _activatedRoute: ActivatedRoute,
   ) {
     this._activatedRoute.paramMap.subscribe(params => {
-      this.cus_id = params.get('id')
+      this.cusId = params.get('id')
     })
   }
 
   ngOnInit() {
 
     this.customerForm = this._fb.group({
-      cus_id: [this.cus_id],
-      cus_member: [''],
-      cus_prefix: [''],
-      cus_full_name: [''],
-      cus_nick_name: [''],
-      cus_telephone: [''],
-      cus_birthday: [''],
-      cus_gender: [''],
-      cus_occupation: [''],
-      cus_status: [''],
-      cus_salary: [''],
-      cus_payment: [''],
-      cus_house_number: [''],
-      cus_moo: [''],
-      cus_soi: [''],
-      cus_road: [''],
+      cusId: [this.cusId],
+      cusMember: [''],
+      cusPrefix: [''],
+      cusFullName: [''],
+      cusNickName: [''],
+      cusTelephone: [''],
+      cusBirthday: [''],
+      cusGender: [''],
+      cusOccupation: [''],
+      cusStatus: [''],
+      cusSalary: [''],
+      cusPayment: [''],
+      cusHouseNumber: [''],
+      cusMoo: [''],
+      cusSoi: [''],
+      cusRoad: [''],
       provinceID: [],
       districtID: [],
       sub_districtID: [],
@@ -108,12 +108,12 @@ export class ZimCustomersComponent {
 
     this.provinces$ = this._Service.provinces$;
 
-    if (this.cus_id) {
+    if (this.cusId) {
       this._SerivceCus.customer$.pipe(takeUntil(this._unsubscribeAll)).subscribe(customer => {
         this.customerForm.patchValue(customer);
       })
     }
-    this.GetByIdCustomer(this.cus_id);
+    this.GetByIdCustomer(this.cusId);
   }
 
   GetByIdCustomer(id) {
@@ -138,8 +138,8 @@ export class ZimCustomersComponent {
 
     let DataCustomer: Customer = this.customerForm.getRawValue();
 
-    if (DataCustomer.cus_id) {
-      this._SerivceCus.updateCustomer(DataCustomer.cus_id, DataCustomer).subscribe((res) => {
+    if (DataCustomer.cusId) {
+      this._SerivceCus.updateCustomer(DataCustomer.cusId, DataCustomer).subscribe((res) => {
         if (res) {
           Swal.fire({
             icon: 'success',

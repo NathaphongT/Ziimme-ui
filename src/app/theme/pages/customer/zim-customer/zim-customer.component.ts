@@ -5,11 +5,13 @@ import { ColumnMode, DatatableComponent } from '@swimlane/ngx-datatable';
 import { TokenStorageService } from '../../../../_service/token-storage.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { CustomerService } from '@app/theme/pages/customer/customer.service';
-import { Observable, Subject, map, take, takeUntil, tap } from 'rxjs';
+import { Observable, Subject, debounceTime, map, switchMap, take, takeUntil, tap } from 'rxjs';
 import { Customer } from '@app/_service/user.types';
 import Swal from 'sweetalert2';
 import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import { Province } from '../../basic-data/basic.model';
+import { CustomerPagination } from '@app/_service/pagination.types';
+import { UntypedFormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-zim-customer',
@@ -31,31 +33,52 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
 
   isLoading: boolean;
 
+  customerPagination: CustomerPagination;
+  searchInputControl: UntypedFormControl = new UntypedFormControl();
+
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
   constructor(private _changeDetectorRef: ChangeDetectorRef,
     private modalService: BsModalService,
-    private _SerivceCus: CustomerService,
+    private _serivceCus: CustomerService,
     private _ServiceBasic: BasicService
   ) {
 
   }
 
   ngOnInit(): void {
-    this.LoadCustomerALL();
-    this._SerivceCus.customers$.pipe(takeUntil(this._unsubscribeAll)).subscribe(customers => {
+    this._serivceCus.customersPagination$
+      .pipe(takeUntil(this._unsubscribeAll)).subscribe(pagination => {
+        this.customerPagination = pagination;
 
-      if (customers) {
-        this.basicRows = customers;
-        
+        this._changeDetectorRef.markForCheck();
+
+      });
+
+    this._serivceCus.customers$
+      .pipe(takeUntil(this._unsubscribeAll)).subscribe(users => {
+        this.basicRows = users;
+
         this.basicRows = [...this.basicRows];
-      }
-      else {
-        this.basicRows = [];
-      }
 
-      this.isLoading = false;
-    })
+        this.isLoading = false;
+      })
+
+    this.searchInputControl.valueChanges
+      .pipe(
+        takeUntil(this._unsubscribeAll),
+        debounceTime(300),
+        switchMap((query) => {
+          this.isLoading = true;
+          console.log('ค้นหา', query);
+          localStorage.setItem("query", query);
+          return this._serivceCus.getCustomer(query, 1, 10);
+        }),
+        map(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe();
 
   }
 
@@ -68,14 +91,14 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
     Swal.fire({
       title: 'คุณแน่ใจหรือว่าต้องการลบ?',
       text:
-        'คุณจะไม่สามารถกู้พนักงาน ' + row.cus_full_name + ' ได้!',
+        'คุณจะไม่สามารถกู้พนักงาน ' + row.cusFullName + ' ได้!',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'ยืนยัน',
       cancelButtonText: 'ยกเลิก',
     }).then((result) => {
       if (result.isConfirmed) {
-        this._SerivceCus.deleteCustomer(row.cus_id).pipe(take(1))
+        this._serivceCus.deleteCustomer(row.cusId).pipe(take(1))
           .subscribe(() => {
             Swal.fire({
               icon: 'success',
@@ -95,37 +118,15 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
     this.key = event.target.value.toLowerCase();
     const temp = this.basicSort.filter(function (d) {
       return (
-        d.cus_member.toLowerCase().indexOf(val) !== -1 ||
-        d.cus_member.toLowerCase().indexOf(val) !== -1 ||
-        d.cus_full_name.toLowerCase().indexOf(val) !== -1 ||
-        d.cus_full_name.toLowerCase().indexOf(val) !== -1 ||
+        d.cusMember.toLowerCase().indexOf(val) !== -1 ||
+        d.cusMember.toLowerCase().indexOf(val) !== -1 ||
+        d.cusFullName.toLowerCase().indexOf(val) !== -1 ||
+        d.cusFullName.toLowerCase().indexOf(val) !== -1 ||
         !val
       );
     });
     this.basicRows = temp;
     this.table.offset = 0;
-  }
-
-  LoadCustomerALL() {
-    this._SerivceCus.getAllCustomer().subscribe((res) => {
-      // console.log('category', res);
-      let data = res;
-      this.basicSort = data.length ? [...data] : [];
-      this.basicRows = data.length ? data : [];
-      this.count = data.length;
-      if (typeof data !== 'undefined' && data.length > 0) {
-        this.lastupdate = new Date(
-          Math.max.apply(
-            null,
-            data.map(function (e) {
-              return e.createdTime ? new Date(e.createdTime) : new Date();
-            })
-          )
-        );
-      } else {
-        this.lastupdate = '-';
-      }
-    });
   }
 
   highLight(temp) {
@@ -135,6 +136,23 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
     if (temp != null) {
       return temp.replace(new RegExp(this.key, 'gi'), (match) => {
         return '<span class="highlightText">' + match + '</span>';
+      });
+    }
+  }
+
+
+  setPage(pageInfo) {
+    this.customerPagination.page = pageInfo.offset + 1;
+    this._serivceCus.getCustomer(this.searchInputControl.value || "", this.customerPagination.page, this.customerPagination.size).subscribe();
+  }
+
+  sorting(event) {
+    if (event.sorts && event.sorts.length) {
+      this.isLoading = true;
+
+      this.customerPagination.page = 1;
+      this._serivceCus.getCustomer(this.searchInputControl.value || "", this.customerPagination.page, this.customerPagination.size, event.sorts[0].prop, event.sorts[0].dir).subscribe(() => {
+        this.isLoading = false;
       });
     }
   }

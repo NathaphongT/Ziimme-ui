@@ -11,130 +11,8 @@ import { Customer } from '@app/_service/user.types';
 import { Observable, forkJoin } from 'rxjs';
 import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import { Course, Districts, PostCode, Province, SaleCut, SubDistricts } from '../basic-data/basic.model';
-import { Employee, Sale } from '@app/_service/main.types';
-import { ManageService } from '@app/_service/manage.service';
-import { SalePagination } from '@app/_service/pagination.types';
-
-
-
-@Injectable({
-  providedIn: 'root'
-})
-export class CustomerResolver implements Resolve<any> {
-
-  constructor(private _customerService: CustomerService) { }
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Customer[]> {
-    return this._customerService.getAllCustomer();
-  }
-
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class CustomerIDResolver implements Resolve<any> {
-
-  constructor(private _customerService: CustomerService) { }
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Customer> {
-    return this._customerService.getByIdCustomer(route.paramMap.get('id'));
-  }
-
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class EmployeeResolver implements Resolve<any> {
-
-  constructor(private _employeeService: EmployeeService) { }
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Employee[]> {
-    return this._employeeService.getAllEmployee();
-  }
-
-}
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class CourseResolver implements Resolve<any> {
-
-//   constructor(private _basicService: BasicService) { }
-
-//   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Course[]> {
-//     return this._basicService.getAllCourse();
-//   }
-
-// }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SaleResolver implements Resolve<any> {
-
-  constructor(private _saleService: SaleService) { }
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Sale[]> {
-    return this._saleService.getAllSale();
-  }
-
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SaleByIdSlaeResolver implements Resolve<any> {
-
-  constructor(private _saleService: SaleService) { }
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Sale[]> {
-    return this._saleService.getSaleBYIDSale(route.paramMap.get('id'));
-  }
-
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SaleByIdCusResolver implements Resolve<any> {
-
-  constructor(private _saleService: SaleService) { }
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Sale[]> {
-    return this._saleService.getSaleBYIDCus(route.paramMap.get('id'));
-  }
-
-}
-
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SaleCutResolver implements Resolve<any> {
-
-  constructor(private _saleService: SaleService) { }
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | SaleCut[]> {
-    return this._saleService.getSaleCutBYID(route.paramMap.get('id'));
-  }
-
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SaleCutOrderResolver implements Resolve<any> {
-
-  constructor(private _saleService: SaleService) { }
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | SaleCut> {
-    return this._saleService.getSaleCutBYIDOrder(route.paramMap.get('id'));
-  }
-
-}
-
+import { Employee, Sale, SaleEmployee } from '@app/_service/main.types';
+import { CustomerPagination, SalePagination } from '@app/_service/pagination.types';
 
 @Injectable({
   providedIn: 'root'
@@ -174,6 +52,116 @@ export class SubDistrictsResolver implements Resolve<any> {
 
 }
 
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CustomerResolver implements Resolve<any> {
+
+  constructor(private _service: CustomerService) {
+
+  }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<{ pagination: CustomerPagination, customers: Customer[] }> {
+    return this._service.getCustomer();
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CustomerIDResolver implements Resolve<any> {
+
+  constructor(private _customerService: CustomerService) { }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Customer> {
+    return this._customerService.getByIdCustomer(route.paramMap.get('id'));
+  }
+
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SaleResolver implements Resolve<any> {
+
+  constructor(private _saleService: SaleService) { }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Sale[]> {
+    return this._saleService.getAllSale();
+  }
+
+}
+
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SaleByIdCusResolver implements Resolve<any> {
+
+  constructor(private _saleService: SaleService) { }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Sale[]> {
+    return this._saleService.getSaleBYIDCus(route.paramMap.get('id'));
+  }
+
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SaleEmployeeByIdCusResolver implements Resolve<any> {
+
+  constructor(private _saleService: SaleService) { }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Sale[]> {
+    return this._saleService.getSaleBYIDConsult(route.paramMap.get('id'));
+  }
+
+}
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SaleByIdSlaeResolver implements Resolve<any> {
+
+  constructor(private _saleService: SaleService) { }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Sale[]> {
+    return this._saleService.getSaleBYIDSale(route.paramMap.get('id'));
+  }
+
+}
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SaleCutResolver implements Resolve<any> {
+
+  constructor(private _saleService: SaleService) { }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | SaleCut[]> {
+    return this._saleService.getSaleCutBYID(route.paramMap.get('id'));
+  }
+
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SaleCutOrderResolver implements Resolve<any> {
+
+  constructor(private _saleService: SaleService) { }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | SaleCut> {
+    return this._saleService.getSaleCutBYIDOrder(route.paramMap.get('id'));
+  }
+
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -186,18 +174,3 @@ export class SaleEmployeeResolver implements Resolve<any> {
   }
 
 }
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class SocialWarehousesResolver implements Resolve<any> {
-
-//   constructor(private _socialManageService: ManageService) { }
-
-//   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<{ warehouses: Sale[] } | any> {
-//     return forkJoin([
-//       this._socialManageService.getSale,
-//     ]);
-//   }
-
-// }

@@ -9,7 +9,7 @@ import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import { SaleService } from '@app/_service/sale.service';
 import Swal from 'sweetalert2';
 import { CustomerService } from '@app/theme/pages/customer/customer.service';
-import { Course} from '../../basic-data/basic.model';
+import { Course } from '../../basic-data/basic.model';
 import { Employee, Sale } from '@app/_service/main.types';
 @Component({
   selector: 'app-zim-view-customer',
@@ -38,6 +38,8 @@ export class ZimViewCustomerComponent implements OnInit {
 
   employes$: Observable<Employee[]>
   Employees: Employee[]
+  employ: any
+  employees: Employee[]
 
   selectedSaleEmp: number[] = []; // Assuming categoryFarmId is a number
 
@@ -90,6 +92,10 @@ export class ZimViewCustomerComponent implements OnInit {
       this.Employees = employees;
     })
 
+    this._SerivceEmp.employees$.pipe(takeUntil(this._unsubscribeAll)).subscribe(employees => {
+      this.employees = employees;
+    })
+
     this.coures$ = this._SerivceBasic.courses$;
     this._SerivceBasic.courses$.pipe(takeUntil(this._unsubscribeAll)).subscribe(courses => {
       this.Courses = courses;
@@ -138,19 +144,11 @@ export class ZimViewCustomerComponent implements OnInit {
     console.log('คลังข้อมูล', this.saleForm.value);
     console.log('หมวดหมู่', this.saleEmployeeForm.value);
 
-    if (this.saleForm.invalid) {
-      return;
-    }
-
-    this.submitted = true;
-    this.isLoading = true;
-
     let saveData: Sale = this.saleForm.getRawValue();
 
     if (saveData) {
       const overviewData = this.saleForm.getRawValue();
       const platformData = this.saleEmployeeForm.getRawValue();
-      // const socialData = this.getSocialData();
 
       if (overviewData.warehouseId) {
         // no need to update anymore
@@ -189,12 +187,11 @@ export class ZimViewCustomerComponent implements OnInit {
               timer: 2000,
             }).then((result) => {
               console.log('ข้อมูล', result);
-
-              // this._router.navigate(['/data/list'], {
-              //   queryParams: {
-              //     search: v.warehouseName
-              //   }
-              // });
+              this._router.navigate(['./'], {
+                queryParams: {
+                  search: v.warehouseName
+                }
+              });
             });
           }
           );
@@ -213,6 +210,16 @@ export class ZimViewCustomerComponent implements OnInit {
     }
   }
 
+  getCategoryName(categories) {
+    if (!categories) {
+      return "-";
+    }
+
+    return categories.map(category => {
+      let index = this.employees.findIndex(type => type.empId === category.empId);
+      return index === -1 ? ' ' : this.employees[index].empFullname
+    }).join(',');
+  }
 
 
 }

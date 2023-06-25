@@ -1,8 +1,8 @@
 <div class="bg-container">
   <div class="row">
     <div class="col-8">
-      <h4 *ngIf="!this.cus_id">เพิ่มข้อมูลลูกค้า</h4>
-      <h4 *ngIf="this.cus_id">แก้ไขข้อมูลลูกค้า</h4>
+      <h4 *ngIf="!this.cusId">เพิ่มข้อมูลลูกค้า</h4>
+      <h4 *ngIf="this.cusId">แก้ไขข้อมูลลูกค้า</h4>
     </div>
     <div class="col-4">
       <button class="btn btn-info m-0" [routerLink]="['../']">ย้อนกลับ</button>
@@ -20,7 +20,7 @@
           <div class="tw-grid tw-grid-cols-4 tw-gap-4">
             <mat-form-field class="tw-w-full" appearance="outline">
               <mat-label>คำนำหน้า</mat-label>
-              <mat-select [formControlName]="'cus_prefix'">
+              <mat-select [formControlName]="'cusPrefix'">
                 <mat-option *ngFor="let p of prefix" [value]="p">
                   {{p}}
                 </mat-option>
@@ -29,17 +29,17 @@
 
             <mat-form-field class="tw-w-full" appearance="outline">
               <mat-label>ชื่อ-นามสกุล</mat-label>
-              <input [formControlName]="'cus_full_name'" matInput>
+              <input [formControlName]="'cusFullName'" matInput>
             </mat-form-field>
 
             <mat-form-field class="tw-w-full" appearance="outline">
               <mat-label>ชื่อเล่น</mat-label>
-              <input [formControlName]="'cus_nick_name'" matInput>
+              <input [formControlName]="'cusNickName'" matInput>
             </mat-form-field>
 
             <mat-form-field class="example-full-width" appearance="outline">
               <mat-label>วันเกิด</mat-label>
-              <input [formControlName]="'cus_birthday'" matInput [matDatepicker]="picker">
+              <input [formControlName]="'cusBirthday'" matInput [matDatepicker]="picker">
               <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
               <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
               <mat-datepicker touchUi #picker></mat-datepicker>
@@ -50,7 +50,7 @@
           <div class="tw-grid tw-grid-cols-4 tw-gap-4">
             <mat-form-field class="tw-w-full" appearance="outline">
               <mat-label>เพศ</mat-label>
-              <mat-select [formControlName]="'cus_gender'">
+              <mat-select [formControlName]="'cusGender'">
                 <mat-option *ngFor="let p of gender" [value]="p">
                   {{p}}
                 </mat-option>
@@ -59,12 +59,12 @@
 
             <mat-form-field class="tw-w-full" appearance="outline">
               <mat-label>อาชีพ</mat-label>
-              <input [formControlName]="'cus_occupation'" matInput>
+              <input [formControlName]="'cusOccupation'" matInput>
             </mat-form-field>
 
             <mat-form-field class="tw-w-full" appearance="outline">
               <mat-label>สถานะ</mat-label>
-              <mat-select [formControlName]="'cus_status'" id="cus_status" name="cus_status">
+              <mat-select [formControlName]="'cusStatus'" id="cusStatus" name="cusStatus">
                 <mat-option *ngFor="let p of status" [value]="p">
                   {{p}}
                 </mat-option>
@@ -73,19 +73,19 @@
 
             <mat-form-field class="tw-w-full" appearance="outline">
               <mat-label>เบอร์โทรศัพท์</mat-label>
-              <input [formControlName]="'cus_telephone'" maxlength="10" matInput>
+              <input [formControlName]="'cusTelephone'" maxlength="10" matInput>
             </mat-form-field>
           </div>
 
           <div class="tw-grid tw-grid-cols-4 tw-gap-4">
             <mat-form-field class="tw-w-full" appearance="outline">
               <mat-label>เลขสมาชิก</mat-label>
-              <input [formControlName]="'cus_member'" maxlength="5" matInput>
+              <input [formControlName]="'cusMember'" maxlength="5" matInput>
             </mat-form-field>
 
             <mat-form-field class="tw-w-full" appearance="outline">
               <mat-label>รายได้ลูกค้า</mat-label>
-              <mat-select [formControlName]="'cus_salary'">
+              <mat-select [formControlName]="'cusSalary'">
                 <mat-option *ngFor="let p of salary" [value]="p.salary">
                   {{p.salary}}
                 </mat-option>
@@ -109,22 +109,22 @@
           <div class="tw-grid tw-grid-cols-4 tw-gap-4">
             <mat-form-field class="tw-w-full" appearance="outline">
               <mat-label>บ้านเลขที่</mat-label>
-              <input [formControlName]="'cus_house_number'" matInput>
+              <input [formControlName]="'cusHouseNumber'" matInput>
             </mat-form-field>
 
             <mat-form-field class="tw-w-full" appearance="outline">
               <mat-label>หมู่</mat-label>
-              <input [formControlName]="'cus_moo'" matInput>
+              <input [formControlName]="'cusMoo'" matInput>
             </mat-form-field>
 
             <mat-form-field class="tw-w-full" appearance="outline">
               <mat-label>ตรอก/ซอย</mat-label>
-              <input [formControlName]="'cus_soi'" matInput>
+              <input [formControlName]="'cusSoi'" matInput>
             </mat-form-field>
 
             <mat-form-field class="tw-w-full" appearance="outline">
               <mat-label>ถนน</mat-label>
-              <input [formControlName]="'cus_road'" matInput>
+              <input [formControlName]="'cusRoad'" matInput>
             </mat-form-field>
           </div>
 
