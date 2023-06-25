@@ -6,13 +6,8 @@ export const environment = {
   appVersion: require('../../package.json').version,
   production: false,
 
-<<<<<<< HEAD
   APIURL_LOCAL: "http://localhost:8080",
   // APIURL_LOCAL: "http://54.254.184.187:8080",
-=======
-  // APIURL_LOCAL: "http://localhost:8080",
-  APIURL_LOCAL: "http://54.254.184.187:8080",
->>>>>>> ea16e8a95418e6c0a6dd21cb5b7c56428c4ee6fc
 };
 
 
