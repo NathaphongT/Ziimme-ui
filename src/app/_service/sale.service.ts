@@ -13,10 +13,10 @@ export class SaleService {
 
   private _apiPath = environment.APIURL_LOCAL + '/api/v1.0';
 
-  private _sales: BehaviorSubject<Sale[] | null> = new BehaviorSubject(null);
-  private _sale: BehaviorSubject<Sale | null> = new BehaviorSubject(null);
-  private _warehousePagination: BehaviorSubject<SalePagination | null> = new BehaviorSubject(null);
 
+  private _sale: ReplaySubject<Sale> = new ReplaySubject<Sale>(1);
+  private _sales: BehaviorSubject<Sale[] | null> = new BehaviorSubject(null);
+  private _salePagination: BehaviorSubject<SalePagination | null> = new BehaviorSubject(null);
 
   private _saleemps: BehaviorSubject<SaleEmployee[] | null> = new BehaviorSubject(null);
   private _saleemp: BehaviorSubject<SaleEmployee | null> = new BehaviorSubject(null);
@@ -36,12 +36,17 @@ export class SaleService {
     this._salecut.next(value);
   }
 
+  //sales
+  get sales$(): Observable<Sale[]> {
+    return this._sales.asObservable();
+  }
+
   get sale$(): Observable<Sale> {
     return this._sale.asObservable();
   }
 
-  get sales$(): Observable<Sale[]> {
-    return this._sales.asObservable();
+  get salePagination$(): Observable<SalePagination> {
+    return this._salePagination.asObservable();
   }
 
   get salecut$(): Observable<SaleCut> {
@@ -53,13 +58,52 @@ export class SaleService {
   }
 
   getAllSale(): Observable<Sale[]> {
-    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sales/`).pipe(
-      tap((sale: Sale[]) => {
-        this._sales.next(sale)
+    return this._httpClient.get(this._apiPath + '/sales', {
+      params: {
+        q: '',
+        page: '1',
+        limit: 300
+      }
+    }).pipe(
+      map((res: any) => res.data),
+      tap((sales: any) => {
+        this._sales.next(sales);
       })
     );
   }
 
+  getSale(search: string = "", page: number = 1, limit: number = 10, sort: string = 'createdTime', order: 'asc' | 'desc' | '' = 'asc'): Observable<{ pagination: SalePagination, sales: Sale[] }> {
+    return this._httpClient.get<PaginationResponse>(this._apiPath + '/sales', {
+      params: {
+        q: search,
+        page: page.toString(),
+        limit: limit.toString(),
+        sort,
+        order
+      }
+    }).pipe(
+      map(response => {
+
+        const ret: { pagination: SalePagination, sales: Sale[] } = {
+          pagination: {
+            length: response.totalItems,
+            size: limit,
+            page: response.currentPage - 1,
+            lastPage: response.totalPages,
+            startIndex: response.currentPage > 1 ? (response.currentPage - 1) * limit : 0,
+            endIndex: Math.min(response.currentPage * limit, response.totalItems)
+          },
+          sales: response.data
+        };
+
+        this._salePagination.next(ret.pagination);
+        this._sales.next(ret.sales);
+
+        return ret;
+
+      })
+    );
+  }
 
 
   getSaleBYIDCus(id): Observable<any> {
@@ -79,7 +123,7 @@ export class SaleService {
   }
 
   getSaleBYIDConsult(id): Observable<any> {
-    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/salese/${id}/sale_employee`).pipe(
+    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sales/${id}/sale_employee`).pipe(
       tap((sale: any) => {
         this._sales.next(sale);
       })
@@ -146,7 +190,7 @@ export class SaleService {
   }
 
   updateSale(saleId, saleNumber, saleProduct, saleCount, salePayBalance, salePay, saleOverdue, cusId): Observable<any> {
-    return this._httpClient.post(`${this._apiPath}/warehouses/${saleId}`, {
+    return this._httpClient.post(`${this._apiPath}/sales/${saleId}`, {
       saleNumber,
       saleProduct,
       saleCount,
@@ -308,6 +352,83 @@ export class SaleService {
     return this._httpClient.get(this._apiPath + '/salescus/' + id + '/sale_employee').pipe(
       tap((category: any) => {
         this._saleemps.next(category);
+      })
+    );
+  }
+
+  getSales(search: string = "", page: number = 1, limit: number = 10, saleId: number = 0, sort: string = 'createdTime', order: 'asc' | 'desc' | '' = 'asc', useStatus: string | null = null): Observable<{ pagination: SalePagination, sales: Sale[] }> {
+
+    const params = {
+      q: search,
+      page: page.toString(),
+      limit: limit.toString(),
+      saleId,
+      sort,
+      order
+    };
+
+    if (useStatus) {
+      params['useStatus'] = useStatus;
+    }
+
+    return this._httpClient.get<PaginationResponse>(this._apiPath + '/sales', {
+      params: params
+    }).pipe(
+      switchMap(response => {
+        const sales: Sale[] = response.data;
+
+        if (!sales.length) {
+          const ret: { pagination: SalePagination, sales: Sale[] } = {
+            pagination: {
+              length: response.totalItems,
+              size: limit,
+              page: response.currentPage - 1,
+              lastPage: response.totalPages,
+              startIndex: response.currentPage > 1 ? (response.currentPage - 1) * limit : 0,
+              endIndex: Math.min(response.currentPage * limit, response.totalItems)
+            },
+            sales
+          };
+
+          this._salePagination.next(ret.pagination);
+          this._sales.next(ret.sales);
+
+          return of(ret)
+        }
+
+        // Fetch keywords and platforms for each project
+        const requests = sales.map(warehouse => forkJoin([
+          this._httpClient.get<SaleEmployee[]>(`${environment.APIURL_LOCAL}/api/v1.0/sales/${warehouse.saleId}/sale_employee`)
+        ]));
+
+        return forkJoin(requests).pipe(
+
+          map((responses: [
+            SaleEmployee[]
+          ][]) => {
+
+            sales.forEach((warehouse, index) => {
+              warehouse.empId = responses[index][0];
+            });
+
+            const ret: { pagination: SalePagination, sales: Sale[] } = {
+              pagination: {
+                length: response.totalItems,
+                size: limit,
+                page: response.currentPage - 1,
+                lastPage: response.totalPages,
+                startIndex: response.currentPage > 1 ? (response.currentPage - 1) * limit : 0,
+                endIndex: Math.min(response.currentPage * limit, response.totalItems)
+              },
+              sales
+            };
+
+            this._salePagination.next(ret.pagination);
+            this._sales.next(ret.sales);
+
+            return ret;
+          })
+        );
       })
     );
   }

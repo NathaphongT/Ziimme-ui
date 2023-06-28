@@ -67,6 +67,36 @@ export class CustomerResolver implements Resolve<any> {
   }
 }
 
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CustomersResolver implements Resolve<any> {
+
+  constructor(private _serviceEmp:EmployeeService, private _serviceSale:SaleService) {}
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<{ pagination: SalePagination, sales: Sale[] } | any> {
+    return forkJoin([
+      // this._serviceSale.getSale(),
+      this._serviceSale.getSales(),
+    ]);
+  }
+  
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class EmployeeResolver implements Resolve<any> {
+
+  constructor(private _service: EmployeeService) {}
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Employee[]> {
+    return this._service.getAllEmployee();
+  }
+  
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -161,6 +191,8 @@ export class SaleCutOrderResolver implements Resolve<any> {
   }
 
 }
+
+
 
 @Injectable({
   providedIn: 'root'

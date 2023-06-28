@@ -4,7 +4,7 @@ import { CustomerComponent } from './customer.component';
 import { ZimCustomerComponent } from './zim-customer/zim-customer.component';
 import { ZimCustomersComponent } from './zim-customers/zim-customers.component';
 import { ZimViewCustomerComponent } from './zim-view-customer/zim-view-customer.component';
-import { CustomerIDResolver, CustomerResolver, DistrictsResolver, ProvinceResolver, SaleByIdCusResolver, SaleByIdSlaeResolver, SaleCutOrderResolver, SaleCutResolver, SaleEmployeeByIdCusResolver, SaleEmployeeResolver, SubDistrictsResolver } from './customer.resolver';
+import { CustomerIDResolver, CustomerResolver, CustomersResolver, DistrictsResolver, ProvinceResolver, SaleByIdCusResolver, SaleByIdSlaeResolver, SaleCutOrderResolver, SaleCutResolver, SaleEmployeeByIdCusResolver, SaleEmployeeResolver, SubDistrictsResolver } from './customer.resolver';
 import { ZimViewHistoryComponent } from './zim-view-history/zim-view-history.component';
 import { ZimViewBirthdayComponent } from './zim-view-birthday/zim-view-birthday.component';
 import { CourseResolver } from '../basic-data/basic.resolver';
@@ -22,14 +22,16 @@ const routes: Routes = [
       },
       {
         path: 'list',
+        resolve: {
+          employee: EmployeeResolver
+        },
         children: [
           {
             path: '',
             component: ZimCustomerComponent,
             resolve: {
-              customeres: CustomerResolver,
-              // saleemployee: SaleEmployeeResolver
-            },
+              warehouses: CustomerResolver
+            }
           },
           {
             path: 'new',
@@ -38,7 +40,6 @@ const routes: Routes = [
               provinces: ProvinceResolver,
             },
           },
-
           {
             path: ':id',
             component: ZimCustomersComponent,
@@ -53,11 +54,10 @@ const routes: Routes = [
             path: 'views/:id',
             component: ZimViewCustomerComponent,
             resolve: {
-
-              employees: EmployeeResolver,
+              employees: CustomersResolver,
               courses: CourseResolver,
-              customersID: CustomerIDResolver,
-              saleById: SaleByIdCusResolver,
+              // customersID: CustomerIDResolver,
+              // saleById: SaleByIdCusResolver,
             }
           },
           {
@@ -72,7 +72,6 @@ const routes: Routes = [
               // saleCutAllOrder: SaleCutOrderResolver,
             }
           },
-
         ]
       }
     ],

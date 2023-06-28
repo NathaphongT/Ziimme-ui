@@ -11,6 +11,7 @@ import { CustomerService } from '@app/theme/pages/customer/customer.service';
 import { Course } from '../../basic-data/basic.model';
 import { Employee, Sale } from '@app/_service/main.types';
 import { EmployeeService } from '../../employee/employee.service';
+import { SalePagination } from '@app/_service/pagination.types';
 @Component({
   selector: 'app-zim-view-customer',
   templateUrl: './zim-view-customer.component.html',
@@ -32,12 +33,13 @@ export class ZimViewCustomerComponent implements OnInit {
 
   isLoading: boolean;
   submitted: boolean;
+  lastUpdate: Date = null;
 
   sales$: Observable<Sale[]>;
   sale = [];
+  salePagination: SalePagination;
 
   employes$: Observable<Employee[]>
-  Employees: Employee[]
   employ: any
   employees: Employee[]
 
@@ -61,7 +63,8 @@ export class ZimViewCustomerComponent implements OnInit {
     private _SerivceEmp: EmployeeService,
     private _SerivceBasic: BasicService,
     private _activatedRoute: ActivatedRoute,
-    private _router: Router
+    private _router: Router,
+    private _changeDetectorRef: ChangeDetectorRef
   ) {
     this._activatedRoute.paramMap.subscribe(params => {
       this.cus_id = params.get('id')
@@ -86,12 +89,8 @@ export class ZimViewCustomerComponent implements OnInit {
     })
 
     this.sales$ = this._ServiceSale.sales$;
+
     this.employes$ = this._SerivceEmp.employees$;
-
-    this._SerivceEmp.employees$.pipe(takeUntil(this._unsubscribeAll)).subscribe(employees => {
-      this.Employees = employees;
-    })
-
     this._SerivceEmp.employees$.pipe(takeUntil(this._unsubscribeAll)).subscribe(employees => {
       this.employees = employees;
     })
@@ -101,21 +100,49 @@ export class ZimViewCustomerComponent implements OnInit {
       this.Courses = courses;
     })
 
-    this._ServiceSale.sales$
-      .pipe(takeUntil(this._unsubscribeAll))
-      .subscribe((sale) => {
-        if (sale) {
-          this.rows = sale;
+    this._ServiceSale.salePagination$
+      .pipe(takeUntil(this._unsubscribeAll)).subscribe(pagination => {
+        this.salePagination = pagination;
 
-          this.rows = [...this.rows];
-        }
-        else {
-          this.rows = [];
-        }
+        this._changeDetectorRef.markForCheck();
 
-        this.isLoading = false;
+      });
 
-      })
+    this._ServiceSale.sales$.pipe(takeUntil(this._unsubscribeAll)).subscribe(warehouses => {
+
+      if (warehouses) {
+        // =============
+        const mostRecentDate = warehouses.reduce((previous, current) => {
+
+          if (!previous) {
+            return current;
+          }
+
+          const previousDate = new Date(previous.createdTime);
+          const currentDate = new Date(current.createdTime);
+
+          if (previousDate > currentDate) {
+            return previous;
+          } else {
+            return current;
+          }
+        }, undefined);
+
+        if (mostRecentDate)
+          this.lastUpdate = new Date(mostRecentDate.createdTime);
+        // =============
+
+        console.log(warehouses);
+        this.rows = warehouses;
+
+        this.rows = [...this.rows];
+      }
+      else {
+        this.rows = [];
+      }
+
+      this.isLoading = false;
+    })
   }
 
   openModal(template: TemplateRef<any>, data = null) {
@@ -264,10 +291,10 @@ export class ZimViewCustomerComponent implements OnInit {
     }
 
     return categories.map(category => {
+      console.log(category);
       let index = this.employees.findIndex(type => type.empId === category.empId);
       return index === -1 ? ' ' : this.employees[index].empFullname
     }).join(',');
   }
-
 
 }

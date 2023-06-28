@@ -10,7 +10,7 @@ import { SaleService } from '@app/_service/sale.service';
 import { Branch, Position } from '../basic-data/basic.model';
 import { Employee, Sale, SaleEmployee } from '@app/_service/main.types';
 import { EmployeeService } from './employee.service';
-import { EmployeePagination } from '@app/_service/pagination.types';
+import { EmployeePagination, SalePagination } from '@app/_service/pagination.types';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +22,19 @@ export class EmployeeResolver implements Resolve<any> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<{ pagination: EmployeePagination, employees: Employee[] }> {
     return this._service.getEmployee();
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SaleResolver implements Resolve<any> {
+
+  constructor(private _service: SaleService) {
+  }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<{ pagination: SalePagination, sales: Sale[] }> {
+    return this._service.getSale();
   }
 }
 
