@@ -17,6 +17,7 @@ sudo docker run -it --rm --name $CONTAINER_NAME \
                 -v $DIR_LIB:/var/lib/letsencrypt \
                 -v $DIR_CLOUD:/cloudflare \
                 $IMAGE_NAME certonly \
+                --register-unsafely-without-email \
                 --dns-cloudflare \
                 --dns-cloudflare-credentials /cloudflare/cloudflare.ini \
                 -d ziimmegroup.com \
