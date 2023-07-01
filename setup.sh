@@ -10,7 +10,7 @@ PUB_SSL=443
 DIR_LOG="/server/Ziimme-ui/log"
 DIR_CON_NGINX="/server/Ziimme-ui/nginx.conf"
 DIR_CON_DEFAULT="/server/Ziimme-ui/default.conf"
-CERT="/server/Ziimme-ui/cert"
+DIR_SSL="/server/Ziimme-ui/letsencrypt"
 
 # ---------------------------------------------------------------------------
 sudo docker stop $CONTAINER_NAME
@@ -28,5 +28,5 @@ sudo docker run --name $CONTAINER_NAME \
                 -v $DIR_LOG:/var/log/nginx \
                 -v $DIR_CON_NGINX:/etc/nginx/nginx.conf \
                 -v $DIR_CON_DEFAULT:/etc/nginx/conf.d/default.conf \
-                -v $CERT:/cert \
+               -v $DIR_SSL:/letsencrypt \
                 -d $IMAGE_NAME:$TAG
