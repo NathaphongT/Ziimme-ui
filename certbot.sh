@@ -3,8 +3,8 @@
 # ---------------------------------------- Certbot -----------------------------------------
 IMAGE_NAME=certbot/dns-cloudflare
 CONTAINER_NAME="certbot"
-DIR_ETC="/server/Zimme-ui/letsencrypt"
-DIR_LIB="/server/Zimme-ui/lib/letsencrypt"
+DIR_ETC="/server/Ziimme-ui/letsencrypt"
+DIR_LIB="/server/Ziimme-ui/lib/letsencrypt"
 DIR_CLOUD="/server/Ziimme-ui/cloudflare"
 
 # ------------------------------------------------------------------------------------------
