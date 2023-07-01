@@ -22,4 +22,6 @@ sudo docker run -it --rm --name $CONTAINER_NAME \
                 --dns-cloudflare-credentials /cloudflare/cloudflare.ini \
                 -d ziimmegroup.com \
                 -d *.ziimmegroup.com \
+                --manual \
+                --preferred-challenges dns \
                 --server https://acme-v02.api.letsencrypt.org/directory
