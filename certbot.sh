@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ---------------------------------------- Certbot -----------------------------------------
-IMAGE_NAME=certbot/certbot
+IMAGE_NAME=certbot/dns-cloudflare
 CONTAINER_NAME="certbot"
 DIR_ETC="/server/Zimme-ui/letsencrypt"
 DIR_LIB="/server/Zimme-ui/lib/letsencrypt"
@@ -18,4 +18,9 @@ sudo docker run -it --rm --name $CONTAINER_NAME \
                 -v $DIR_LIB:/var/lib/letsencrypt \
                 -v $DIR_CLOUD:/cloudflare/cloudflare.ini \
                 -v $DIR_LOG:/var/log/letsencrypt/letsencrypt.log \
-                $IMAGE_NAME certonly --dns-cloudflare-credentials /cloudflare/cloudflare.ini -d ziimmegroup.com -d *.ziimmegroup.com --server https://acme-v02.api.letsencrypt.org/directory
+                $IMAGE_NAME certonly \
+                --dns-cloudflare \
+                --dns-cloudflare-credentials /cloudflare/cloudflare.ini \
+                -d ziimmegroup.com \
+                -d *.ziimmegroup.com \
+                --server https://acme-v02.api.letsencrypt.org/directory
