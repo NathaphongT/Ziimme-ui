@@ -20,7 +20,6 @@ sudo docker run -it --rm --name $CONTAINER_NAME \
                 -v $DIR_LOG:/var/log/letsencrypt/letsencrypt.log \
                 $IMAGE_NAME \
                 certonly \
-                --dns-cloudflare \
                 --dns-cloudflare-credentials /cloudflare/cloudflare.ini \
                 -d ziimmegroup.com \
                 -d *.ziimmegroup.com \
