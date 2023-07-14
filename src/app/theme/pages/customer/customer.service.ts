@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, ReplaySubject, forkJoin, map, of, switchMap, take, tap, throwError } from 'rxjs';
-import { Customer } from '../../../_service/user.types';
+import { Customer, SaleList } from '../../../_service/user.types';
 import { environment } from '@environments/environment';
 import { CustomerPagination, PaginationResponse } from '@app/_service/pagination.types';
 import { Sale, SaleEmployee } from '@app/_service/main.types';
@@ -15,6 +15,8 @@ export class CustomerService {
 
   private _customer: ReplaySubject<Customer> = new ReplaySubject<Customer>(1);
   private _customers: BehaviorSubject<Customer[] | null> = new BehaviorSubject(null);
+  private _salelist: ReplaySubject<SaleList> = new ReplaySubject<SaleList>(1);
+  private _salelists: BehaviorSubject<SaleList[] | null> = new BehaviorSubject(null);
   private _customersPagination: BehaviorSubject<CustomerPagination | null> = new BehaviorSubject(null);
 
   customerss$: any;
@@ -38,6 +40,15 @@ export class CustomerService {
 
   get customersPagination$(): Observable<CustomerPagination> {
     return this._customersPagination.asObservable();
+  }
+
+  //Customer
+  get salelist$(): Observable<SaleList> {
+    return this._salelist.asObservable();
+  }
+
+  get salelists$(): Observable<SaleList[]> {
+    return this._salelists.asObservable();
   }
 
   // ignored pagination
@@ -171,6 +182,15 @@ export class CustomerService {
       )
     );
   }
+
+  getSaleList(): Observable<SaleList[]> {
+    return this._httpClient.get(this._apiPath + '/sales_all').pipe(
+      tap((customers: any) => {
+        this._salelists.next(customers);
+      })
+    );
+  }
+
 
 
 }

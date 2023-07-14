@@ -42,3 +42,14 @@ export interface Customer {
   updatedTime: Date;
   updatedBy: string
 }
+
+export interface SaleList {
+  saleId: number;
+  empFullname: string;
+  cusId: number;
+  saleProduct: number;
+  saleCount: number;
+  salePayBalance: number;
+  salePay: number;
+  saleOverdue: number;
+}

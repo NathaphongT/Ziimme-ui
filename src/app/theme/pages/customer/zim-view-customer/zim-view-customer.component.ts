@@ -26,9 +26,6 @@ export class ZimViewCustomerComponent implements OnInit {
 
   ModalList: BsModalRef;
 
-  toppingList = ['Extra cheese', 'Mushroom', 'Onion', 'Pepperoni', 'Sausage', 'Tomato'];
-
-
   cus_id = null
 
   isLoading: boolean;
@@ -39,15 +36,16 @@ export class ZimViewCustomerComponent implements OnInit {
   sale = [];
   salePagination: SalePagination;
 
-  employes$: Observable<Employee[]>
+  employees$: Observable<Employee[]>;
+  employee: Employee[] = [];
   employ: any
-  employees: Employee[]
+
 
   selectedSaleEmp: number[] = []; // Assuming categoryFarmId is a number
 
 
   coures$: Observable<Course[]>;
-  Courses: Course[] = [];
+  courses: Course[] = [];
 
 
   emp_detail = [];
@@ -61,6 +59,7 @@ export class ZimViewCustomerComponent implements OnInit {
     private modalService: BsModalService,
     private _ServiceSale: SaleService,
     private _SerivceEmp: EmployeeService,
+    private _serivceCustomer: CustomerService,
     private _SerivceBasic: BasicService,
     private _activatedRoute: ActivatedRoute,
     private _router: Router,
@@ -85,19 +84,22 @@ export class ZimViewCustomerComponent implements OnInit {
     });
 
     this.saleEmployeeForm = this._formBuilder.group({
-      empId: [{ value: '', enabled: !!this.cus_id }, Validators.required]
+      empId: [{ value: '', enabled: !!this.cus_id }, Validators.required],
+      cusId: [this.cus_id],
     })
 
     this.sales$ = this._ServiceSale.sales$;
 
-    this.employes$ = this._SerivceEmp.employees$;
+    this.employees$ = this._SerivceEmp.employees$;
+
+
     this._SerivceEmp.employees$.pipe(takeUntil(this._unsubscribeAll)).subscribe(employees => {
-      this.employees = employees;
+      this.employee = employees;
     })
 
     this.coures$ = this._SerivceBasic.courses$;
     this._SerivceBasic.courses$.pipe(takeUntil(this._unsubscribeAll)).subscribe(courses => {
-      this.Courses = courses;
+      this.courses = courses;
     })
 
     this._ServiceSale.salePagination$
@@ -108,32 +110,33 @@ export class ZimViewCustomerComponent implements OnInit {
 
       });
 
-    this._ServiceSale.sales$.pipe(takeUntil(this._unsubscribeAll)).subscribe(warehouses => {
+    this._serivceCustomer.salelists$.pipe(takeUntil(this._unsubscribeAll)).subscribe(sales => {
 
-      if (warehouses) {
+      if (sales) {
         // =============
-        const mostRecentDate = warehouses.reduce((previous, current) => {
+        // const mostRecentDate = sales.reduce((previous, current) => {
 
-          if (!previous) {
-            return current;
-          }
+        //   if (!previous) {
+        //     return current;
+        //   }
 
-          const previousDate = new Date(previous.createdTime);
-          const currentDate = new Date(current.createdTime);
+        //   const previousDate = new Date(previous.createdTime);
+        //   const currentDate = new Date(current.createdTime);
 
-          if (previousDate > currentDate) {
-            return previous;
-          } else {
-            return current;
-          }
-        }, undefined);
+        //   if (previousDate > currentDate) {
+        //     return previous;
+        //   } else {
+        //     return current;
+        //   }
+        // }, undefined);
 
-        if (mostRecentDate)
-          this.lastUpdate = new Date(mostRecentDate.createdTime);
-        // =============
+        // if (mostRecentDate)
+        //   this.lastUpdate = new Date(mostRecentDate.createdTime);
+        // // =============
 
-        console.log(warehouses);
-        this.rows = warehouses;
+        // console.log('List', sales);
+
+        this.rows = sales;
 
         this.rows = [...this.rows];
       }
@@ -197,7 +200,8 @@ export class ZimViewCustomerComponent implements OnInit {
           overviewData.salePay,
           overviewData.saleOverdue,
           overviewData.cusId,
-          platformData.empId)
+          platformData.empId,
+        )
           .pipe(
             catchError((err) => {
               console.log(err);
@@ -276,25 +280,13 @@ export class ZimViewCustomerComponent implements OnInit {
 
 
   getNameProduct(id: number) {
-    let index = this.Courses.findIndex(type => type.courseId === id);
+    let index = this.courses.findIndex(type => type.courseId === id);
     if (index === -1) {
       return "-";
     }
     else {
-      return this.Courses[index].courseNameEng;
+      return this.courses[index].courseNameEng;
     }
-  }
-
-  getCategoryName(categories) {
-    if (!categories) {
-      return "-";
-    }
-
-    return categories.map(category => {
-      console.log(category);
-      let index = this.employees.findIndex(type => type.empId === category.empId);
-      return index === -1 ? ' ' : this.employees[index].empFullname
-    }).join(',');
   }
 
 }

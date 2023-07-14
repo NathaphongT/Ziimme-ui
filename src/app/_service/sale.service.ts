@@ -105,14 +105,165 @@ export class SaleService {
     );
   }
 
+  // getSaleCusById(id): Observable<Sale> {
+  //   return this._httpClient.get<Sale>(`${environment.APIURL_LOCAL}/api/v1.0/sale_cus/${id}`).pipe(
 
-  getSaleBYIDCus(id): Observable<any> {
+  //     switchMap(warehouse => {
+
+  //       const requests = forkJoin([
+  //         this._httpClient.get<SaleEmployee[]>(`${environment.APIURL_LOCAL}/api/v1.0/salescus/${warehouse.cusId}/sale_employee`)
+  //       ]);
+
+  //       return forkJoin(requests).pipe(
+
+  //         map((responses: [
+  //           SaleEmployee[]
+  //         ][]) => {
+
+  //           warehouse.empId = responses[0][0];
+
+  //           this._sale.next(warehouse);
+
+  //           return warehouse;
+  //         })
+  //       );
+  //     }),
+  //     switchMap(warehouse => {
+
+  //       if (!warehouse) {
+  //         return throwError(() => 'Could not found Warehouse with id of ' + id + '!');
+  //       }
+
+  //       return of(warehouse)
+  //     })
+  //   );
+  // }
+
+  getSaleCus(search: string = "", page: number = 1, limit: number = 10, saleId: number = 0, sort: string = 'createdTime', order: 'asc' | 'desc' | '' = 'asc'): Observable<{ pagination: SalePagination, sales: Sale[] }> {
+
+    const params = {
+      q: search,
+      page: page.toString(),
+      limit: limit.toString(),
+      saleId,
+      sort,
+      order
+    };
+
+    return this._httpClient.get<PaginationResponse>(this._apiPath + '/sales', {
+      params: params
+    }).pipe(
+      switchMap(response => {
+        const sales: Sale[] = response.data;
+
+        if (!sales.length) {
+          const ret: { pagination: SalePagination, sales: Sale[] } = {
+            pagination: {
+              length: response.totalItems,
+              size: limit,
+              page: response.currentPage - 1,
+              lastPage: response.totalPages,
+              startIndex: response.currentPage > 1 ? (response.currentPage - 1) * limit : 0,
+              endIndex: Math.min(response.currentPage * limit, response.totalItems)
+            },
+            sales
+          };
+
+          this._salePagination.next(ret.pagination);
+          this._sales.next(ret.sales);
+
+          return of(ret)
+        }
+
+        // Fetch keywords and platforms for each project
+        const requests = sales.map(sale => forkJoin([
+          this._httpClient.get<SaleEmployee[]>(`${environment.APIURL_LOCAL}/api/v1.0/sales/${sale.saleId}/sale_employee`)
+        ]));
+
+        return forkJoin(requests).pipe(
+
+          map((responses: [
+            SaleEmployee[]
+          ][]) => {
+
+            sales.forEach((warehouse, index) => {
+              warehouse.empId = responses[index][0];
+            });
+
+            const ret: { pagination: SalePagination, sales: Sale[] } = {
+              pagination: {
+                length: response.totalItems,
+                size: limit,
+                page: response.currentPage - 1,
+                lastPage: response.totalPages,
+                startIndex: response.currentPage > 1 ? (response.currentPage - 1) * limit : 0,
+                endIndex: Math.min(response.currentPage * limit, response.totalItems)
+              },
+              sales
+            };
+
+            this._salePagination.next(ret.pagination);
+            this._sales.next(ret.sales);
+
+            return ret;
+          })
+        );
+      })
+    );
+  }
+
+  getSaleCusById(id): Observable<Sale | boolean> {
+    return this._httpClient.get<Sale>(`${environment.APIURL_LOCAL}/api/v1.0/sale_cus/${id}`).pipe(
+
+      switchMap(warehouse => {
+
+        const requests = forkJoin([
+          this._httpClient.get<SaleEmployee[]>(`${environment.APIURL_LOCAL}/api/v1.0/sales/1/sale_employee`)
+        ]);
+
+        return forkJoin(requests).pipe(
+
+          map((responses: [
+            SaleEmployee[]
+          ][]) => {
+
+            warehouse.empId = responses[0][0];
+
+            this._sale.next(warehouse);
+
+            return warehouse;
+          })
+        );
+      }),
+      switchMap(warehouse => {
+
+        if (!warehouse) {
+          return throwError(() => 'Could not found Warehouse with id of ' + id + '!');
+        }
+
+        return of(warehouse)
+      })
+    );
+  }
+
+
+  getSaleBYIDCus(id): Observable<Sale[]> {
     return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sale_cus/${id}`).pipe(
-      tap((sale: any) => {
+      tap((sale: Sale[]) => {
         this._sales.next(sale);
       })
     );
   }
+
+  getSaleCusId(id): Observable<any> {
+    return this._httpClient.get(this._apiPath + '/salescus/' + id + '/sale_employee').pipe(
+      tap((category: any) => {
+        this._saleemps.next(category);
+      })
+    );
+  }
+
+
 
   getSaleBYIDSale(id): Observable<Sale[]> {
     return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sales/${id}`).pipe(
@@ -183,7 +334,7 @@ export class SaleService {
       saleOverdue,
       cusId,
     ).pipe(
-      concatMap(wh => this.saveSaleEmployee(wh.saleId, wh.saleId, consultantList).pipe(
+      concatMap(wh => this.saveSaleEmployee(wh.saleId, wh.cusId, consultantList).pipe(
         map(() => wh)
       ))
     )
@@ -348,88 +499,5 @@ export class SaleService {
     );
   }
 
-  getCategoryByWarehouseId(id): Observable<any> {
-    return this._httpClient.get(this._apiPath + '/salescus/' + id + '/sale_employee').pipe(
-      tap((category: any) => {
-        this._saleemps.next(category);
-      })
-    );
-  }
 
-  getSales(search: string = "", page: number = 1, limit: number = 10, saleId: number = 0, sort: string = 'createdTime', order: 'asc' | 'desc' | '' = 'asc', useStatus: string | null = null): Observable<{ pagination: SalePagination, sales: Sale[] }> {
-
-    const params = {
-      q: search,
-      page: page.toString(),
-      limit: limit.toString(),
-      saleId,
-      sort,
-      order
-    };
-
-    if (useStatus) {
-      params['useStatus'] = useStatus;
-    }
-
-    return this._httpClient.get<PaginationResponse>(this._apiPath + '/sales', {
-      params: params
-    }).pipe(
-      switchMap(response => {
-        const sales: Sale[] = response.data;
-
-        if (!sales.length) {
-          const ret: { pagination: SalePagination, sales: Sale[] } = {
-            pagination: {
-              length: response.totalItems,
-              size: limit,
-              page: response.currentPage - 1,
-              lastPage: response.totalPages,
-              startIndex: response.currentPage > 1 ? (response.currentPage - 1) * limit : 0,
-              endIndex: Math.min(response.currentPage * limit, response.totalItems)
-            },
-            sales
-          };
-
-          this._salePagination.next(ret.pagination);
-          this._sales.next(ret.sales);
-
-          return of(ret)
-        }
-
-        // Fetch keywords and platforms for each project
-        const requests = sales.map(warehouse => forkJoin([
-          this._httpClient.get<SaleEmployee[]>(`${environment.APIURL_LOCAL}/api/v1.0/sales/${warehouse.saleId}/sale_employee`)
-        ]));
-
-        return forkJoin(requests).pipe(
-
-          map((responses: [
-            SaleEmployee[]
-          ][]) => {
-
-            sales.forEach((warehouse, index) => {
-              warehouse.empId = responses[index][0];
-            });
-
-            const ret: { pagination: SalePagination, sales: Sale[] } = {
-              pagination: {
-                length: response.totalItems,
-                size: limit,
-                page: response.currentPage - 1,
-                lastPage: response.totalPages,
-                startIndex: response.currentPage > 1 ? (response.currentPage - 1) * limit : 0,
-                endIndex: Math.min(response.currentPage * limit, response.totalItems)
-              },
-              sales
-            };
-
-            this._salePagination.next(ret.pagination);
-            this._sales.next(ret.sales);
-
-            return ret;
-          })
-        );
-      })
-    );
-  }
 }

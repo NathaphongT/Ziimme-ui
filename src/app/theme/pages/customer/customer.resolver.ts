@@ -6,12 +6,12 @@ import {
 } from '@angular/router';
 import { CustomerService } from '@app/theme/pages/customer/customer.service';
 import { SaleService } from '@app/_service/sale.service';
-import { Customer } from '@app/_service/user.types';
+import { Customer, SaleList } from '@app/_service/user.types';
 import { Observable, forkJoin } from 'rxjs';
 import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import { Course, Districts, PostCode, Province, SaleCut, SubDistricts } from '../basic-data/basic.model';
 import { Employee, Sale, SaleEmployee } from '@app/_service/main.types';
-import { CustomerPagination, SalePagination } from '@app/_service/pagination.types';
+import { CustomerPagination, EmployeePagination, SalePagination } from '@app/_service/pagination.types';
 import { EmployeeService } from '../employee/employee.service';
 
 @Injectable({
@@ -71,30 +71,14 @@ export class CustomerResolver implements Resolve<any> {
 @Injectable({
   providedIn: 'root'
 })
-export class CustomersResolver implements Resolve<any> {
-
-  constructor(private _serviceEmp:EmployeeService, private _serviceSale:SaleService) {}
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<{ pagination: SalePagination, sales: Sale[] } | any> {
-    return forkJoin([
-      // this._serviceSale.getSale(),
-      this._serviceSale.getSales(),
-    ]);
-  }
-  
-}
-
-@Injectable({
-  providedIn: 'root'
-})
 export class EmployeeResolver implements Resolve<any> {
 
-  constructor(private _service: EmployeeService) {}
+  constructor(private _service: EmployeeService) { }
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Employee[]> {
-    return this._service.getAllEmployee();
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<{ pagination: EmployeePagination, employees: Employee[] }> {
+    return this._service.getEmployee();
   }
-  
+
 }
 
 @Injectable({
@@ -192,52 +176,48 @@ export class SaleCutOrderResolver implements Resolve<any> {
 
 }
 
-
-
 @Injectable({
   providedIn: 'root'
 })
-export class SaleEmployeeResolver implements Resolve<any> {
+export class SalesResolver implements Resolve<any> {
 
-  constructor(private _empService: EmployeeService) { }
+  constructor(private _saleService: SaleService) { }
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Employee[]> {
-    return this._empService.getAllEmployee();
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<{ pagination: SalePagination, sales: Sale[] } | any> {
+    return forkJoin([
+
+      this._saleService.getSaleCus(),
+    ]);
   }
 
 }
 
-// S
+@Injectable({
+  providedIn: 'root'
+})
+export class SocialResolver implements Resolve<any> {
 
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class SocialResolver implements Resolve<any> {
+  constructor(private _saleService: SaleService) { }
 
-//   constructor(private _socialManageService: SaleService) {}
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
+    return forkJoin([
+      // this._saleService.getSaleBYIDCus(route.paramMap.get('id')),
+      // this._saleService.getSaleCusId(route.paramMap.get('id')),
+      this._saleService.getSaleCusById(route.paramMap.get('id')),
+    ]);
+  }
 
-//   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<{ pagination: SalePagination, warehouses: Sale[]} | any> {
-//     return forkJoin([
-//       this._socialManageService.getWareHouse(),
-//     ]);
-//   }
-  
-// }
+}
 
+@Injectable({
+  providedIn: 'root'
+})
+export class SaleListResolver implements Resolve<any> {
 
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class SocialResolver implements Resolve<any> {
+  constructor(private _customerService: CustomerService) { }
 
-//   constructor(private _socialManageService: SaleService) { }
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | SaleList[]> {
+    return this._customerService.getSaleList();
+  }
 
-//   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
-//     return forkJoin([
-//       this._socialManageService.getCategoryByWarehouseId(route.paramMap.get('id')),
-//       // this._socialManageService.getSocial(route.paramMap.get('id'))
-//       //this._socialManageService.getCategoryByWarehouseId(route.paramMap.get('id')) // รวม categories ไปไว้ใน getWareHouseById แล้ว
-//     ]);
-//   }
-
-// }
+}

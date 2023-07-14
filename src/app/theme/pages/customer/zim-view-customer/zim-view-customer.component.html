@@ -27,13 +27,13 @@
     </ngx-datatable-column>
     <ngx-datatable-column name="เลขเอกสาร" [canAutoResize]="false" [width]="100" [cellClass]="'cellColumn'">
       <ng-template let-row="row" ngx-datatable-cell-template>
-        {{row?.saleNumber}}
+        {{row?.cusId}}
       </ng-template>
 
     </ngx-datatable-column>
     <ngx-datatable-column name="ที่ปรึกษา" [cellClass]="'cellColumn'">
       <ng-template let-row="row" ngx-datatable-cell-template>
-        <b> {{getCategoryName(row?.empId)}} </b>
+        {{row?.empFullname}}
       </ng-template>
 
     </ngx-datatable-column>
@@ -164,7 +164,7 @@
     <mat-form-field [formGroup]="saleEmployeeForm" class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
       <mat-label>ผู้ปรึกษา</mat-label>
       <mat-select [formControlName]="'empId'" [(ngModel)]="employ" id="empId" name="empId" multiple>
-        <mat-option *ngFor="let item of (employes$ | async)" [value]="item.empId">
+        <mat-option *ngFor="let item of (employees$ | async)" [value]="item.empId">
           {{item.empFullname}}
         </mat-option>
       </mat-select>

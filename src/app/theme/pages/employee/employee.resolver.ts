@@ -75,7 +75,7 @@ export class SaleByIdConResolver implements Resolve<any> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
     return forkJoin([
-      // this._saleService.getWareHouseById(route.paramMap.get('id')),
+      // this._saleService.getSaleCusById(route.paramMap.get('id')),
       this._saleService.getSaleBYIDSale(route.paramMap.get('id')),
       this._saleService.getSaleBYIDConsult(route.paramMap.get('id'))
 
