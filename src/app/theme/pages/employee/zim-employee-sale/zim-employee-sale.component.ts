@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { BasicService } from '@app/theme/pages/basic-data/basic.service';
-import { EmployeeService } from '@app/_service/employee.service';
 import { SaleService } from '@app/_service/sale.service';
 import { ColumnMode } from '@swimlane/ngx-datatable';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { Course } from '../../basic-data/basic.model';
 import { Employee, Sale } from '@app/_service/main.types';
+import { EmployeeService } from '../employee.service';
 
 @Component({
   selector: 'app-zim-employee-sale',

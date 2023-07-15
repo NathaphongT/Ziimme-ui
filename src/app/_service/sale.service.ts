@@ -3,15 +3,23 @@ import { BehaviorSubject, Observable, ReplaySubject, concatMap, forkJoin, map, o
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@environments/environment';
 import { SaleCut } from '@app/theme/pages/basic-data/basic.model';
-import { Sale, SaleEmployee } from './main.types';
+import { Employee, Sale, SaleEmployee } from './main.types';
+import { PaginationResponse, SalePagination } from './pagination.types';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SaleService {
 
+  private _apiPath = environment.APIURL_LOCAL + '/api/v1.0';
+
+
+  private _sale: ReplaySubject<Sale> = new ReplaySubject<Sale>(1);
   private _sales: BehaviorSubject<Sale[] | null> = new BehaviorSubject(null);
-  private _sale: BehaviorSubject<Sale | null> = new BehaviorSubject(null);
+  private _salePagination: BehaviorSubject<SalePagination | null> = new BehaviorSubject(null);
+
+  private _saleemps: BehaviorSubject<SaleEmployee[] | null> = new BehaviorSubject(null);
+  private _saleemp: BehaviorSubject<SaleEmployee | null> = new BehaviorSubject(null);
 
   private _salecut: ReplaySubject<SaleCut> = new ReplaySubject<SaleCut>(1);
   private _salescut: BehaviorSubject<SaleCut[]> = new BehaviorSubject<SaleCut[]>(null);
@@ -28,12 +36,17 @@ export class SaleService {
     this._salecut.next(value);
   }
 
+  //sales
+  get sales$(): Observable<Sale[]> {
+    return this._sales.asObservable();
+  }
+
   get sale$(): Observable<Sale> {
     return this._sale.asObservable();
   }
 
-  get sales$(): Observable<Sale[]> {
-    return this._sales.asObservable();
+  get salePagination$(): Observable<SalePagination> {
+    return this._salePagination.asObservable();
   }
 
   get salecut$(): Observable<SaleCut> {
@@ -45,19 +58,139 @@ export class SaleService {
   }
 
   getAllSale(): Observable<Sale[]> {
-    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sales/`).pipe(
-      tap((sale: Sale[]) => {
-        this._sales.next(sale)
+    return this._httpClient.get(this._apiPath + '/sales', {
+      params: {
+        q: '',
+        page: '1',
+        limit: 300
+      }
+    }).pipe(
+      map((res: any) => res.data),
+      tap((sales: any) => {
+        this._sales.next(sales);
+      })
+    );
+  }
+
+  getSale(search: string = "", page: number = 1, limit: number = 10, sort: string = 'createdTime', order: 'asc' | 'desc' | '' = 'asc'): Observable<{ pagination: SalePagination, sales: Sale[] }> {
+    return this._httpClient.get<PaginationResponse>(this._apiPath + '/sales', {
+      params: {
+        q: search,
+        page: page.toString(),
+        limit: limit.toString(),
+        sort,
+        order
+      }
+    }).pipe(
+      map(response => {
+
+        const ret: { pagination: SalePagination, sales: Sale[] } = {
+          pagination: {
+            length: response.totalItems,
+            size: limit,
+            page: response.currentPage - 1,
+            lastPage: response.totalPages,
+            startIndex: response.currentPage > 1 ? (response.currentPage - 1) * limit : 0,
+            endIndex: Math.min(response.currentPage * limit, response.totalItems)
+          },
+          sales: response.data
+        };
+
+        this._salePagination.next(ret.pagination);
+        this._sales.next(ret.sales);
+
+        return ret;
+
       })
     );
   }
 
 
+  getSaleCus(search: string = "", page: number = 1, limit: number = 10, saleId: number = 0, sort: string = 'createdTime', order: 'asc' | 'desc' | '' = 'asc'): Observable<{ pagination: SalePagination, sales: Sale[] }> {
 
-  getSaleBYIDCus(id): Observable<any> {
+    const params = {
+      q: search,
+      page: page.toString(),
+      limit: limit.toString(),
+      saleId,
+      sort,
+      order
+    };
+
+    return this._httpClient.get<PaginationResponse>(this._apiPath + '/sales', {
+      params: params
+    }).pipe(
+      switchMap(response => {
+        const sales: Sale[] = response.data;
+
+        if (!sales.length) {
+          const ret: { pagination: SalePagination, sales: Sale[] } = {
+            pagination: {
+              length: response.totalItems,
+              size: limit,
+              page: response.currentPage - 1,
+              lastPage: response.totalPages,
+              startIndex: response.currentPage > 1 ? (response.currentPage - 1) * limit : 0,
+              endIndex: Math.min(response.currentPage * limit, response.totalItems)
+            },
+            sales
+          };
+
+          this._salePagination.next(ret.pagination);
+          this._sales.next(ret.sales);
+
+          return of(ret)
+        }
+
+        // Fetch keywords and platforms for each project
+        const requests = sales.map(sale => forkJoin([
+          this._httpClient.get<SaleEmployee[]>(`${environment.APIURL_LOCAL}/api/v1.0/sales/${sale.saleId}/sale_employee`)
+        ]));
+
+        return forkJoin(requests).pipe(
+
+          map((responses: [
+            SaleEmployee[]
+          ][]) => {
+
+            sales.forEach((warehouse, index) => {
+              warehouse.empId = responses[index][0];
+            });
+
+            const ret: { pagination: SalePagination, sales: Sale[] } = {
+              pagination: {
+                length: response.totalItems,
+                size: limit,
+                page: response.currentPage - 1,
+                lastPage: response.totalPages,
+                startIndex: response.currentPage > 1 ? (response.currentPage - 1) * limit : 0,
+                endIndex: Math.min(response.currentPage * limit, response.totalItems)
+              },
+              sales
+            };
+
+            this._salePagination.next(ret.pagination);
+            this._sales.next(ret.sales);
+
+            return ret;
+          })
+        );
+      })
+    );
+  }
+
+  getSaleBYIDCus(id): Observable<Sale[]> {
     return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sale_cus/${id}`).pipe(
-      tap((sale: any) => {
+      tap((sale: Sale[]) => {
         this._sales.next(sale);
+      })
+    );
+  }
+
+  getSaleCusId(id): Observable<any> {
+    return this._httpClient.get(this._apiPath + '/salescus/' + id + '/sale_employee').pipe(
+      tap((category: any) => {
+        this._saleemps.next(category);
       })
     );
   }
@@ -71,7 +204,7 @@ export class SaleService {
   }
 
   getSaleBYIDConsult(id): Observable<any> {
-    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/salese/${id}/sale_employee`).pipe(
+    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sales/${id}/sale_employee`).pipe(
       tap((sale: any) => {
         this._sales.next(sale);
       })
@@ -107,6 +240,20 @@ export class SaleService {
     )
   }
 
+  saveWareHouseCategory(saleId, cusId, consultantList): Observable<any> {
+    return this._httpClient.post(`${this._apiPath}/sales/${saleId}/sale_employee`, consultantList.map(empId => {
+      return { saleId, cusId, empId: empId }
+    })).pipe(
+      tap((v) => console.log("saveWareHouseCategory", v))
+    )
+  }
+
+  deleteWareHouseCategory(saleId): Observable<any> {
+    return this._httpClient.delete(`${this._apiPath}/sales/${saleId}/sale_employee`).pipe(
+      tap((v) => console.log("deleteWareHouseCategory", v))
+    )
+  }
+
   saveSale(saleNumber, saleProduct, saleCount, salePayBalance, salePay, saleOverdue, cusId): Observable<any> {
     return this._httpClient.post(`${environment.APIURL_LOCAL}/api/v1.0/sales`, {
       saleNumber,
@@ -131,13 +278,45 @@ export class SaleService {
       saleOverdue,
       cusId,
     ).pipe(
-      concatMap(wh => this.saveSaleEmployee(wh.saleId, wh.saleId, consultantList).pipe(
+      concatMap(wh => this.saveSaleEmployee(wh.saleId, wh.cusId, consultantList).pipe(
         map(() => wh)
       ))
     )
   }
 
-  updateSale(id: number, data: Sale): Observable<Sale> {
+  updateSale(saleId, saleNumber, saleProduct, saleCount, salePayBalance, salePay, saleOverdue, cusId): Observable<any> {
+    return this._httpClient.put(`${this._apiPath}/sales/${saleId}`, {
+      saleNumber,
+      saleProduct,
+      saleCount,
+      salePayBalance,
+      salePay,
+      saleOverdue,
+      cusId,
+    }).pipe(
+      tap((v) => console.log("updateWareHouse", v))
+    )
+  }
+
+  updateAll(saleId, saleNumber, saleProduct, saleCount, salePayBalance, salePay, saleOverdue, cusId, consultantList): Observable<any> {
+    return this.updateSale(saleId,
+      saleNumber,
+      saleProduct,
+      saleCount,
+      salePayBalance,
+      salePay,
+      saleOverdue,
+      cusId,
+    ).pipe(
+      concatMap(wh => this.deleteWareHouseCategory(wh.saleId).pipe(
+        concatMap(() => this.saveWareHouseCategory(wh.saleId, wh.cusId, consultantList).pipe(
+        ))
+      ))
+
+    )
+  }
+
+  updateSales(id: number, data: Sale): Observable<Sale> {
     return this.sales$.pipe(
       take(1),
       switchMap((sales) =>
@@ -209,10 +388,10 @@ export class SaleService {
     );
   }
 
-  getSaleCutBYIDOrder(id): Observable<SaleCut> {
+  getSaleCutBYIDOrder(id): Observable<SaleCut[]> {
     return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sale_cut_order/${id}`).pipe(
-      tap((salecut: SaleCut) => {
-        this._salecut.next(salecut);
+      tap((salecut: SaleCut[]) => {
+        this._salescut.next(salecut);
       })
     );
   }
@@ -265,13 +444,14 @@ export class SaleService {
     );
   }
 
+
   getWareHouseById(id): Observable<Sale | boolean> {
     return this._httpClient.get<Sale>(`${environment.APIURL_LOCAL}/api/v1.0/sales/${id}`).pipe(
 
       switchMap(warehouse => {
 
         const requests = forkJoin([
-          this._httpClient.get<SaleEmployee[]>(`${environment.APIURL_LOCAL}/api/v1.0/salese/${warehouse.empId}/sale_employee`)
+          this._httpClient.get<SaleEmployee[]>(`${environment.APIURL_LOCAL}/api/v1.0/sales/${warehouse.saleId}/sale_employee`)
         ]);
 
         return forkJoin(requests).pipe(

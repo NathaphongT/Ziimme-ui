@@ -6,23 +6,38 @@ import {
 } from '@angular/router';
 import { Observable, forkJoin } from 'rxjs';
 import { BasicService } from '@app/theme/pages/basic-data/basic.service';
-import { EmployeeService } from '@app/_service/employee.service';
 import { SaleService } from '@app/_service/sale.service';
-import { Branch, Position} from '../basic-data/basic.model';
+import { Branch, Position } from '../basic-data/basic.model';
 import { Employee, Sale, SaleEmployee } from '@app/_service/main.types';
+import { EmployeeService } from './employee.service';
+import { EmployeePagination, SalePagination } from '@app/_service/pagination.types';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EmployeeResolver implements Resolve<any> {
 
-  constructor(private _basicService: EmployeeService) { }
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Employee[]> {
-    return this._basicService.getAllEmployee();
+  constructor(private _service: EmployeeService) {
   }
 
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<{ pagination: EmployeePagination, employees: Employee[] }> {
+    return this._service.getEmployee();
+  }
 }
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SaleResolver implements Resolve<any> {
+
+  constructor(private _service: SaleService) {
+  }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<{ pagination: SalePagination, sales: Sale[] }> {
+    return this._service.getSale();
+  }
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -60,10 +75,10 @@ export class SaleByIdConResolver implements Resolve<any> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
     return forkJoin([
-      // this._saleService.getWareHouseById(route.paramMap.get('id')),
+      // this._saleService.getSaleCusById(route.paramMap.get('id')),
       this._saleService.getSaleBYIDSale(route.paramMap.get('id')),
       this._saleService.getSaleBYIDConsult(route.paramMap.get('id'))
-      
+
 
     ]);
   }

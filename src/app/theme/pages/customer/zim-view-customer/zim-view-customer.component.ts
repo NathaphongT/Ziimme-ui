@@ -4,13 +4,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ColumnMode } from '@swimlane/ngx-datatable';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subject, catchError, map, take, takeUntil, throwError } from 'rxjs';
-import { EmployeeService } from '@app/_service/employee.service';
 import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import { SaleService } from '@app/_service/sale.service';
 import Swal from 'sweetalert2';
 import { CustomerService } from '@app/theme/pages/customer/customer.service';
 import { Course } from '../../basic-data/basic.model';
 import { Employee, Sale } from '@app/_service/main.types';
+import { EmployeeService } from '../../employee/employee.service';
+import { SalePagination } from '@app/_service/pagination.types';
 @Component({
   selector: 'app-zim-view-customer',
   templateUrl: './zim-view-customer.component.html',
@@ -25,27 +26,26 @@ export class ZimViewCustomerComponent implements OnInit {
 
   ModalList: BsModalRef;
 
-  toppingList = ['Extra cheese', 'Mushroom', 'Onion', 'Pepperoni', 'Sausage', 'Tomato'];
-
-
   cus_id = null
 
   isLoading: boolean;
   submitted: boolean;
+  lastUpdate: Date = null;
 
-  sales$: Observable<Sale[]>;
-  sale = [];
+  sale$: Observable<any>
 
-  employes$: Observable<Employee[]>
-  Employees: Employee[]
+  salePagination: SalePagination;
+
+  employees$: Observable<Employee[]>;
+
+  employee: Employee[] = [];
   employ: any
-  employees: Employee[]
 
-  selectedSaleEmp: number[] = []; // Assuming categoryFarmId is a number
 
+  selectedCategories: number[] = []; // Assuming categoryFarmId is a number
 
   coures$: Observable<Course[]>;
-  Courses: Course[] = [];
+  courses: Course[] = [];
 
 
   emp_detail = [];
@@ -57,11 +57,11 @@ export class ZimViewCustomerComponent implements OnInit {
   constructor(
     private _formBuilder: FormBuilder,
     private modalService: BsModalService,
-    private _ServiceSale: SaleService,
+    private _serviceSale: SaleService,
     private _SerivceEmp: EmployeeService,
+    private _serivceCustomer: CustomerService,
     private _SerivceBasic: BasicService,
     private _activatedRoute: ActivatedRoute,
-    private _router: Router
   ) {
     this._activatedRoute.paramMap.subscribe(params => {
       this.cus_id = params.get('id')
@@ -82,54 +82,57 @@ export class ZimViewCustomerComponent implements OnInit {
     });
 
     this.saleEmployeeForm = this._formBuilder.group({
-      empId: [{ value: '', enabled: !!this.cus_id }, Validators.required]
+      empId: [{ value: [], enabled: !!this.cus_id }, Validators.required],
+      cusId: [this.cus_id],
     })
 
-    this.sales$ = this._ServiceSale.sales$;
-    this.employes$ = this._SerivceEmp.employees$;
-
-    this._SerivceEmp.employees$.pipe(takeUntil(this._unsubscribeAll)).subscribe(employees => {
-      this.Employees = employees;
-    })
-
-    this._SerivceEmp.employees$.pipe(takeUntil(this._unsubscribeAll)).subscribe(employees => {
-      this.employees = employees;
-    })
+    this.sale$ = this._serviceSale.sale$;
+    this.employees$ = this._SerivceEmp.employees$;
 
     this.coures$ = this._SerivceBasic.courses$;
     this._SerivceBasic.courses$.pipe(takeUntil(this._unsubscribeAll)).subscribe(courses => {
-      this.Courses = courses;
+      this.courses = courses;
     })
 
-    this._ServiceSale.sales$
-      .pipe(takeUntil(this._unsubscribeAll))
-      .subscribe((sale) => {
-        if (sale) {
-          this.rows = sale;
+    this._serivceCustomer.salelists$.pipe(takeUntil(this._unsubscribeAll)).subscribe(sales => {
 
-          this.rows = [...this.rows];
-        }
-        else {
-          this.rows = [];
-        }
+      this.rows = sales;
 
-        this.isLoading = false;
+      this.rows = [...this.rows];
 
-      })
+      this.isLoading = false;
+    })
   }
 
   openModal(template: TemplateRef<any>, data = null) {
-
-    this.sale = data
-    console.log(this.sale);
-
 
     this.saleForm.reset();
     this.saleForm.patchValue({ cusId: this.cus_id })
     this.saleForm.markAsPristine();
 
     if (data) {
-      this.saleForm.patchValue(data);
+      console.log(data.saleId);
+      this._serviceSale.getWareHouseById(data.saleId).pipe(
+        takeUntil(this._unsubscribeAll)
+      ).subscribe(warehouse => {
+        console.log('ข้อมูลลูกค้า', warehouse);
+
+        if (typeof warehouse === 'object') {
+          this.saleForm.patchValue(warehouse);
+          if (warehouse.empId) {
+            const empIds = warehouse.empId.map(c => {
+              return c.empId
+            });
+            console.log(empIds);
+            this.saleEmployeeForm.patchValue({
+              empId: empIds
+            });
+          }
+        } else {
+          // Handle the case when `warehouse` is a boolean value
+          // For example, you can set some default form values or display an error message.
+        }
+      });
     }
 
     this.ModalList = this.modalService.show(
@@ -144,21 +147,70 @@ export class ZimViewCustomerComponent implements OnInit {
     console.log('คลังข้อมูล', this.saleForm.value);
     console.log('หมวดหมู่', this.saleEmployeeForm.value);
 
+    // Return if the form is invalid
+    if (this.saleForm.invalid) {
+      return;
+    }
+
+    this.submitted = true;
+    this.isLoading = true;
+
     let saveData: Sale = this.saleForm.getRawValue();
+
 
     if (saveData) {
       const overviewData = this.saleForm.getRawValue();
       const platformData = this.saleEmployeeForm.getRawValue();
 
-      if (overviewData.warehouseId) {
+      if (overviewData.saleId) {
+        console.log();
+
         // no need to update anymore
-        /* this._socialService.updateAll(overviewData.warehouseId, overviewData.warehouseName, this.myDropDown, platformData.categories, socialData).subscribe((v) => {
-          console.log(v)
-        }
-        ); */
+        this._serviceSale.updateAll(
+          overviewData.saleId,
+          overviewData.saleNumber,
+          overviewData.saleProduct,
+          overviewData.saleCount,
+          overviewData.salePayBalance,
+          overviewData.salePay,
+          overviewData.saleOverdue,
+          overviewData.cusId,
+          platformData.empId,
+        )
+          .pipe(
+            catchError((err) => {
+              console.log(err);
+              Swal.fire({
+                icon: 'error',
+                title: 'ชื่อผู้ใช้งานนี้มีอยู่ในระบบแล้ว',
+                showConfirmButton: false,
+                timer: 2000,
+              });
+              return throwError(err);
+            })
+          )
+          .subscribe((res) => {
+            this.ModalList.hide();
+            if (res) {
+              Swal.fire({
+                icon: 'success',
+                title: 'แก้ไขข้อมูลสำเร็จ',
+                showConfirmButton: false,
+                timer: 2000,
+              });
+            }
+          },
+            () => {
+              Swal.fire({
+                icon: 'error',
+                title: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้',
+                showConfirmButton: false,
+                timer: 2000,
+              });
+            });
       }
       else {
-        this._ServiceSale.saveAll(
+        this._serviceSale.saveAll(
           overviewData.saleNumber,
           overviewData.saleProduct,
           overviewData.saleCount,
@@ -179,6 +231,7 @@ export class ZimViewCustomerComponent implements OnInit {
             })
           )
           .subscribe((v) => {
+            this.ModalList.hide();
             console.log('กรอกเรียบร้อย', v);
             Swal.fire({
               icon: 'success',
@@ -187,11 +240,7 @@ export class ZimViewCustomerComponent implements OnInit {
               timer: 2000,
             }).then((result) => {
               console.log('ข้อมูล', result);
-              this._router.navigate(['./'], {
-                queryParams: {
-                  search: v.warehouseName
-                }
-              });
+              window.location.reload();
             });
           }
           );
@@ -201,25 +250,29 @@ export class ZimViewCustomerComponent implements OnInit {
 
 
   getNameProduct(id: number) {
-    let index = this.Courses.findIndex(type => type.courseId === id);
+    let index = this.courses.findIndex(type => type.courseId === id);
     if (index === -1) {
       return "-";
     }
     else {
-      return this.Courses[index].courseNameEng;
+      return this.courses[index].courseNameEng;
     }
   }
 
-  getCategoryName(categories) {
-    if (!categories) {
-      return "-";
+  onCategorySelectionChange(checked: boolean, categoryId: number): void {
+    if (checked) {
+      this.selectedCategories.push(categoryId);
+    } else {
+      const index = this.selectedCategories.indexOf(categoryId);
+      if (index !== -1) {
+        this.selectedCategories.splice(index, 1);
+      }
     }
-
-    return categories.map(category => {
-      let index = this.employees.findIndex(type => type.empId === category.empId);
-      return index === -1 ? ' ' : this.employees[index].empFullname
-    }).join(',');
   }
 
+  // You might also need a function to pre-select certain categories when the component loads
+  selectCategories(empIds: number[]): void {
+    this.selectedCategories = empIds;
+  }
 
 }

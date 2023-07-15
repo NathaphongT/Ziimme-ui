@@ -4,6 +4,7 @@ WORKDIR /app
 COPY . .
 RUN npm ci --legacy-peer-deps
 RUN npm run build 
+
 # ------------------------------ Nginx --------------------------------
 FROM nginx:1.23-alpine
 # set timezone
@@ -16,7 +17,5 @@ RUN apk add ca-certificates && update-ca-certificates
 RUN apk add --update tzdata
 # Clean APK cache
 RUN rm -rf /var/cache/apk/*
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY default.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/wiimme
 CMD ["nginx", "-g", "daemon off;"]

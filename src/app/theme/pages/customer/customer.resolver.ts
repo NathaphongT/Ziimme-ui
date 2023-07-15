@@ -5,14 +5,14 @@ import {
   ActivatedRouteSnapshot
 } from '@angular/router';
 import { CustomerService } from '@app/theme/pages/customer/customer.service';
-import { EmployeeService } from '@app/_service/employee.service';
 import { SaleService } from '@app/_service/sale.service';
-import { Customer } from '@app/_service/user.types';
+import { Customer, SaleList } from '@app/_service/user.types';
 import { Observable, forkJoin } from 'rxjs';
 import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import { Course, Districts, PostCode, Province, SaleCut, SubDistricts } from '../basic-data/basic.model';
 import { Employee, Sale, SaleEmployee } from '@app/_service/main.types';
-import { CustomerPagination, SalePagination } from '@app/_service/pagination.types';
+import { CustomerPagination, EmployeePagination, SalePagination } from '@app/_service/pagination.types';
+import { EmployeeService } from '../employee/employee.service';
 
 @Injectable({
   providedIn: 'root'
@@ -65,6 +65,20 @@ export class CustomerResolver implements Resolve<any> {
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<{ pagination: CustomerPagination, customers: Customer[] }> {
     return this._service.getCustomer();
   }
+}
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class EmployeeResolver implements Resolve<any> {
+
+  constructor(private _service: EmployeeService) { }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<{ pagination: EmployeePagination, employees: Employee[] }> {
+    return this._service.getEmployee();
+  }
+
 }
 
 @Injectable({
@@ -121,6 +135,50 @@ export class SaleEmployeeByIdCusResolver implements Resolve<any> {
 
 }
 
+@Injectable({
+  providedIn: 'root'
+})
+export class SalesResolver implements Resolve<any> {
+
+  constructor(private _saleService: SaleService) { }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<{ pagination: SalePagination, sales: Sale[] } | any> {
+    return forkJoin([
+
+      this._saleService.getSaleCus(),
+    ]);
+  }
+
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SaleListResolver implements Resolve<any> {
+
+  constructor(private _customerService: CustomerService) { }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
+    return this._customerService.getSaleList(route.paramMap.get('id'));
+  }
+
+}
+
+
+//zimViewHistory
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SaleCutOrderResolver implements Resolve<any> {
+
+  constructor(private _saleService: SaleService) { }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | SaleCut[]> {
+    return this._saleService.getSaleCutBYIDOrder(route.paramMap.get('id'));
+  }
+
+}
 
 @Injectable({
   providedIn: 'root'
@@ -131,46 +189,6 @@ export class SaleByIdSlaeResolver implements Resolve<any> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Sale[]> {
     return this._saleService.getSaleBYIDSale(route.paramMap.get('id'));
-  }
-
-}
-
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SaleCutResolver implements Resolve<any> {
-
-  constructor(private _saleService: SaleService) { }
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | SaleCut[]> {
-    return this._saleService.getSaleCutBYID(route.paramMap.get('id'));
-  }
-
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SaleCutOrderResolver implements Resolve<any> {
-
-  constructor(private _saleService: SaleService) { }
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | SaleCut> {
-    return this._saleService.getSaleCutBYIDOrder(route.paramMap.get('id'));
-  }
-
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SaleEmployeeResolver implements Resolve<any> {
-
-  constructor(private _empService: EmployeeService) { }
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Employee[]> {
-    return this._empService.getAllEmployee();
   }
 
 }

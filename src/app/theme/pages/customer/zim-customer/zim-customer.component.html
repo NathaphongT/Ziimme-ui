@@ -62,7 +62,7 @@
 
       <ngx-datatable-column name="" [width]="80" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
         <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
-          <a class="btn btn-views" routerLink="./views/{{ row?.cusId }}">ประวัติ</a>
+          <a class="btn btn-views" routerLink="./views/{{ row?.cusId || null}}">ประวัติ</a>
         </ng-template>
       </ngx-datatable-column>
 
