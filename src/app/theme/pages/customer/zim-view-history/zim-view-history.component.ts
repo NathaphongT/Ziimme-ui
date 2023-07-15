@@ -22,8 +22,8 @@ export class ZimViewHistoryComponent implements OnInit {
   sales$: Observable<Sale[]>;
   Sales: Sale[] = [];
   sale: any = {};
-  sale_pay_balance: any = "";
-  sale_count: any = "";
+  salePayBalance: any = "";
+  saleCount: any = "";
 
   salescut$: Observable<SaleCut[]>;
   Salescut: SaleCut[] = [];
@@ -31,7 +31,7 @@ export class ZimViewHistoryComponent implements OnInit {
   sale_cut_pay_balance: any = "";
   sale_cut_count: any = "";
 
-  SalescutOrder: SaleCut;
+  SalescutOrder: SaleCut[];
 
 
   CutOder = [];
@@ -108,8 +108,9 @@ export class ZimViewHistoryComponent implements OnInit {
     this._ServiceSale.sales$.pipe(takeUntil(this._unsubscribeAll)).subscribe(sales => {
       this.Sales = sales;
       this.sale = Object.assign({}, this.Sales);
-      this.sale_pay_balance = this.sale[0].sale_overdue
-      this.sale_count = this.sale[0].sale_count
+      this.salePayBalance = this.sale.saleOverdue
+      this.saleCount = this.sale.saleCount
+      console.log('sale_cut', this.sale.saleCount);
     })
 
     this.employes$ = this._SerivceEmp.employees$;
@@ -128,11 +129,6 @@ export class ZimViewHistoryComponent implements OnInit {
     })
 
     this.salescut$ = this._ServiceSale.salescut$;
-    this._ServiceSale.salescut$.pipe(takeUntil(this._unsubscribeAll)).subscribe(salescut => {
-      this.Salescut = salescut;
-
-
-    })
 
     this.salescut$
       .pipe(takeUntil(this._unsubscribeAll))
@@ -142,6 +138,14 @@ export class ZimViewHistoryComponent implements OnInit {
           this.rows = salecut;
 
           this.rows = [...this.rows];
+
+          this.SalescutOrder = salecut;
+          this.CutOder = Array(this.SalescutOrder[0]);
+          this.sale_cut = Object.assign({}, this.SalescutOrder);
+          this.sale_cut_pay_balance = this.sale_cut[0]?.sale_cut_overdue
+          this.sale_cut_count = this.sale_cut[0]?.sale_cut_count
+          console.log('sale_cut_count', this.sale_cut_count);
+
         }
         else {
           this.rows = [];
@@ -150,26 +154,31 @@ export class ZimViewHistoryComponent implements OnInit {
         this.isLoading = false;
 
       })
-
-    this.GetOrder(this.sale_id);
   }
 
-  GetOrder(id) {
-    this._ServiceSale.getSaleCutBYIDOrder(id).subscribe(res => {
-      this.SalescutOrder = res;
-      this.CutOder = Array(this.SalescutOrder[0]);
-      this.sale_cut = Object.assign({}, this.SalescutOrder);
-      this.sale_cut_pay_balance = this.sale_cut[0]?.sale_cut_overdue
-      this.sale_cut_count = this.sale_cut[0]?.sale_cut_count
-      console.log(this.sale_cut);
-    })
+  openModal(template: TemplateRef<any>) {
+
+    this.salecutForm.reset();
+    if (this.sale_cut_pay_balance >= 0) {
+      this.salecutForm.patchValue({ sale_cut_pay_balance: this.sale_cut_pay_balance })
+      this.salecutForm.patchValue({ sale_cut_count: this.sale_cut_count + 1 })
+    } else {
+      this.salecutForm.patchValue({ sale_cut_pay_balance: this.salePayBalance })
+      this.salecutForm.patchValue({ sale_cut_count: 1 })
+    }
+    this.salecutForm.patchValue({ sale_id: this.sale_id });
+    this.salecutForm.markAsPristine();
+
+    this.ModalList = this.modalService.show(
+      template,
+      Object.assign({}, { class: 'gray modal-lg' })
+    );
   }
 
 
   get f() { return this.salecutForm.controls; }
 
   onSubmit() {
-    // console.log('ข้อมูลทั้งหมด', this.salecutForm.value);
     //Return if the form is invalid
     if (this.salecutForm.invalid) {
       return;
@@ -217,35 +226,6 @@ export class ZimViewHistoryComponent implements OnInit {
         }
       });
     }
-  }
-
-  openModal(template: TemplateRef<any>, data = null) {
-
-    this.sale = data
-    // console.log(this.sale_id);
-
-    this.salecutForm.reset();
-    if (this.sale_cut_pay_balance >= 0) {
-      this.salecutForm.patchValue({ sale_cut_pay_balance: this.sale_cut_pay_balance })
-      this.salecutForm.patchValue({ sale_cut_count: this.sale_cut_count + 1 })
-    } else {
-      this.salecutForm.patchValue({ sale_cut_pay_balance: this.sale_pay_balance })
-      this.salecutForm.patchValue({ sale_cut_count: this.sale_cut })
-    }
-
-    this.salecutForm.patchValue({ sale_id: this.sale_id });
-    // this.salecutForm.patchValue({ sale_cut_pay_balance: this.sale_pay_balance });
-    this.salecutForm.markAsPristine();
-
-
-    if (data) {
-      this.salecutForm.patchValue(data);
-    }
-
-    this.ModalList = this.modalService.show(
-      template,
-      Object.assign({}, { class: 'gray modal-lg' })
-    );
   }
 
   getNameEmployee(id: number) {

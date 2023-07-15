@@ -183,10 +183,10 @@ export class CustomerService {
     );
   }
 
-  getSaleList(): Observable<SaleList[]> {
-    return this._httpClient.get(this._apiPath + '/sales_all').pipe(
-      tap((customers: any) => {
-        this._salelists.next(customers);
+  getSaleList(id): Observable<SaleList[]> {
+    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sales_all_cus/${id}`).pipe(
+      tap((salecut: SaleList[]) => {
+        this._salelists.next(salecut);
       })
     );
   }

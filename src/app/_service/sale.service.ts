@@ -105,39 +105,6 @@ export class SaleService {
     );
   }
 
-  // getSaleCusById(id): Observable<Sale> {
-  //   return this._httpClient.get<Sale>(`${environment.APIURL_LOCAL}/api/v1.0/sale_cus/${id}`).pipe(
-
-  //     switchMap(warehouse => {
-
-  //       const requests = forkJoin([
-  //         this._httpClient.get<SaleEmployee[]>(`${environment.APIURL_LOCAL}/api/v1.0/salescus/${warehouse.cusId}/sale_employee`)
-  //       ]);
-
-  //       return forkJoin(requests).pipe(
-
-  //         map((responses: [
-  //           SaleEmployee[]
-  //         ][]) => {
-
-  //           warehouse.empId = responses[0][0];
-
-  //           this._sale.next(warehouse);
-
-  //           return warehouse;
-  //         })
-  //       );
-  //     }),
-  //     switchMap(warehouse => {
-
-  //       if (!warehouse) {
-  //         return throwError(() => 'Could not found Warehouse with id of ' + id + '!');
-  //       }
-
-  //       return of(warehouse)
-  //     })
-  //   );
-  // }
 
   getSaleCus(search: string = "", page: number = 1, limit: number = 10, saleId: number = 0, sort: string = 'createdTime', order: 'asc' | 'desc' | '' = 'asc'): Observable<{ pagination: SalePagination, sales: Sale[] }> {
 
@@ -212,41 +179,6 @@ export class SaleService {
     );
   }
 
-  getSaleCusById(id): Observable<Sale | boolean> {
-    return this._httpClient.get<Sale>(`${environment.APIURL_LOCAL}/api/v1.0/sale_cus/${id}`).pipe(
-
-      switchMap(warehouse => {
-
-        const requests = forkJoin([
-          this._httpClient.get<SaleEmployee[]>(`${environment.APIURL_LOCAL}/api/v1.0/sales/1/sale_employee`)
-        ]);
-
-        return forkJoin(requests).pipe(
-
-          map((responses: [
-            SaleEmployee[]
-          ][]) => {
-
-            warehouse.empId = responses[0][0];
-
-            this._sale.next(warehouse);
-
-            return warehouse;
-          })
-        );
-      }),
-      switchMap(warehouse => {
-
-        if (!warehouse) {
-          return throwError(() => 'Could not found Warehouse with id of ' + id + '!');
-        }
-
-        return of(warehouse)
-      })
-    );
-  }
-
-
   getSaleBYIDCus(id): Observable<Sale[]> {
     return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sale_cus/${id}`).pipe(
       tap((sale: Sale[]) => {
@@ -262,8 +194,6 @@ export class SaleService {
       })
     );
   }
-
-
 
   getSaleBYIDSale(id): Observable<Sale[]> {
     return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sales/${id}`).pipe(
@@ -310,6 +240,20 @@ export class SaleService {
     )
   }
 
+  saveWareHouseCategory(saleId, cusId, consultantList): Observable<any> {
+    return this._httpClient.post(`${this._apiPath}/sales/${saleId}/sale_employee`, consultantList.map(empId => {
+      return { saleId, cusId, empId: empId }
+    })).pipe(
+      tap((v) => console.log("saveWareHouseCategory", v))
+    )
+  }
+
+  deleteWareHouseCategory(saleId): Observable<any> {
+    return this._httpClient.delete(`${this._apiPath}/sales/${saleId}/sale_employee`).pipe(
+      tap((v) => console.log("deleteWareHouseCategory", v))
+    )
+  }
+
   saveSale(saleNumber, saleProduct, saleCount, salePayBalance, salePay, saleOverdue, cusId): Observable<any> {
     return this._httpClient.post(`${environment.APIURL_LOCAL}/api/v1.0/sales`, {
       saleNumber,
@@ -341,7 +285,7 @@ export class SaleService {
   }
 
   updateSale(saleId, saleNumber, saleProduct, saleCount, salePayBalance, salePay, saleOverdue, cusId): Observable<any> {
-    return this._httpClient.post(`${this._apiPath}/sales/${saleId}`, {
+    return this._httpClient.put(`${this._apiPath}/sales/${saleId}`, {
       saleNumber,
       saleProduct,
       saleCount,
@@ -350,10 +294,9 @@ export class SaleService {
       saleOverdue,
       cusId,
     }).pipe(
-      tap((v) => console.log("updateSale", v))
+      tap((v) => console.log("updateWareHouse", v))
     )
   }
-
 
   updateAll(saleId, saleNumber, saleProduct, saleCount, salePayBalance, salePay, saleOverdue, cusId, consultantList): Observable<any> {
     return this.updateSale(saleId,
@@ -365,9 +308,11 @@ export class SaleService {
       saleOverdue,
       cusId,
     ).pipe(
-      concatMap(wh => this.saveSaleEmployee(wh.saleId, wh.saleId, consultantList).pipe(
-        map(() => wh)
+      concatMap(wh => this.deleteWareHouseCategory(wh.saleId).pipe(
+        concatMap(() => this.saveWareHouseCategory(wh.saleId, wh.cusId, consultantList).pipe(
+        ))
       ))
+
     )
   }
 
@@ -443,10 +388,10 @@ export class SaleService {
     );
   }
 
-  getSaleCutBYIDOrder(id): Observable<SaleCut> {
+  getSaleCutBYIDOrder(id): Observable<SaleCut[]> {
     return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sale_cut_order/${id}`).pipe(
-      tap((salecut: SaleCut) => {
-        this._salecut.next(salecut);
+      tap((salecut: SaleCut[]) => {
+        this._salescut.next(salecut);
       })
     );
   }
@@ -496,6 +441,41 @@ export class SaleService {
             })
           )
       )
+    );
+  }
+
+
+  getWareHouseById(id): Observable<Sale | boolean> {
+    return this._httpClient.get<Sale>(`${environment.APIURL_LOCAL}/api/v1.0/sales/${id}`).pipe(
+
+      switchMap(warehouse => {
+
+        const requests = forkJoin([
+          this._httpClient.get<SaleEmployee[]>(`${environment.APIURL_LOCAL}/api/v1.0/sales/${warehouse.saleId}/sale_employee`)
+        ]);
+
+        return forkJoin(requests).pipe(
+
+          map((responses: [
+            SaleEmployee[]
+          ][]) => {
+
+            warehouse.empId = responses[0][0];
+
+            this._sale.next(warehouse);
+
+            return warehouse;
+          })
+        );
+      }),
+      switchMap(warehouse => {
+
+        if (!warehouse) {
+          return throwError(() => 'Could not found Warehouse with id of ' + id + '!');
+        }
+
+        return of(warehouse)
+      })
     );
   }
 

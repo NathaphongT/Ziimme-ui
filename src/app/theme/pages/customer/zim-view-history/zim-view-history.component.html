@@ -1,67 +1,21 @@
+<div class="tw-w-full tw-bg-white tw-p-4">
+    <div class="tw-flex">
+        <span class="tw-text-2xl tw-font-bold tw-text-[#454545] tw-my-5">รายการตัดคอร์ส</span>
+    </div>
+    <div class="tw-flex tw-justify-between tw-items-center" [ngSwitch]="sale_cut_count">
+        <button *ngSwitchCase="saleCount"
+            class="btn tw-px-3 tw-py-2 tw-m-0 tw-rounded-md tw-w-40 tw-border-0 tw-bg-red-500 tw-text-white tw-font-normal tw-select-none"
+            (click)="openModal(template)">
+            <i class="fa-solid fa-lock"></i>ปิดคอร์ส
+        </button>
+        <button *ngSwitchDefault
+            class="btn tw-px-3 tw-py-2 tw-m-0 tw-rounded-md tw-w-40 tw-border-0 tw-bg-green-500 tw-text-white tw-font-normal tw-select-none"
+            (click)="openModal(template)">
+            <i class="fa-solid fa-scissors"></i>ตัดคอร์ส
+        </button>
+    </div>
+</div>
 <div class="wrap-body">
-    <div class="tw-grid tw-grid-cols-2">
-        <div class="card tw-p-4 tw-mx-1">
-            <label class="tw-my-1 tw-text-lg tw-font-bold" style="border-bottom: 1px solid #e2e2e2;">ข้อมูล</label>
-            <div class="tw-grid tw-grid-cols-2 tw-my-2" *ngFor="let item of Sales">
-                <!-- <div class="tw-mx-2">
-                    <label class="tw-font-semibold">รหัสสมาชิก :</label>
-                    <span class="tw-mx-1 tw-text-base">{{item?.saleNumber}}</span>
-                </div>
-
-                <div class="tw-mx-2">
-                    <label class="tw-font-semibold">สินค้าและบริการ :</label>
-                    <span class="tw-mx-1 tw-text-base">{{getNameProduct(item?.saleProduct)}}</span>
-                </div> -->
-            </div>
-            <!-- <div class="tw-mx-2">
-                    <label class="tw-font-semibold">ที่ปรึกษา :</label>
-                    <span class="tw-mx-1 tw-text-base">{{getNameEmployee(item?.sale_consultant)}}</span>
-                </div> -->
-        </div>
-        <div class="card tw-p-4 tw-mx-1">
-            <label class="tw-my-1 tw-text-lg tw-font-bold"
-                style="border-bottom: 1px solid #e2e2e2;">
-                ข้อมูลการเข้าใช้งานบริการ
-            </label>
-
-            <div class="tw-grid tw-grid-cols-3 tw-my-2">
-                <ng-container *ngFor="let item of Sales">
-                    <div class="tw-mx-2 tw-mb-2">
-                        <label class="tw-font-semibold">จำนวนทั้งหมด :</label>
-                        <span class="tw-mx-1 tw-text-base">{{item?.saleCount}} ครั้ง</span>
-
-                    </div>
-                </ng-container>
-                <ng-container *ngFor="let item of CutOder">
-                    <div class="tw-mx-2 tw-mb-2">
-                        <label class="tw-font-semibold">จำนวนล่าสุด :</label>
-                        <span class="tw-mx-1 tw-text-base">{{item?.sale_cut_count}} ครั้ง</span>
-
-                    </div>
-                    <!-- <div class="tw-mx-2">
-                        <label class="tw-font-semibold">วันที่เข้าใช้บริการล่าสุด :</label>
-                        <span class="tw-mx-1 tw-text-base">{{ item?.createdTime | dateTHPipe: 'day' }}</span>
-                    </div> -->
-                    <div class="tw-mx-2 tw-mb-2">
-                        <label class="tw-font-semibold">ยอดรวมล่าสุด :</label>
-                        <span class="tw-mx-1 tw-text-base">{{item?.sale_cut_pay_balance}}</span>
-                    </div>
-                    <div class="tw-mx-2 tw-mb-2">
-                        <label class="tw-font-semibold">ยอดชำระล่าสุด :</label>
-                        <span class="tw-mx-1 tw-text-base">{{item?.sale_cut_pay}}</span>
-                    </div>
-                    <div class="tw-mx-2 tw-mb-2">
-                        <label class="tw-font-semibold">ยอดคงเหลือ :</label>
-                        <span class="tw-mx-1 tw-text-base">{{item?.sale_cut_overdue}}</span>
-                    </div>
-
-                </ng-container>
-            </div>
-        </div>
-    </div>
-    <div class="tw-flex tw-justify-end tw-p-2">
-        <button class="btn btn-primary m-0" (click)="openModal(template)">ตัดยอดคอร์ส</button>
-    </div>
     <div class="container">
         <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="5" [columnMode]="ColumnMode.force"
             [footerHeight]="50" rowHeight="auto" [rows]="rows">
@@ -71,18 +25,20 @@
                     {{ rowIndex + 1 }}
                 </ng-template>
             </ngx-datatable-column> -->
-            <ngx-datatable-column name="จำนวนครั้ง" [cellClass]="'cellColumn'" [canAutoResize]="false"
-                [sortable]="false" [width]="100">
+            <ngx-datatable-column name="ครั้งที่" [cellClass]="'cellColumn'" [canAutoResize]="false" [sortable]="false"
+                [width]="100">
                 <ng-template let-row="row" ngx-datatable-cell-template>
                     <b class="tw-text-center">{{row?.sale_cut_count}}</b>
                 </ng-template>
             </ngx-datatable-column>
-            <ngx-datatable-column name="วิตามิน" [cellClass]="'cellColumn'">
+            <ngx-datatable-column name="วิตามิน" [cellClass]="'cellColumn'" [canAutoResize]="false" [sortable]="false"
+                [width]="120">
                 <ng-template let-row="row" ngx-datatable-cell-template>
                     {{row?.sale_cut_vitamin}}
                 </ng-template>
             </ngx-datatable-column>
-            <ngx-datatable-column name="มาร์ค" [cellClass]="'cellColumn'">
+            <ngx-datatable-column name="มาร์ค" [cellClass]="'cellColumn'" [canAutoResize]="false" [sortable]="false"
+                [width]="120">
                 <ng-template let-row="row" ngx-datatable-cell-template>
                     {{ row?.sale_cut_mark }}
                 </ng-template>
@@ -125,25 +81,6 @@
                     {{ row?.createdTime | dateTHPipe: 'day' }}
                 </ng-template>
             </ngx-datatable-column>
-            <ngx-datatable-column name="" [width]="70" [canAutoResize]="false" [sortable]="false"
-                [cellClass]="'cellColumn'">
-                <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
-                    <button class="btn btn-views" [routerLink]="['../history', row.sale_id]">ข้อมูล</button>
-                </ng-template>
-            </ngx-datatable-column>
-            <ngx-datatable-column name="" [width]="70" [canAutoResize]="false" [sortable]="false"
-                [cellClass]="'cellColumn'">
-                <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
-                    <a>
-                        <!-- <button class="btn btn-edit" (click)="openModal(template, row)">แก้ไข</button> -->
-                    </a>
-                </ng-template>
-            </ngx-datatable-column>
-            <!-- <ngx-datatable-column name="" [width]="70" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
-          <ng-template let-row="row" ngx-datatable-cell-template>
-            <button class="btn btn-delete" (click)="delete(row)">ลบ</button>
-          </ng-template>
-        </ngx-datatable-column> -->
         </ngx-datatable>
     </div>
 </div>

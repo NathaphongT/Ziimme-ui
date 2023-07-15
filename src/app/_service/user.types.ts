@@ -47,6 +47,7 @@ export interface SaleList {
   saleId: number;
   empFullname: string;
   cusId: number;
+  saleNumber: number;
   saleProduct: number;
   saleCount: number;
   salePayBalance: number;

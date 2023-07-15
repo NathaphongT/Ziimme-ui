@@ -32,17 +32,17 @@ export class ZimViewCustomerComponent implements OnInit {
   submitted: boolean;
   lastUpdate: Date = null;
 
-  sales$: Observable<Sale[]>;
-  sale = [];
+  sale$: Observable<any>
+
   salePagination: SalePagination;
 
   employees$: Observable<Employee[]>;
+
   employee: Employee[] = [];
   employ: any
 
 
-  selectedSaleEmp: number[] = []; // Assuming categoryFarmId is a number
-
+  selectedCategories: number[] = []; // Assuming categoryFarmId is a number
 
   coures$: Observable<Course[]>;
   courses: Course[] = [];
@@ -57,13 +57,11 @@ export class ZimViewCustomerComponent implements OnInit {
   constructor(
     private _formBuilder: FormBuilder,
     private modalService: BsModalService,
-    private _ServiceSale: SaleService,
+    private _serviceSale: SaleService,
     private _SerivceEmp: EmployeeService,
     private _serivceCustomer: CustomerService,
     private _SerivceBasic: BasicService,
     private _activatedRoute: ActivatedRoute,
-    private _router: Router,
-    private _changeDetectorRef: ChangeDetectorRef
   ) {
     this._activatedRoute.paramMap.subscribe(params => {
       this.cus_id = params.get('id')
@@ -84,65 +82,23 @@ export class ZimViewCustomerComponent implements OnInit {
     });
 
     this.saleEmployeeForm = this._formBuilder.group({
-      empId: [{ value: '', enabled: !!this.cus_id }, Validators.required],
+      empId: [{ value: [], enabled: !!this.cus_id }, Validators.required],
       cusId: [this.cus_id],
     })
 
-    this.sales$ = this._ServiceSale.sales$;
-
+    this.sale$ = this._serviceSale.sale$;
     this.employees$ = this._SerivceEmp.employees$;
-
-
-    this._SerivceEmp.employees$.pipe(takeUntil(this._unsubscribeAll)).subscribe(employees => {
-      this.employee = employees;
-    })
 
     this.coures$ = this._SerivceBasic.courses$;
     this._SerivceBasic.courses$.pipe(takeUntil(this._unsubscribeAll)).subscribe(courses => {
       this.courses = courses;
     })
 
-    this._ServiceSale.salePagination$
-      .pipe(takeUntil(this._unsubscribeAll)).subscribe(pagination => {
-        this.salePagination = pagination;
-
-        this._changeDetectorRef.markForCheck();
-
-      });
-
     this._serivceCustomer.salelists$.pipe(takeUntil(this._unsubscribeAll)).subscribe(sales => {
 
-      if (sales) {
-        // =============
-        // const mostRecentDate = sales.reduce((previous, current) => {
+      this.rows = sales;
 
-        //   if (!previous) {
-        //     return current;
-        //   }
-
-        //   const previousDate = new Date(previous.createdTime);
-        //   const currentDate = new Date(current.createdTime);
-
-        //   if (previousDate > currentDate) {
-        //     return previous;
-        //   } else {
-        //     return current;
-        //   }
-        // }, undefined);
-
-        // if (mostRecentDate)
-        //   this.lastUpdate = new Date(mostRecentDate.createdTime);
-        // // =============
-
-        // console.log('List', sales);
-
-        this.rows = sales;
-
-        this.rows = [...this.rows];
-      }
-      else {
-        this.rows = [];
-      }
+      this.rows = [...this.rows];
 
       this.isLoading = false;
     })
@@ -150,16 +106,33 @@ export class ZimViewCustomerComponent implements OnInit {
 
   openModal(template: TemplateRef<any>, data = null) {
 
-    this.sale = data
-    console.log(this.sale);
-
-
     this.saleForm.reset();
     this.saleForm.patchValue({ cusId: this.cus_id })
     this.saleForm.markAsPristine();
 
     if (data) {
-      this.saleForm.patchValue(data);
+      console.log(data.saleId);
+      this._serviceSale.getWareHouseById(data.saleId).pipe(
+        takeUntil(this._unsubscribeAll)
+      ).subscribe(warehouse => {
+        console.log('ข้อมูลลูกค้า', warehouse);
+
+        if (typeof warehouse === 'object') {
+          this.saleForm.patchValue(warehouse);
+          if (warehouse.empId) {
+            const empIds = warehouse.empId.map(c => {
+              return c.empId
+            });
+            console.log(empIds);
+            this.saleEmployeeForm.patchValue({
+              empId: empIds
+            });
+          }
+        } else {
+          // Handle the case when `warehouse` is a boolean value
+          // For example, you can set some default form values or display an error message.
+        }
+      });
     }
 
     this.ModalList = this.modalService.show(
@@ -190,8 +163,10 @@ export class ZimViewCustomerComponent implements OnInit {
       const platformData = this.saleEmployeeForm.getRawValue();
 
       if (overviewData.saleId) {
+        console.log();
+
         // no need to update anymore
-        this._ServiceSale.updateAll(
+        this._serviceSale.updateAll(
           overviewData.saleId,
           overviewData.saleNumber,
           overviewData.saleProduct,
@@ -205,7 +180,6 @@ export class ZimViewCustomerComponent implements OnInit {
           .pipe(
             catchError((err) => {
               console.log(err);
-
               Swal.fire({
                 icon: 'error',
                 title: 'ชื่อผู้ใช้งานนี้มีอยู่ในระบบแล้ว',
@@ -236,7 +210,7 @@ export class ZimViewCustomerComponent implements OnInit {
             });
       }
       else {
-        this._ServiceSale.saveAll(
+        this._serviceSale.saveAll(
           overviewData.saleNumber,
           overviewData.saleProduct,
           overviewData.saleCount,
@@ -266,11 +240,7 @@ export class ZimViewCustomerComponent implements OnInit {
               timer: 2000,
             }).then((result) => {
               console.log('ข้อมูล', result);
-              this._router.navigate(['./'], {
-                queryParams: {
-                  search: v.warehouseName
-                }
-              });
+              window.location.reload();
             });
           }
           );
@@ -287,6 +257,22 @@ export class ZimViewCustomerComponent implements OnInit {
     else {
       return this.courses[index].courseNameEng;
     }
+  }
+
+  onCategorySelectionChange(checked: boolean, categoryId: number): void {
+    if (checked) {
+      this.selectedCategories.push(categoryId);
+    } else {
+      const index = this.selectedCategories.indexOf(categoryId);
+      if (index !== -1) {
+        this.selectedCategories.splice(index, 1);
+      }
+    }
+  }
+
+  // You might also need a function to pre-select certain categories when the component loads
+  selectCategories(empIds: number[]): void {
+    this.selectedCategories = empIds;
   }
 
 }

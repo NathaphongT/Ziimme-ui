@@ -135,47 +135,6 @@ export class SaleEmployeeByIdCusResolver implements Resolve<any> {
 
 }
 
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SaleByIdSlaeResolver implements Resolve<any> {
-
-  constructor(private _saleService: SaleService) { }
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Sale[]> {
-    return this._saleService.getSaleBYIDSale(route.paramMap.get('id'));
-  }
-
-}
-
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SaleCutResolver implements Resolve<any> {
-
-  constructor(private _saleService: SaleService) { }
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | SaleCut[]> {
-    return this._saleService.getSaleCutBYID(route.paramMap.get('id'));
-  }
-
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SaleCutOrderResolver implements Resolve<any> {
-
-  constructor(private _saleService: SaleService) { }
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | SaleCut> {
-    return this._saleService.getSaleCutBYIDOrder(route.paramMap.get('id'));
-  }
-
-}
-
 @Injectable({
   providedIn: 'root'
 })
@@ -195,16 +154,28 @@ export class SalesResolver implements Resolve<any> {
 @Injectable({
   providedIn: 'root'
 })
-export class SocialResolver implements Resolve<any> {
+export class SaleListResolver implements Resolve<any> {
+
+  constructor(private _customerService: CustomerService) { }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
+    return this._customerService.getSaleList(route.paramMap.get('id'));
+  }
+
+}
+
+
+//zimViewHistory
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SaleCutOrderResolver implements Resolve<any> {
 
   constructor(private _saleService: SaleService) { }
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
-    return forkJoin([
-      // this._saleService.getSaleBYIDCus(route.paramMap.get('id')),
-      // this._saleService.getSaleCusId(route.paramMap.get('id')),
-      this._saleService.getSaleCusById(route.paramMap.get('id')),
-    ]);
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | SaleCut[]> {
+    return this._saleService.getSaleCutBYIDOrder(route.paramMap.get('id'));
   }
 
 }
@@ -212,12 +183,12 @@ export class SocialResolver implements Resolve<any> {
 @Injectable({
   providedIn: 'root'
 })
-export class SaleListResolver implements Resolve<any> {
+export class SaleByIdSlaeResolver implements Resolve<any> {
 
-  constructor(private _customerService: CustomerService) { }
+  constructor(private _saleService: SaleService) { }
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | SaleList[]> {
-    return this._customerService.getSaleList();
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Sale[]> {
+    return this._saleService.getSaleBYIDSale(route.paramMap.get('id'));
   }
 
 }
