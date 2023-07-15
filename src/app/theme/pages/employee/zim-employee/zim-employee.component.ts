@@ -1,14 +1,15 @@
 import { ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, UntypedFormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ColumnMode, DatatableComponent } from '@swimlane/ngx-datatable';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { Observable, Subject, catchError, take, takeUntil, tap, throwError } from 'rxjs';
+import { Observable, Subject, catchError, debounceTime, map, switchMap, take, takeUntil, tap, throwError } from 'rxjs';
 import { BasicService } from '@app/theme/pages/basic-data/basic.service';
-import { EmployeeService } from 'src/app/_service/employee.service';
 import Swal from 'sweetalert2';
 import { Branch, Position } from '../../basic-data/basic.model';
 import { Employee } from '@app/_service/main.types';
+import { EmployeeService } from '../employee.service';
+import { EmployeePagination } from '@app/_service/pagination.types';
 
 @Component({
   selector: 'app-zim-employee',
@@ -19,7 +20,6 @@ export class ZimEmployeeComponent implements OnInit {
   @ViewChild(DatatableComponent, { static: true }) table: DatatableComponent;
 
   public employees: Employee[];
-  employees$: Observable<Employee[]>;
 
   positions$: Observable<Position[]>
   Positions: Position[] = [];
@@ -46,6 +46,8 @@ export class ZimEmployeeComponent implements OnInit {
   isLoading: boolean;
   submitted: boolean;
 
+  employeePagination: EmployeePagination;
+  searchInputControl: UntypedFormControl = new UntypedFormControl();
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
   constructor(
@@ -83,24 +85,38 @@ export class ZimEmployeeComponent implements OnInit {
       this.Branchs = branchs;
     })
 
-    this.employees$ = this._Service.employees$;
+    this._Service.employeesPagination$
+      .pipe(takeUntil(this._unsubscribeAll)).subscribe(pagination => {
+        this.employeePagination = pagination;
 
-    this.employees$
-      .pipe(takeUntil(this._unsubscribeAll))
-      .subscribe((employees) => {
+        this._changeDetectorRef.markForCheck();
 
-        if (employees) {
-          this.basicRows = employees;
+      });
 
-          this.basicRows = [...this.basicRows];
-        }
-        else {
-          this.basicRows = [];
-        }
+    this._Service.employees$
+      .pipe(takeUntil(this._unsubscribeAll)).subscribe(users => {
+        this.basicRows = users;
+
+        this.basicRows = [...this.basicRows];
 
         this.isLoading = false;
-
       })
+
+    this.searchInputControl.valueChanges
+      .pipe(
+        takeUntil(this._unsubscribeAll),
+        debounceTime(300),
+        switchMap((query) => {
+          this.isLoading = true;
+          console.log('ค้นหา', query);
+          localStorage.setItem("query", query);
+          return this._Service.getEmployee(query, 1, 10);
+        }),
+        map(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe();
   }
 
   openModal(template: TemplateRef<any>, data = null) {
@@ -258,13 +274,18 @@ export class ZimEmployeeComponent implements OnInit {
     });
   }
 
-  highLight(temp) {
-    if (!this.key) {
-      return temp;
-    }
-    if (temp != null) {
-      return temp.replace(new RegExp(this.key, 'gi'), (match) => {
-        return '<span class="highlightText">' + match + '</span>';
+  setPage(pageInfo) {
+    this.employeePagination.page = pageInfo.offset + 1;
+    this._Service.getEmployee(this.searchInputControl.value || "", this.employeePagination.page, this.employeePagination.size).subscribe();
+  }
+
+  sorting(event) {
+    if (event.sorts && event.sorts.length) {
+      this.isLoading = true;
+
+      this.employeePagination.page = 1;
+      this._Service.getEmployee(this.searchInputControl.value || "", this.employeePagination.page, this.employeePagination.size, event.sorts[0].prop, event.sorts[0].dir).subscribe(() => {
+        this.isLoading = false;
       });
     }
   }

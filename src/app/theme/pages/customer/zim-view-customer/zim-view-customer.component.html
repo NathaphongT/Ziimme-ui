@@ -7,39 +7,38 @@
       <button
         class="btn tw-px-3 tw-py-2 tw-m-0 tw-rounded-md tw-w-40 tw-border-0 tw-bg-green-500 tw-text-white tw-font-normal tw-select-none"
         (click)="openModal(template)">
-        <i class="fa-solid fa-user-plus"></i>เพิ่มข้อมูล
+        <i class="fa-solid fa-user-plus"></i>ข้อมูลการใช้บริการ
       </button>
       <!-- <mat-form-field class="example-full-width tw-flex tw-flex-row" appearance="outline">
         <mat-label>ค้นหาข้อมูลลูกค้า</mat-label>
         <mat-icon matPrefix>search</mat-icon>
-        <input type="search"  class="tw-text-xs" placeholder="ค้นหาเลขสมาชิกและชื่อลูกค้า" matInput>
+        <input type="search"  class="tw-text-xs" placeholder="ค้นหาเลขเอกสารและชื่อลูกค้า" matInput>
       </mat-form-field> -->
     </div>
   </div>
 </div>
 <div class="wrap-body">
-  <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="5" [columnMode]="ColumnMode.force"
+  <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
     [footerHeight]="50" rowHeight="auto" [rows]="rows">
     <ngx-datatable-column name="#" [canAutoResize]="false" [sortable]="false" [width]="50" [cellClass]="'cellColumn'">
       <ng-template let-rowIndex="rowIndex" ngx-datatable-cell-template>
         {{ rowIndex + 1 }}
       </ng-template>
     </ngx-datatable-column>
-    <ngx-datatable-column name="เลขสมาชิก" [canAutoResize]="false" [width]="100" [cellClass]="'cellColumn'">
+    <ngx-datatable-column name="เลขเอกสาร" [canAutoResize]="false" [width]="120" [cellClass]="'cellColumn'">
       <ng-template let-row="row" ngx-datatable-cell-template>
         {{row?.saleNumber}}
       </ng-template>
-
+    </ngx-datatable-column>
+    <ngx-datatable-column name="ชื่อสินค้าและบริการ" [cellClass]="'cellColumn'" [canAutoResize]="false"
+      [sortable]="false" [width]="250" [cellClass]="'cellColumn'">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{getNameProduct(row?.saleProduct)}}
+      </ng-template>
     </ngx-datatable-column>
     <ngx-datatable-column name="ที่ปรึกษา" [cellClass]="'cellColumn'">
       <ng-template let-row="row" ngx-datatable-cell-template>
-        <b> {{getCategoryName(row?.categories)}} </b>
-      </ng-template>
-
-    </ngx-datatable-column>
-    <ngx-datatable-column name="ชื่อสินค้าและบริการ" [cellClass]="'cellColumn'">
-      <ng-template let-row="row" ngx-datatable-cell-template>
-        {{getNameProduct(row?.saleProduct)}}
+        {{row?.empFullname}}
       </ng-template>
     </ngx-datatable-column>
     <ngx-datatable-column name="จำนวนครั้ง" [canAutoResize]="false" [sortable]="false" [width]="100"
@@ -48,22 +47,25 @@
         {{ row?.saleCount }}
       </ng-template>
     </ngx-datatable-column>
-    <ngx-datatable-column name="ราคารวม" [sortable]="false" [cellClass]="'cellColumn'">
+    <ngx-datatable-column name="ราคารวม" [cellClass]="'cellColumn'" [canAutoResize]="false" [sortable]="false"
+      [width]="140">
       <ng-template let-row="row" ngx-datatable-cell-template>
         {{ row?.salePayBalance }}
       </ng-template>
     </ngx-datatable-column>
-    <ngx-datatable-column name="ชำระเงินแล้ว" [sortable]="false" [cellClass]="'cellColumn'">
+    <ngx-datatable-column name="ชำระเงินแล้ว" [sortable]="false" [cellClass]="'cellColumn'" [canAutoResize]="false"
+      [sortable]="false" [width]="140">
       <ng-template let-row="row" ngx-datatable-cell-template>
         {{ row?.salePay }}
       </ng-template>
     </ngx-datatable-column>
-    <ngx-datatable-column name="ยอดคงเหลือ" [sortable]="false" [cellClass]="'cellColumn'">
+    <ngx-datatable-column name="ยอดคงเหลือ" [sortable]="false" [cellClass]="'cellColumn'" [canAutoResize]="false"
+      [sortable]="false" [width]="140">
       <ng-template let-row="row" ngx-datatable-cell-template>
         {{ row?.saleOverdue }}
       </ng-template>
     </ngx-datatable-column>
-    <ngx-datatable-column name="" [width]="120" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
+    <ngx-datatable-column name="" [width]="140" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
       <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
         <button class="btn btn-views" routerLink="../history/{{ row?.saleId }}">ตัดคอร์ส</button>
       </ng-template>
@@ -98,11 +100,11 @@
   <div class="modal-body">
     <div class="tw-flex tw-flex-wrap" [formGroup]="saleForm">
       <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
-        <mat-label>เลขสมาชิก</mat-label>
+        <mat-label>เลขเอกสาร</mat-label>
         <input #postalCode maxlength="5" id="saleNumber" name="saleNumber" [formControlName]="'saleNumber'" matInput>
         <mat-error *ngIf="saleForm.get('saleNumber').hasError('required')">
           <div class="box-error">
-            กรุณากรอกเลขสมาชิก
+            กรุณากรอกเลขเอกสาร
           </div>
         </mat-error>
       </mat-form-field>
@@ -160,13 +162,11 @@
         </mat-error>
       </mat-form-field>
     </div>
-
-    <mat-form-field [formGroup]="saleEmployeeForm" class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+    <mat-form-field class="tw-w-full tw-px-2 tw-mb-3" [formGroup]="saleEmployeeForm" appearance="outline">
       <mat-label>ผู้ปรึกษา</mat-label>
-      <mat-select [formControlName]="'empId'" [(ngModel)]="employ" id="empId" name="empId" multiple>
-        <mat-option *ngFor="let item of (employes$ | async)" [value]="item.empId">
-          {{item.empFullname}}
-        </mat-option>
+      <mat-select [formControlName]="'empId'" [ngModel]="sales" multiple>
+        <mat-option *ngFor="let employee of (employees$ | async)"
+          [value]="employee.empId">{{employee.empFullname}}</mat-option>
       </mat-select>
       <mat-error *ngIf="saleEmployeeForm.get('empId').hasError('required')">
         <div class="box-error">

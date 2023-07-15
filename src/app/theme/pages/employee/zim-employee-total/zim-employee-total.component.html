@@ -11,3 +11,72 @@
         </mat-form-field>
     </div>
 </div>
+<div class="wrap-body">
+    <div class="container">
+        <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
+            [footerHeight]="50" [rowHeight]="50" [rows]="basicRows" [loadingIndicator]="isLoading"
+            [externalPaging]="true" [count]="salePagination.length" [offset]="salePagination.page"
+            [limit]="salePagination.size" (page)="setPage($event)" (sort)="sorting($event)">
+            <ngx-datatable-column name="" [width]="70" [canAutoResize]="false" [sortable]="false"
+                [cellClass]="'cellColumn'">
+                <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
+                    <!-- <button class="btn btn-views" routerLink="./{{ row.empId }}">ข้อมูล</button> -->
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="" [width]="70" [canAutoResize]="false" [sortable]="false"
+                [cellClass]="'cellColumn'">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    <!-- <button class="btn btn-edit" (click)="openModal(template, row)">แก้ไข</button> -->
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="" [width]="70" [canAutoResize]="false" [sortable]="false"
+                [cellClass]="'cellColumn'">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    <!-- <button class="btn btn-delete" (click)="delete(row)">ลบ</button> -->
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="#" [canAutoResize]="false" [sortable]="false" [width]="50"
+                [cellClass]="'cellColumn'">
+                <ng-template let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                    {{ rowIndex + 1 }}
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="ชื่อ-นามสกุล" [cellClass]="'cellColumn'">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{ row.saleNumber }}
+                </ng-template>
+            </ngx-datatable-column>
+            <!-- <ngx-datatable-column name="ชื่อเล่น" [cellClass]="'cellColumn'">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{ row.empNickname }}
+                </ng-template>
+            </ngx-datatable-column> -->
+            <ngx-datatable-column name="ตำแหน่ง" [cellClass]="'cellColumn'" [canAutoResize]="false" [width]="120">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    <!-- {{getNamePosition(row.empPosition)}} -->
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="สาขาประจำ" [cellClass]="'cellColumn'" [canAutoResize]="false" [width]="120">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    <!-- {{getNameBranch(row.empBranch)}} -->
+                </ng-template>
+            </ngx-datatable-column>
+            <!-- <ngx-datatable-column name="เบอร์โทรศัพท์" [cellClass]="'cellColumn'" [canAutoResize]="false" [width]="120">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{ row.empTelephone }}
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="อีเมล" [cellClass]="'cellColumn'">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{ row.empEmail }}
+                </ng-template>
+            </ngx-datatable-column> -->
+            <ngx-datatable-column name="วันที่เพิ่มข้อมูล" [cellClass]="'cellColumn'">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{ row.createdTime }}<br />
+                    <b>โดย : </b>{{ row.createdBy }}
+                </ng-template>
+            </ngx-datatable-column>
+        </ngx-datatable>
+    </div>
+</div>
