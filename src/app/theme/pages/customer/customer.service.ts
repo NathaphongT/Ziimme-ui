@@ -4,7 +4,6 @@ import { BehaviorSubject, Observable, ReplaySubject, forkJoin, map, of, switchMa
 import { Customer, SaleList } from '../../../_service/user.types';
 import { environment } from '@environments/environment';
 import { CustomerPagination, PaginationResponse } from '@app/_service/pagination.types';
-import { Sale, SaleEmployee } from '@app/_service/main.types';
 
 @Injectable({
   providedIn: 'root'

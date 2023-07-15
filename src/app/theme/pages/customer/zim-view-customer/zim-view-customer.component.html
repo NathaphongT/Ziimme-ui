@@ -30,10 +30,9 @@
         {{row?.saleNumber}}
       </ng-template>
     </ngx-datatable-column>
-    <ngx-datatable-column name="ชื่อสินค้าและบริการ" [cellClass]="'cellColumn'" [canAutoResize]="false"
-      [sortable]="false" [width]="250" [cellClass]="'cellColumn'">
+    <ngx-datatable-column name="ชื่อสินค้าและบริการ" [cellClass]="'cellColumn'" [cellClass]="'cellColumn'">
       <ng-template let-row="row" ngx-datatable-cell-template>
-        {{getNameProduct(row?.saleProduct)}}
+        {{row?.courseCode}}
       </ng-template>
     </ngx-datatable-column>
     <ngx-datatable-column name="ที่ปรึกษา" [cellClass]="'cellColumn'">
@@ -110,20 +109,6 @@
       </mat-form-field>
 
       <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
-        <mat-label>รายการสินค้า/บริการ</mat-label>
-        <mat-select [formControlName]="'saleProduct'" id="saleProduct" name="saleProduct">
-          <mat-option *ngFor="let item of (coures$ | async)" [value]="item.courseId">
-            {{item.courseNameTh || item.courseNameEng }} ({{item.courseCode}})
-          </mat-option>
-        </mat-select>
-        <mat-error *ngIf="saleForm.get('saleProduct').hasError('required')">
-          <div class="box-error">
-            กรุณากรอกสินค้า/บริการ
-          </div>
-        </mat-error>
-      </mat-form-field>
-
-      <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>จำนวนครั้ง</mat-label>
         <input type="number" matInput id="saleCount" name="saleCount" [formControlName]="'saleCount'">
         <mat-error *ngIf="saleForm.get('saleCount').hasError('required')">
@@ -175,6 +160,19 @@
       </mat-error>
     </mat-form-field>
 
+    <mat-form-field class="tw-w-full tw-px-2 tw-mb-3" [formGroup]="saleProductForm" appearance="outline">
+      <mat-label>รายการสินค้า/บริการ</mat-label>
+      <mat-select [formControlName]="'courseId'" [ngModel]="products" multiple>
+        <mat-option *ngFor="let item of (coures$ | async)" [value]="item.courseId">
+          {{item.courseNameTh || item.courseNameEng }} ({{item.courseCode}})
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="saleProductForm.get('courseId').hasError('required')">
+        <div class="box-error">
+          กรุณากรอกสินค้า/บริการ
+        </div>
+      </mat-error>
+    </mat-form-field>
 
     <div class="modal-footer">
       <button class="btn btn-save" type="submit" (click)="save()">บันทึก</button>

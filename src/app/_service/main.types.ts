@@ -33,12 +33,25 @@ export interface Sale {
     updatedBy: string
 
     empId?: SaleEmployee[];
+    courseId?: SaleProducts[];
 }
 
 export interface SaleEmployee {
     consultantId: number;
     saleId: number;
     empId: number;
+    cusId: number;
+    recordStatus: string;
+    createdTime: Date;
+    createdBy: string;
+    updatedTime: Date;
+    updatedBy: string
+}
+
+export interface SaleProducts {
+    saleProductId: number;
+    saleId: number;
+    courseId: number;
     cusId: number;
     recordStatus: string;
     createdTime: Date;

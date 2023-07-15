@@ -21,6 +21,7 @@ export class ZimViewCustomerComponent implements OnInit {
 
   saleForm: FormGroup;
   saleEmployeeForm: FormGroup;
+  saleProductForm: FormGroup;
   ColumnMode = ColumnMode;
   rows = [];
 
@@ -42,7 +43,8 @@ export class ZimViewCustomerComponent implements OnInit {
   employ: any
 
 
-  selectedCategories: number[] = []; // Assuming categoryFarmId is a number
+  selectedEmployee: number[] = []; // Assuming selectedEmployeeId is a number
+  selectedCourse: number[] = []; // Assuming selectedCourseId is a number
 
   coures$: Observable<Course[]>;
   courses: Course[] = [];
@@ -51,6 +53,7 @@ export class ZimViewCustomerComponent implements OnInit {
   emp_detail = [];
 
   sales: any;
+  products: any;
 
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -73,7 +76,6 @@ export class ZimViewCustomerComponent implements OnInit {
     this.saleForm = this._formBuilder.group({
       saleId: [this.cus_id],
       saleNumber: [{ value: '', enabled: !!this.cus_id }, Validators.required],
-      saleProduct: [{ value: '', enabled: !!this.cus_id }, Validators.required],
       saleCount: [{ value: '', enabled: !!this.cus_id }, Validators.required],
       salePayBalance: [{ value: '', enabled: !!this.cus_id }, Validators.required],
       salePay: [{ value: '', enabled: !!this.cus_id }, Validators.required],
@@ -83,6 +85,11 @@ export class ZimViewCustomerComponent implements OnInit {
 
     this.saleEmployeeForm = this._formBuilder.group({
       empId: [{ value: [], enabled: !!this.cus_id }, Validators.required],
+      cusId: [this.cus_id],
+    })
+
+    this.saleProductForm = this._formBuilder.group({
+      courseId: [{ value: [], enabled: !!this.cus_id }, Validators.required],
       cusId: [this.cus_id],
     })
 
@@ -111,30 +118,48 @@ export class ZimViewCustomerComponent implements OnInit {
     this.saleForm.markAsPristine();
 
     if (data) {
-      console.log(data.saleId);
-      this._serviceSale.getWareHouseById(data.saleId).pipe(
-        takeUntil(this._unsubscribeAll)
-      ).subscribe(warehouse => {
-        console.log('ข้อมูลลูกค้า', warehouse);
+      //Get ข้อมูลพนักงาน
+      this._serviceSale.getSaleById(data.saleId).pipe(takeUntil(this._unsubscribeAll))
+        .subscribe(warehouse => {
+          if (typeof warehouse === 'object') {
+            this.saleForm.patchValue(warehouse);
+            if (warehouse.empId) {
+              const empIds = warehouse.empId.map(c => {
+                return c.empId
+              });
 
-        if (typeof warehouse === 'object') {
-          this.saleForm.patchValue(warehouse);
-          if (warehouse.empId) {
-            const empIds = warehouse.empId.map(c => {
-              return c.empId
-            });
-            console.log(empIds);
-            this.saleEmployeeForm.patchValue({
-              empId: empIds
-            });
+              this.saleEmployeeForm.patchValue({
+                empId: empIds
+              });
+
+              const courseIds = warehouse.empId.map(c => {
+                return c.empId
+              });
+
+              this.saleProductForm.patchValue({
+                empId: courseIds
+              });
+            }
           }
-        } else {
-          // Handle the case when `warehouse` is a boolean value
-          // For example, you can set some default form values or display an error message.
-        }
-      });
-    }
+        });
+      //Get ข้อมูลสินค้าและบริการ
+      this._serviceSale.getSaleByIdPo(data.saleId).pipe(takeUntil(this._unsubscribeAll))
+        .subscribe(warehouse => {
+          console.log('ข้อมูลลูกค้าสินค้า', warehouse);
+          if (typeof warehouse === 'object') {
+            this.saleForm.patchValue(warehouse);
+            if (warehouse.courseId) {
+              const courseIds = warehouse.courseId.map(c => {
+                return c.courseId
+              });
 
+              this.saleProductForm.patchValue({
+                courseId: courseIds
+              });
+            }
+          }
+        });
+    }
     this.ModalList = this.modalService.show(
       template,
       Object.assign({}, { class: 'gray modal-lg' })
@@ -146,6 +171,7 @@ export class ZimViewCustomerComponent implements OnInit {
   save() {
     console.log('คลังข้อมูล', this.saleForm.value);
     console.log('หมวดหมู่', this.saleEmployeeForm.value);
+    console.log('สินค้า', this.saleProductForm.value);
 
     // Return if the form is invalid
     if (this.saleForm.invalid) {
@@ -159,66 +185,60 @@ export class ZimViewCustomerComponent implements OnInit {
 
 
     if (saveData) {
-      const overviewData = this.saleForm.getRawValue();
-      const platformData = this.saleEmployeeForm.getRawValue();
+      const saleViewData = this.saleForm.getRawValue();
+      const saleEmployeeData = this.saleEmployeeForm.getRawValue();
+      const saleProductData = this.saleProductForm.getRawValue();
 
-      if (overviewData.saleId) {
+      if (saleViewData.saleId) {
         console.log();
 
-        // no need to update anymore
+        // // no need to update anymore
         this._serviceSale.updateAll(
-          overviewData.saleId,
-          overviewData.saleNumber,
-          overviewData.saleProduct,
-          overviewData.saleCount,
-          overviewData.salePayBalance,
-          overviewData.salePay,
-          overviewData.saleOverdue,
-          overviewData.cusId,
-          platformData.empId,
-        )
+          saleViewData.saleId,
+          saleViewData.saleNumber,
+          saleViewData.saleCount,
+          saleViewData.salePayBalance,
+          saleViewData.salePay,
+          saleViewData.saleOverdue,
+          saleViewData.cusId,
+          saleEmployeeData.empId,
+          saleProductData.courseId,)
           .pipe(
             catchError((err) => {
-              console.log(err);
               Swal.fire({
                 icon: 'error',
-                title: 'ชื่อผู้ใช้งานนี้มีอยู่ในระบบแล้ว',
+                title: 'แก้ไขข้อมูลไม่สำเร็จ',
                 showConfirmButton: false,
                 timer: 2000,
               });
               return throwError(err);
             })
           )
-          .subscribe((res) => {
+          .subscribe((v) => {
             this.ModalList.hide();
-            if (res) {
-              Swal.fire({
-                icon: 'success',
-                title: 'แก้ไขข้อมูลสำเร็จ',
-                showConfirmButton: false,
-                timer: 2000,
-              });
-            }
-          },
-            () => {
-              Swal.fire({
-                icon: 'error',
-                title: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้',
-                showConfirmButton: false,
-                timer: 2000,
-              });
+            console.log('กรอกเรียบร้อย', v);
+            Swal.fire({
+              icon: 'success',
+              title: 'แก้ไขข้อมูลสำเร็จแล้ว',
+              showConfirmButton: false,
+              timer: 2000,
+            }).then((result) => {
+              console.log('ข้อมูล', result);
+              window.location.reload();
             });
+          }
+          );
       }
       else {
         this._serviceSale.saveAll(
-          overviewData.saleNumber,
-          overviewData.saleProduct,
-          overviewData.saleCount,
-          overviewData.salePayBalance,
-          overviewData.salePay,
-          overviewData.saleOverdue,
-          overviewData.cusId,
-          platformData.empId)
+          saleViewData.saleNumber,
+          saleViewData.saleCount,
+          saleViewData.salePayBalance,
+          saleViewData.salePay,
+          saleViewData.saleOverdue,
+          saleViewData.cusId,
+          saleEmployeeData.empId,
+          saleProductData.courseId,)
           .pipe(
             catchError((err) => {
               Swal.fire({
@@ -248,31 +268,32 @@ export class ZimViewCustomerComponent implements OnInit {
     }
   }
 
-
-  getNameProduct(id: number) {
-    let index = this.courses.findIndex(type => type.courseId === id);
-    if (index === -1) {
-      return "-";
-    }
-    else {
-      return this.courses[index].courseNameEng;
-    }
-  }
-
-  onCategorySelectionChange(checked: boolean, categoryId: number): void {
+  onEmployeeSelectionChange(checked: boolean, categoryId: number): void {
     if (checked) {
-      this.selectedCategories.push(categoryId);
+      this.selectedEmployee.push(categoryId);
     } else {
-      const index = this.selectedCategories.indexOf(categoryId);
+      const index = this.selectedEmployee.indexOf(categoryId);
       if (index !== -1) {
-        this.selectedCategories.splice(index, 1);
+        this.selectedEmployee.splice(index, 1);
       }
     }
   }
+  selectEmployee(empIds: number[]): void {
+    this.selectedEmployee = empIds;
+  }
 
-  // You might also need a function to pre-select certain categories when the component loads
-  selectCategories(empIds: number[]): void {
-    this.selectedCategories = empIds;
+  onCourseSelectionChange(checked: boolean, categoryId: number): void {
+    if (checked) {
+      this.selectedCourse.push(categoryId);
+    } else {
+      const index = this.selectedCourse.indexOf(categoryId);
+      if (index !== -1) {
+        this.selectedCourse.splice(index, 1);
+      }
+    }
+  }
+  selectCourse(courseIds: number[]): void {
+    this.selectedCourse = courseIds;
   }
 
 }
