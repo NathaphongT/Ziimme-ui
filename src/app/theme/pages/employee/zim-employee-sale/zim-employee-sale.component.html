@@ -19,42 +19,24 @@
                     {{ rowIndex + 1 }}
                 </ng-template>
             </ngx-datatable-column>
-            <ngx-datatable-column name="ชื่อสินค้า" [cellClass]="'cellColumn'">
+            <ngx-datatable-column name="เลขที่เอกสาร" [cellClass]="'cellColumn'">
                 <ng-template let-row="row" ngx-datatable-cell-template>
-                    {{getNameEmployee(row.empId)}}
-                    <!-- {{row.empId}} -->
+                    {{row.saleNumber}}
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="ชื่อลูกค้า" [cellClass]="'cellColumn'">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{row.cusFullName}}
                 </ng-template>
             </ngx-datatable-column>
             <ngx-datatable-column name="ชื่อสินค้าและบริการ" [cellClass]="'cellColumn'">
                 <ng-template let-row="row" ngx-datatable-cell-template>
-                    {{getNameProduct(row.saleId)}}
-                    <!-- {{row.saleId}} -->
+                    {{row.courseCode}}
                 </ng-template>
             </ngx-datatable-column>
-            <!-- <ngx-datatable-column name="ยอดรวมทั้งหมด" [cellClass]="'cellColumn'">
+            <ngx-datatable-column name="ยอดรวม" [cellClass]="'cellColumn'" [canAutoResize]="false" [width]="120">
                 <ng-template let-row="row" ngx-datatable-cell-template>
-                    {{row.sale_pay_balance}}
-                </ng-template>
-            </ngx-datatable-column> -->
-            <!-- <ngx-datatable-column name="สาขาประจำ" [cellClass]="'cellColumn'" [canAutoResize]="false" [width]="120">
-                <ng-template let-row="row" ngx-datatable-cell-template>
-                    {{getNameBranch(row.emp_branch)}}
-                </ng-template>
-            </ngx-datatable-column> -->
-            <!-- <ngx-datatable-column name="เบอร์โทรศัพท์" [cellClass]="'cellColumn'" [canAutoResize]="false" [width]="120">
-                <ng-template let-row="row" ngx-datatable-cell-template>
-                    {{ row.emp_telephone }}
-                </ng-template>
-            </ngx-datatable-column> -->
-            <!-- <ngx-datatable-column name="อีเมล" [cellClass]="'cellColumn'">
-                <ng-template let-row="row" ngx-datatable-cell-template>
-                    {{ row.emp_email }}
-                </ng-template>
-            </ngx-datatable-column> -->
-            <ngx-datatable-column name="วันที่เพิ่มข้อมูล" [cellClass]="'cellColumn'">
-                <ng-template let-row="row" ngx-datatable-cell-template>
-                    {{ row.createdTime | dateTHPipe: 'dt' }}<br />
-                    <b>โดย : </b>{{ row.createdBy }}
+                    {{row.salePayBalance}}
                 </ng-template>
             </ngx-datatable-column>
         </ngx-datatable>

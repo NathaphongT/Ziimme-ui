@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { Employee } from '@app/_service/main.types';
 import { EmployeePagination, PaginationResponse } from '@app/_service/pagination.types';
+import { SaleList, SaleListEmp } from '@app/_service/user.types';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +16,9 @@ export class EmployeeService {
   private _employee: ReplaySubject<Employee> = new ReplaySubject<Employee>(1);
   private _employees: BehaviorSubject<Employee[] | null> = new BehaviorSubject(null);
   private _employeesPagination: BehaviorSubject<EmployeePagination | null> = new BehaviorSubject(null);
+
+  private _salelistemp: ReplaySubject<SaleListEmp> = new ReplaySubject<SaleListEmp>(1);
+  private _salelistemps: BehaviorSubject<SaleListEmp[] | null> = new BehaviorSubject(null);
 
   constructor(private _httpClient: HttpClient) { }
 
@@ -34,6 +38,15 @@ export class EmployeeService {
 
   get employeesPagination$(): Observable<EmployeePagination> {
     return this._employeesPagination.asObservable();
+  }
+
+  //SaleListEmp
+  get salelistemp$(): Observable<SaleListEmp> {
+    return this._salelistemp.asObservable();
+  }
+
+  get salelistemps$(): Observable<SaleListEmp[]> {
+    return this._salelistemps.asObservable();
   }
 
   // ignored pagination
@@ -158,6 +171,22 @@ export class EmployeeService {
             })
           )
       )
+    );
+  }
+
+  getSaleAllEmp(): Observable<SaleListEmp[]> {
+    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sales_all_emp/`).pipe(
+      tap((customers: any) => {
+        this._salelistemps.next(customers);
+      })
+    );
+  }
+
+  getSaleListEmp(id): Observable<SaleListEmp[]> {
+    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sales_all_emp/${id}`).pipe(
+      tap((saleallemp: SaleListEmp[]) => {
+        this._salelistemps.next(saleallemp);
+      })
     );
   }
 

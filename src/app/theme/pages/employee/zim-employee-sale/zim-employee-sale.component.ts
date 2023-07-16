@@ -40,38 +40,11 @@ export class ZimEmployeeSaleComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this._SerivceSale.sales$.pipe(takeUntil(this._unsubscribeAll)).subscribe(warehouses => {
+    this._SerivceEmp.salelistemps$.pipe(takeUntil(this._unsubscribeAll)).subscribe(sales => {
 
-      if (warehouses) {
-        // =============
-        const mostRecentDate = warehouses.reduce((previous, current) => {
+      this.rows = sales;
 
-          if (!previous) {
-            return current;
-          }
-
-          const previousDate = new Date(previous.createdTime);
-          const currentDate = new Date(current.createdTime);
-
-          if (previousDate > currentDate) {
-            return previous;
-          } else {
-            return current;
-          }
-        }, undefined);
-
-        // if (mostRecentDate)
-        //   this.lastUpdate = new Date(mostRecentDate.createdTime);
-        // =============
-
-        console.log(warehouses);
-        this.rows = warehouses;
-
-        this.rows = [...this.rows];
-      }
-      else {
-        this.rows = [];
-      }
+      this.rows = [...this.rows];
 
       this.isLoading = false;
     })

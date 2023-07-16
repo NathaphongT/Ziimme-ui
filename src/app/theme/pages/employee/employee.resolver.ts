@@ -11,6 +11,7 @@ import { Branch, Position } from '../basic-data/basic.model';
 import { Employee, Sale, SaleEmployee } from '@app/_service/main.types';
 import { EmployeeService } from './employee.service';
 import { EmployeePagination, SalePagination } from '@app/_service/pagination.types';
+import { SaleListEmp } from '@app/_service/user.types';
 
 @Injectable({
   providedIn: 'root'
@@ -65,21 +66,28 @@ export class BranchResolver implements Resolve<any> {
 
 }
 
+@Injectable({
+  providedIn: 'root'
+})
+export class SaleListEmpResolver implements Resolve<any> {
+
+  constructor(private _service: EmployeeService) { }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
+    return this._service.getSaleListEmp(route.paramMap.get('id'));
+  }
+
+}
 
 @Injectable({
   providedIn: 'root'
 })
-export class SaleByIdConResolver implements Resolve<any> {
+export class SaleAllEmpResolver implements Resolve<any> {
 
-  constructor(private _saleService: SaleService) { }
+  constructor(private _service: EmployeeService) { }
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
-    return forkJoin([
-      // this._saleService.getSaleCusById(route.paramMap.get('id')),
-      this._saleService.getSaleBYIDSale(route.paramMap.get('id')),
-      this._saleService.getSaleBYIDConsult(route.paramMap.get('id'))
-
-
-    ]);
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | SaleListEmp[]> {
+    return this._service.getSaleAllEmp();
   }
+
 }
