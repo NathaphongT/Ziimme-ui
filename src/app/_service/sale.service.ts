@@ -230,14 +230,14 @@ export class SaleService {
   }
 
 
-  saveSaleProduct(saleId, cusId, ProductList): Observable<any> {
+  saveSaleProduct(saleId, cusId, saleCount, ProductList): Observable<any> {
     return this._httpClient.post(`${environment.APIURL_LOCAL}/api/v1.0/products/${saleId}/sale_product`, ProductList.map(courseId => {
-      return { saleId, cusId, courseId: courseId }
+      return { saleId, cusId, saleCount, ...courseId }
     })).pipe(
       tap((v) => console.log("saveAllSaleProduct", v))
     )
   }
-  
+
 
   deleteSaleEmployee(saleId): Observable<any> {
     return this._httpClient.delete(`${environment.APIURL_LOCAL}/api/v1.0/sales/${saleId}/sale_employee`).pipe(
@@ -251,10 +251,9 @@ export class SaleService {
     )
   }
 
-  saveSale(saleNumber, saleCount, salePayBalance, salePay, saleOverdue, cusId): Observable<any> {
+  saveSale(saleNumber, salePayBalance, salePay, saleOverdue, cusId): Observable<any> {
     return this._httpClient.post(`${environment.APIURL_LOCAL}/api/v1.0/sales`, {
       saleNumber,
-      saleCount,
       salePayBalance,
       salePay,
       saleOverdue,
@@ -264,10 +263,9 @@ export class SaleService {
     )
   }
 
-  updateSale(slaeId, saleNumber, saleCount, salePayBalance, salePay, saleOverdue, cusId): Observable<any> {
+  updateSale(slaeId, saleNumber, salePayBalance, salePay, saleOverdue, cusId): Observable<any> {
     return this._httpClient.put(`${environment.APIURL_LOCAL}/api/v1.0/sales/${slaeId}`, {
       saleNumber,
-      saleCount,
       salePayBalance,
       salePay,
       saleOverdue,
@@ -277,10 +275,9 @@ export class SaleService {
     )
   }
 
-  saveAll(saleNumber, saleCount, salePayBalance, salePay, saleOverdue, cusId, consultantList, ProductList): Observable<any> {
+  saveAll(saleNumber, salePayBalance, salePay, saleOverdue, cusId, consultantList, ProductList): Observable<any> {
     return this.saveSale(
       saleNumber,
-      saleCount,
       salePayBalance,
       salePay,
       saleOverdue,
@@ -289,7 +286,7 @@ export class SaleService {
       concatMap(wh => this.deleteSaleEmployee(wh.saleId).pipe(
         concatMap(() => this.saveSaleEmployee(wh.saleId, wh.cusId, consultantList).pipe(
           concatMap(() => this.deleteSaleProduct(wh.saleId).pipe(
-            concatMap(() => this.saveSaleProduct(wh.saleId, wh.cusId, ProductList).pipe(
+            concatMap(() => this.saveSaleProduct(wh.saleId, wh.cusId, wh.saleCount, ProductList).pipe(
               map(() => wh)
             ))
           ))
@@ -298,11 +295,10 @@ export class SaleService {
     )
   }
 
-  updateAll(saleId, saleNumber, saleCount, salePayBalance, salePay, saleOverdue, cusId, consultantList, ProductList): Observable<any> {
+  updateAll(saleId, saleNumber, salePayBalance, salePay, saleOverdue, cusId, consultantList, ProductList): Observable<any> {
     return this.updateSale(
       saleId,
       saleNumber,
-      saleCount,
       salePayBalance,
       salePay,
       saleOverdue,
@@ -311,7 +307,7 @@ export class SaleService {
       concatMap(wh => this.deleteSaleEmployee(wh.saleId).pipe(
         concatMap(() => this.saveSaleEmployee(wh.saleId, wh.cusId, consultantList).pipe(
           concatMap(() => this.deleteSaleProduct(wh.saleId).pipe(
-            concatMap(() => this.saveSaleProduct(wh.saleId, wh.cusId, ProductList).pipe(
+            concatMap(() => this.saveSaleProduct(wh.saleId, wh.cusId, wh.saleCount, ProductList).pipe(
               map(() => wh)
             ))
           ))

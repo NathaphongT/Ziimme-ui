@@ -18,7 +18,64 @@
   </div>
 </div>
 <div class="wrap-body">
-  <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
+  <ngx-datatable #myTable class='material expandable' [rows]="rows" [groupRowsBy]="'saleNumber'" [columnMode]="'force'"
+    [scrollbarH]="true" [headerHeight]="50" [footerHeight]="50" [rowHeight]="50" [limit]="10"
+    [groupExpansionDefault]="true">
+    <!-- Group Header Template -->
+    <ngx-datatable-group-header [rowHeight]="70" #myGroupHeader (toggle)="onDetailToggle($event)">
+      <ng-template let-group="group" let-expanded="expanded" ngx-datatable-group-header-template>
+        <div style="padding-left:5px;">
+          <a [class.datatable-icon-right]="!expanded" [class.datatable-icon-down]="expanded"
+            title="Expand/Collapse Group" (click)="toggleExpandGroup(group)">
+            <b>เลขที่เอกสาร : {{group.value[0].saleNumber}}</b>
+          </a>
+        </div>
+      </ng-template>
+    </ngx-datatable-group-header>
+    <!-- Row Column Template -->
+    <ngx-datatable-column name="คอร์ส" [cellClass]="'cellColumn'">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row?.courseId}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="จำนวนครั้ง" [canAutoResize]="false" [sortable]="false" [width]="100"
+      [cellClass]="'cellColumn'">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{ row?.saleCount }}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="ราคารวม" [cellClass]="'cellColumn'" [canAutoResize]="false" [sortable]="false"
+      [width]="140">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{ row?.salePayBalance }}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="ชำระเงินแล้ว" [sortable]="false" [cellClass]="'cellColumn'" [canAutoResize]="false"
+      [sortable]="false" [width]="140">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{ row?.salePay }}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="ยอดคงเหลือ" [sortable]="false" [cellClass]="'cellColumn'" [canAutoResize]="false"
+      [sortable]="false" [width]="140">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{ row?.saleOverdue }}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="" [width]="140" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
+      <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
+        <button class="btn btn-views" routerLink="../history/{{ row?.saleId }}">ตัดคอร์ส</button>
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="" [width]="120" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
+      <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
+        <a>
+          <button class="btn btn-edit" (click)="openModal(template, row)">แก้ไข</button>
+        </a>
+      </ng-template>
+    </ngx-datatable-column>
+  </ngx-datatable>
+  <!-- <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
     [footerHeight]="50" rowHeight="auto" [rows]="rows">
     <ngx-datatable-column name="#" [canAutoResize]="false" [sortable]="false" [width]="50" [cellClass]="'cellColumn'">
       <ng-template let-rowIndex="rowIndex" ngx-datatable-cell-template>
@@ -76,12 +133,7 @@
         </a>
       </ng-template>
     </ngx-datatable-column>
-    <!-- <ngx-datatable-column name="" [width]="70" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
-        <ng-template let-row="row" ngx-datatable-cell-template>
-          <button class="btn btn-delete" (click)="delete(row)">ลบ</button>
-        </ng-template>
-      </ngx-datatable-column> -->
-  </ngx-datatable>
+  </ngx-datatable> -->
 
 
 </div>
@@ -98,7 +150,7 @@
   </div>
   <div class="modal-body">
     <div class="tw-flex tw-flex-wrap" [formGroup]="saleForm">
-      <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+      <mat-form-field class="tw-w-3/6 tw-px-2" appearance="outline">
         <mat-label>เลขเอกสาร</mat-label>
         <input #postalCode maxlength="5" id="saleNumber" name="saleNumber" [formControlName]="'saleNumber'" matInput>
         <mat-error *ngIf="saleForm.get('saleNumber').hasError('required')">
@@ -108,16 +160,7 @@
         </mat-error>
       </mat-form-field>
 
-      <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
-        <mat-label>จำนวนครั้ง</mat-label>
-        <input type="number" matInput id="saleCount" name="saleCount" [formControlName]="'saleCount'">
-        <mat-error *ngIf="saleForm.get('saleCount').hasError('required')">
-          <div class="box-error">
-            กรุณากรอกจำนวนครั้ง
-          </div>
-        </mat-error>
-      </mat-form-field>
-      <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+      <mat-form-field class="tw-w-3/6 tw-px-2" appearance="outline">
         <mat-label>ราคารวม</mat-label>
         <input type="number" matInput id="salePayBalance" name="salePayBalance" [formControlName]="'salePayBalance'">
         <mat-error *ngIf="saleForm.get('salePayBalance').hasError('required')">
@@ -127,7 +170,7 @@
         </mat-error>
       </mat-form-field>
 
-      <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+      <mat-form-field class="tw-w-3/6 tw-px-2" appearance="outline">
         <mat-label>ชำระแล้ว</mat-label>
         <input type="number" matInput id="salePay" name="salePay" [formControlName]="'salePay'">
         <mat-error *ngIf="saleForm.get('salePay').hasError('required')">
@@ -137,7 +180,7 @@
         </mat-error>
       </mat-form-field>
 
-      <mat-form-field class="tw-w-3/6 tw-px-2 tw-mb-3" appearance="outline">
+      <mat-form-field class="tw-w-3/6 tw-px-2" appearance="outline">
         <mat-label>ค้างชำระ</mat-label>
         <input type="number" matInput id="saleOverdue" name="saleOverdue" [formControlName]="'saleOverdue'">
         <mat-error *ngIf="saleForm.get('saleOverdue').hasError('required')">
@@ -147,7 +190,7 @@
         </mat-error>
       </mat-form-field>
     </div>
-    <mat-form-field class="tw-w-full tw-px-2 tw-mb-3" [formGroup]="saleEmployeeForm" appearance="outline">
+    <mat-form-field class="tw-w-full tw-px-2" [formGroup]="saleEmployeeForm" appearance="outline">
       <mat-label>ผู้ปรึกษา</mat-label>
       <mat-select [formControlName]="'empId'" [ngModel]="sales" multiple>
         <mat-option *ngFor="let employee of (employees$ | async)"
@@ -159,20 +202,51 @@
         </div>
       </mat-error>
     </mat-form-field>
-
-    <mat-form-field class="tw-w-full tw-px-2 tw-mb-3" [formGroup]="saleProductForm" appearance="outline">
+    <div class="tw-w-full tw-px-1 tw-my-3">
+      <button matSuffix mat-raised-button color="primary" class="tw-p-3 tw-m-1 tw-h-12 "
+        (click)="addURL(newUrl.value,newUrl2.value);">เพิ่มคอร์ส</button>
+    </div>
+    <mat-form-field class="tw-w-3/6 tw-px-2" appearance="outline">
       <mat-label>รายการสินค้า/บริการ</mat-label>
-      <mat-select [formControlName]="'courseId'" [ngModel]="products" multiple>
+      <mat-select [ngModel]="Products" #newUrl>
         <mat-option *ngFor="let item of (coures$ | async)" [value]="item.courseId">
           {{item.courseNameTh || item.courseNameEng }} ({{item.courseCode}})
         </mat-option>
       </mat-select>
-      <mat-error *ngIf="saleProductForm.get('courseId').hasError('required')">
+      <!-- <mat-error *ngIf="saleProductForm.get('courseId').hasError('required')">
         <div class="box-error">
           กรุณากรอกสินค้า/บริการ
         </div>
-      </mat-error>
+      </mat-error> -->
     </mat-form-field>
+    <mat-form-field class="tw-w-3/6 tw-px-2" appearance="outline">
+      <mat-label>จำนวนครั้ง</mat-label>
+      <input type="number" [ngModel]="Counts" matInput #newUrl2>
+      <!-- <mat-error *ngIf="saleForm.get('saleCount').hasError('required')">
+        <div class="box-error">
+          กรุณากรอกจำนวนครั้ง
+        </div>
+      </mat-error> -->
+    </mat-form-field>
+    <div *ngFor="let item of urlData; let i = index" class="flex tw-flex-row">
+      <mat-form-field class="tw-w-[45%] tw-p-3" appearance="outline">
+        <mat-label>สินค้าและบริการ</mat-label>
+        <!-- <mat-label>สินค้าและบริการ : {{i+1}}</mat-label> -->
+        <input type="text" value="{{item.courseId}}" [disabled]="isDisabled[i]" [textContent]="textValues[i]"
+          matInput />
+
+      </mat-form-field>
+      <mat-form-field class="tw-w-[45%] tw-p-3" appearance="outline">
+        <mat-label>จำนวนครั้ง</mat-label>
+        <!-- <mat-label>จำนวนครั้ง : {{i+1}}</mat-label> -->
+        <input type="text" value="{{item.saleCount}}" [disabled]="isDisabled[i]" [textContent]="textValues2[i]"
+          matInput />
+      </mat-form-field>
+
+      <button (click)="removeURL(i)"
+        class="tw-w-[10%] tw-bg-red-500 tw-text-white tw-p-3 tw-border-0 tw-font-semibold tw-rounded-lg">Delete</button>
+
+    </div>
 
     <div class="modal-footer">
       <button class="btn btn-save" type="submit" (click)="save()">บันทึก</button>

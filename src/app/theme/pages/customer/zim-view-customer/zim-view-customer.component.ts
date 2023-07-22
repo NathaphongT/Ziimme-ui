@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, TemplateRef } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ColumnMode } from '@swimlane/ngx-datatable';
@@ -18,12 +18,14 @@ import { SalePagination } from '@app/_service/pagination.types';
   styleUrls: ['./zim-view-customer.component.scss']
 })
 export class ZimViewCustomerComponent implements OnInit {
-
+  @ViewChild('myTable') table: any;
+  
   saleForm: FormGroup;
   saleEmployeeForm: FormGroup;
   saleProductForm: FormGroup;
   ColumnMode = ColumnMode;
   rows = [];
+  groups = [];
 
   ModalList: BsModalRef;
 
@@ -53,7 +55,19 @@ export class ZimViewCustomerComponent implements OnInit {
   emp_detail = [];
 
   sales: any;
-  products: any;
+  Products = '';
+  Counts = '';
+  // items: any[] = []; // Array of items
+  isDisabled: boolean[] = [];
+
+  textValues: string[] = []; // Array to store input values
+  textValues2: string[] = []; // Array to store input values
+  // isDisabled: boolean = true;
+  newUrl: string = '';
+
+  urlData: any = [];
+
+
 
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -76,7 +90,6 @@ export class ZimViewCustomerComponent implements OnInit {
     this.saleForm = this._formBuilder.group({
       saleId: [this.cus_id],
       saleNumber: [{ value: '', enabled: !!this.cus_id }, Validators.required],
-      saleCount: [{ value: '', enabled: !!this.cus_id }, Validators.required],
       salePayBalance: [{ value: '', enabled: !!this.cus_id }, Validators.required],
       salePay: [{ value: '', enabled: !!this.cus_id }, Validators.required],
       saleOverdue: [{ value: '', enabled: !!this.cus_id }, Validators.required],
@@ -85,12 +98,13 @@ export class ZimViewCustomerComponent implements OnInit {
 
     this.saleEmployeeForm = this._formBuilder.group({
       empId: [{ value: [], enabled: !!this.cus_id }, Validators.required],
-      cusId: [this.cus_id],
+      // cusId: [this.cus_id],
     })
 
     this.saleProductForm = this._formBuilder.group({
-      courseId: [{ value: [], enabled: !!this.cus_id }, Validators.required],
-      cusId: [this.cus_id],
+      // courseId: [{ value: [], enabled: !!this.cus_id }, Validators.required],
+      // cusId: [this.cus_id],
+      selectedData: [null]
     })
 
     this.sale$ = this._serviceSale.sale$;
@@ -109,6 +123,62 @@ export class ZimViewCustomerComponent implements OnInit {
 
       this.isLoading = false;
     })
+  }
+
+  addURL(data: any, data2: any): void {
+
+    this.urlData.push(
+      {
+        courseId: data,
+        saleCount: data2
+      }
+    );
+    this.Counts = '';
+    this.Products = '';
+    this.isDisabled.push(true);
+    this.textValues.push('');
+    this.textValues2.push('');
+  }
+
+  getSocialData() {
+    const socialData: any[] = [];
+
+    if (this.urlData.length > 0) {
+      this.urlData.forEach((item, index) => {
+        socialData.push({
+          "courseId": item.courseId,
+          "saleCount": item.saleCount,
+        })
+      });
+      console.log("url", socialData);
+    }
+    else {
+      const id = this.saleProductForm.getRawValue().selectedData;
+      let data: any;
+
+      if (data) {
+        socialData.push({
+          "courseId": data.courseId,
+          "saleCount": data.saleCount,
+        })
+      }
+
+    }
+    console.log(this.urlData);
+    console.log("socialData", socialData);
+    return socialData;
+  }
+
+  editUrl(index: number): void {
+    console.log(index, this.isDisabled[index])
+    this.isDisabled[index] = !this.isDisabled[index];
+  }
+
+  removeURL(index: number): void {
+    this.urlData.splice(index, 1);
+    this.isDisabled.splice(index, 1);
+    this.textValues.splice(index, 1);
+    this.textValues2.splice(index, 1);
   }
 
   openModal(template: TemplateRef<any>, data = null) {
@@ -131,31 +201,6 @@ export class ZimViewCustomerComponent implements OnInit {
               this.saleEmployeeForm.patchValue({
                 empId: empIds
               });
-
-              const courseIds = warehouse.empId.map(c => {
-                return c.empId
-              });
-
-              this.saleProductForm.patchValue({
-                empId: courseIds
-              });
-            }
-          }
-        });
-      //Get ข้อมูลสินค้าและบริการ
-      this._serviceSale.getSaleByIdPo(data.saleId).pipe(takeUntil(this._unsubscribeAll))
-        .subscribe(warehouse => {
-          console.log('ข้อมูลลูกค้าสินค้า', warehouse);
-          if (typeof warehouse === 'object') {
-            this.saleForm.patchValue(warehouse);
-            if (warehouse.courseId) {
-              const courseIds = warehouse.courseId.map(c => {
-                return c.courseId
-              });
-
-              this.saleProductForm.patchValue({
-                courseId: courseIds
-              });
             }
           }
         });
@@ -169,9 +214,6 @@ export class ZimViewCustomerComponent implements OnInit {
   get f() { return this.saleForm.controls; }
 
   save() {
-    console.log('คลังข้อมูล', this.saleForm.value);
-    console.log('หมวดหมู่', this.saleEmployeeForm.value);
-    console.log('สินค้า', this.saleProductForm.value);
 
     // Return if the form is invalid
     if (this.saleForm.invalid) {
@@ -187,22 +229,22 @@ export class ZimViewCustomerComponent implements OnInit {
     if (saveData) {
       const saleViewData = this.saleForm.getRawValue();
       const saleEmployeeData = this.saleEmployeeForm.getRawValue();
-      const saleProductData = this.saleProductForm.getRawValue();
-
+      const saleProductData = this.getSocialData();
+      console.log('ข้อมูลขาย', saleViewData);
+      console.log('ข้อมูลพนักงาน', saleEmployeeData);
+      console.log('ข้อมูลสินค้า', saleProductData);
       if (saleViewData.saleId) {
-        console.log();
-
         // // no need to update anymore
         this._serviceSale.updateAll(
           saleViewData.saleId,
           saleViewData.saleNumber,
-          saleViewData.saleCount,
           saleViewData.salePayBalance,
           saleViewData.salePay,
           saleViewData.saleOverdue,
           saleViewData.cusId,
           saleEmployeeData.empId,
-          saleProductData.courseId,)
+          saleProductData,
+        )
           .pipe(
             catchError((err) => {
               Swal.fire({
@@ -232,13 +274,12 @@ export class ZimViewCustomerComponent implements OnInit {
       else {
         this._serviceSale.saveAll(
           saleViewData.saleNumber,
-          saleViewData.saleCount,
           saleViewData.salePayBalance,
           saleViewData.salePay,
           saleViewData.saleOverdue,
           saleViewData.cusId,
           saleEmployeeData.empId,
-          saleProductData.courseId,)
+          saleProductData,)
           .pipe(
             catchError((err) => {
               Swal.fire({
@@ -292,8 +333,20 @@ export class ZimViewCustomerComponent implements OnInit {
       }
     }
   }
+
   selectCourse(courseIds: number[]): void {
     this.selectedCourse = courseIds;
   }
+
+  //Table New
+  onDetailToggle(event) {
+    console.log('Detail Toggled', event);
+  }
+
+  toggleExpandGroup(group) {
+    console.log('Toggled Expand Group!', group);
+    this.table.groupHeader.toggleExpandGroup(group);
+  }  
+
 
 }

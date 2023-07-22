@@ -13,6 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatNativeDateModule } from "@angular/material/core";
 import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
 
 
 
@@ -48,6 +49,7 @@ import { ZimViewBirthdayComponent } from './zim-view-birthday/zim-view-birthday.
         MatNativeDateModule,
         MatDatepickerModule,
         MatCardModule,
+        MatButtonModule,
         MatAutocompleteModule,
         DateTHPipeModule
     ]
