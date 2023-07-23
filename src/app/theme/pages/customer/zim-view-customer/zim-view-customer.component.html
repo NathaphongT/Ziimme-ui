@@ -18,124 +18,54 @@
   </div>
 </div>
 <div class="wrap-body">
-  <ngx-datatable #myTable class='material expandable' [rows]="rows" [groupRowsBy]="'saleNumber'" [columnMode]="'force'"
-    [scrollbarH]="true" [headerHeight]="50" [footerHeight]="50" [rowHeight]="50" [limit]="10"
+  <ngx-datatable #myTable class="material expandable" [rows]="rows" [groupRowsBy]="'saleNumber'"
+    [columnMode]="ColumnMode.force" [headerHeight]="60" [footerHeight]="60" [rowHeight]="60" [limit]="4"
     [groupExpansionDefault]="true">
-    <!-- Group Header Template -->
-    <ngx-datatable-group-header [rowHeight]="70" #myGroupHeader (toggle)="onDetailToggle($event)">
+    <ngx-datatable-group-header [rowHeight]="70" #myGroupHeader>
       <ng-template let-group="group" let-expanded="expanded" ngx-datatable-group-header-template>
-        <div style="padding-left:5px;">
-          <a [class.datatable-icon-right]="!expanded" [class.datatable-icon-down]="expanded"
-            title="Expand/Collapse Group" (click)="toggleExpandGroup(group)">
-            <b>เลขที่เอกสาร : {{group.value[0].saleNumber}}</b>
-          </a>
+        <div class="tw-flex tw-flex-row tw-items-center tw-p-3">
+          <div class="tw-basis-1/4">
+            <b>เลขที่เอกสาร : {{group.value[0].saleNumber}}</b><br>
+            <b>พนักงาน : {{group.value[0].empFullname}}</b>
+          </div>
+          <div class="tw-flex tw-items-center tw-basis-1/2">
+            <button class="btn btn-views tw-m-1" routerLink="../history/{{ group.value[0].saleId }}">ตัดคอร์ส</button>
+            <button class="btn btn-edit tw-m-1" (click)="openModal(template, group.value[0])">แก้ไข</button>
+          </div>
         </div>
       </ng-template>
     </ngx-datatable-group-header>
-    <!-- Row Column Template -->
-    <ngx-datatable-column name="คอร์ส" [cellClass]="'cellColumn'">
-      <ng-template let-row="row" ngx-datatable-cell-template>
-        {{row?.courseId}}
+    <ngx-datatable-column name="คอร์ส" editable="true" frozenLeft="True">
+      <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row"
+        let-group="group">
+        {{row.courseNameTh}} : ({{row?.courseCode}})
       </ng-template>
     </ngx-datatable-column>
-    <ngx-datatable-column name="จำนวนครั้ง" [canAutoResize]="false" [sortable]="false" [width]="100"
-      [cellClass]="'cellColumn'">
-      <ng-template let-row="row" ngx-datatable-cell-template>
-        {{ row?.saleCount }}
+    <ngx-datatable-column name="จำนวนครั้ง" editable="true">
+      <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row"
+        let-group="group">
+        <b>{{ row.saleCount }}</b>
       </ng-template>
     </ngx-datatable-column>
-    <ngx-datatable-column name="ราคารวม" [cellClass]="'cellColumn'" [canAutoResize]="false" [sortable]="false"
-      [width]="140">
-      <ng-template let-row="row" ngx-datatable-cell-template>
-        {{ row?.salePayBalance }}
+    <ngx-datatable-column name="ราคาสุทธิ" editable="true">
+      <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row"
+        let-group="group">
+        <b>{{ row?.salePayBalance }}</b>
       </ng-template>
     </ngx-datatable-column>
-    <ngx-datatable-column name="ชำระเงินแล้ว" [sortable]="false" [cellClass]="'cellColumn'" [canAutoResize]="false"
-      [sortable]="false" [width]="140">
-      <ng-template let-row="row" ngx-datatable-cell-template>
-        {{ row?.salePay }}
+    <ngx-datatable-column name="ยอดชำระล่าสุด" editable="true">
+      <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row"
+        let-group="group">
+        <b>{{ row?.salePay }}</b>
       </ng-template>
     </ngx-datatable-column>
-    <ngx-datatable-column name="ยอดคงเหลือ" [sortable]="false" [cellClass]="'cellColumn'" [canAutoResize]="false"
-      [sortable]="false" [width]="140">
-      <ng-template let-row="row" ngx-datatable-cell-template>
-        {{ row?.saleOverdue }}
-      </ng-template>
-    </ngx-datatable-column>
-    <ngx-datatable-column name="" [width]="140" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
-      <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
-        <button class="btn btn-views" routerLink="../history/{{ row?.saleId }}">ตัดคอร์ส</button>
-      </ng-template>
-    </ngx-datatable-column>
-    <ngx-datatable-column name="" [width]="120" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
-      <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
-        <a>
-          <button class="btn btn-edit" (click)="openModal(template, row)">แก้ไข</button>
-        </a>
+    <ngx-datatable-column name="ยอดคงเหลือล่าสุด" editable="true">
+      <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row"
+        let-group="group">
+        <b>{{ row?.saleOverdue }}</b>
       </ng-template>
     </ngx-datatable-column>
   </ngx-datatable>
-  <!-- <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
-    [footerHeight]="50" rowHeight="auto" [rows]="rows">
-    <ngx-datatable-column name="#" [canAutoResize]="false" [sortable]="false" [width]="50" [cellClass]="'cellColumn'">
-      <ng-template let-rowIndex="rowIndex" ngx-datatable-cell-template>
-        {{ rowIndex + 1 }}
-      </ng-template>
-    </ngx-datatable-column>
-    <ngx-datatable-column name="เลขเอกสาร" [canAutoResize]="false" [width]="120" [cellClass]="'cellColumn'">
-      <ng-template let-row="row" ngx-datatable-cell-template>
-        {{row?.saleNumber}}
-      </ng-template>
-    </ngx-datatable-column>
-    <ngx-datatable-column name="ชื่อสินค้าและบริการ" [cellClass]="'cellColumn'" [cellClass]="'cellColumn'">
-      <ng-template let-row="row" ngx-datatable-cell-template>
-        {{row?.courseCode}}
-      </ng-template>
-    </ngx-datatable-column>
-    <ngx-datatable-column name="ที่ปรึกษา" [cellClass]="'cellColumn'">
-      <ng-template let-row="row" ngx-datatable-cell-template>
-        {{row?.empFullname}}
-      </ng-template>
-    </ngx-datatable-column>
-    <ngx-datatable-column name="จำนวนครั้ง" [canAutoResize]="false" [sortable]="false" [width]="100"
-      [cellClass]="'cellColumn'">
-      <ng-template let-row="row" ngx-datatable-cell-template>
-        {{ row?.saleCount }}
-      </ng-template>
-    </ngx-datatable-column>
-    <ngx-datatable-column name="ราคารวม" [cellClass]="'cellColumn'" [canAutoResize]="false" [sortable]="false"
-      [width]="140">
-      <ng-template let-row="row" ngx-datatable-cell-template>
-        {{ row?.salePayBalance }}
-      </ng-template>
-    </ngx-datatable-column>
-    <ngx-datatable-column name="ชำระเงินแล้ว" [sortable]="false" [cellClass]="'cellColumn'" [canAutoResize]="false"
-      [sortable]="false" [width]="140">
-      <ng-template let-row="row" ngx-datatable-cell-template>
-        {{ row?.salePay }}
-      </ng-template>
-    </ngx-datatable-column>
-    <ngx-datatable-column name="ยอดคงเหลือ" [sortable]="false" [cellClass]="'cellColumn'" [canAutoResize]="false"
-      [sortable]="false" [width]="140">
-      <ng-template let-row="row" ngx-datatable-cell-template>
-        {{ row?.saleOverdue }}
-      </ng-template>
-    </ngx-datatable-column>
-    <ngx-datatable-column name="" [width]="140" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
-      <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
-        <button class="btn btn-views" routerLink="../history/{{ row?.saleId }}">ตัดคอร์ส</button>
-      </ng-template>
-    </ngx-datatable-column>
-    <ngx-datatable-column name="" [width]="120" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
-      <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
-        <a>
-          <button class="btn btn-edit" (click)="openModal(template, row)">แก้ไข</button>
-        </a>
-      </ng-template>
-    </ngx-datatable-column>
-  </ngx-datatable> -->
-
-
 </div>
 
 
@@ -202,6 +132,7 @@
         </div>
       </mat-error>
     </mat-form-field>
+
     <div class="tw-w-full tw-px-1 tw-my-3">
       <button matSuffix mat-raised-button color="primary" class="tw-p-3 tw-m-1 tw-h-12 "
         (click)="addURL(newUrl.value,newUrl2.value);">เพิ่มคอร์ส</button>
@@ -228,6 +159,24 @@
         </div>
       </mat-error> -->
     </mat-form-field>
+    <div *ngFor="let item of this.pros; let i = index" class="flex tw-flex-row">
+      <mat-form-field class="tw-w-[45%] tw-p-3" appearance="outline">
+        <mat-label>สินค้าและบริการ</mat-label>
+        <!-- <mat-label>สินค้าและบริการ : {{i+1}}</mat-label> -->
+        <input type="text" value="{{item.courseCode}}" [disabled]="isDisabled[i]" [textContent]="textValues[i]"
+          matInput />
+
+      </mat-form-field>
+      <mat-form-field class="tw-w-[45%] tw-p-3" appearance="outline">
+        <mat-label>จำนวนครั้ง</mat-label>
+        <!-- <mat-label>จำนวนครั้ง : {{i+1}}</mat-label> -->
+        <input type="text" value="{{item.saleCount}}" [disabled]="isDisabled[i]" [textContent]="textValues2[i]"
+          matInput />
+      </mat-form-field>
+
+      <button (click)="removeURL(i)"
+        class="tw-w-[10%] tw-bg-red-500 tw-text-white tw-p-3 tw-border-0 tw-font-semibold tw-rounded-lg">Delete</button>
+    </div>
     <div *ngFor="let item of urlData; let i = index" class="flex tw-flex-row">
       <mat-form-field class="tw-w-[45%] tw-p-3" appearance="outline">
         <mat-label>สินค้าและบริการ</mat-label>
@@ -245,7 +194,6 @@
 
       <button (click)="removeURL(i)"
         class="tw-w-[10%] tw-bg-red-500 tw-text-white tw-p-3 tw-border-0 tw-font-semibold tw-rounded-lg">Delete</button>
-
     </div>
 
     <div class="modal-footer">

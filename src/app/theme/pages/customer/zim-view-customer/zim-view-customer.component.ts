@@ -19,13 +19,15 @@ import { SalePagination } from '@app/_service/pagination.types';
 })
 export class ZimViewCustomerComponent implements OnInit {
   @ViewChild('myTable') table: any;
-  
+
   saleForm: FormGroup;
   saleEmployeeForm: FormGroup;
   saleProductForm: FormGroup;
   ColumnMode = ColumnMode;
   rows = [];
   groups = [];
+
+  pros: any;
 
   ModalList: BsModalRef;
 
@@ -189,8 +191,10 @@ export class ZimViewCustomerComponent implements OnInit {
 
     if (data) {
       //Get ข้อมูลพนักงาน
+
       this._serviceSale.getSaleById(data.saleId).pipe(takeUntil(this._unsubscribeAll))
         .subscribe(warehouse => {
+          console.log('ข้อมูลพนักงาน', warehouse);
           if (typeof warehouse === 'object') {
             this.saleForm.patchValue(warehouse);
             if (warehouse.empId) {
@@ -203,6 +207,11 @@ export class ZimViewCustomerComponent implements OnInit {
               });
             }
           }
+        });
+
+      this._serivceCustomer.getSaleList(data.saleId).pipe(takeUntil(this._unsubscribeAll))
+        .subscribe(product => {
+          this.pros = product
         });
     }
     this.ModalList = this.modalService.show(
@@ -319,6 +328,7 @@ export class ZimViewCustomerComponent implements OnInit {
       }
     }
   }
+
   selectEmployee(empIds: number[]): void {
     this.selectedEmployee = empIds;
   }
@@ -337,16 +347,4 @@ export class ZimViewCustomerComponent implements OnInit {
   selectCourse(courseIds: number[]): void {
     this.selectedCourse = courseIds;
   }
-
-  //Table New
-  onDetailToggle(event) {
-    console.log('Detail Toggled', event);
-  }
-
-  toggleExpandGroup(group) {
-    console.log('Toggled Expand Group!', group);
-    this.table.groupHeader.toggleExpandGroup(group);
-  }  
-
-
 }

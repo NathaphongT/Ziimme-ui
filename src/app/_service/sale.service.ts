@@ -5,6 +5,7 @@ import { environment } from '@environments/environment';
 import { SaleCut } from '@app/theme/pages/basic-data/basic.model';
 import { Employee, Sale, SaleEmployee, SaleProducts } from './main.types';
 import { PaginationResponse, SalePagination } from './pagination.types';
+import { SaleList } from './user.types';
 
 @Injectable({
   providedIn: 'root'
@@ -485,16 +486,16 @@ export class SaleService {
       switchMap(warehouse => {
 
         const requests = forkJoin([
-          this._httpClient.get<SaleProducts[]>(`${environment.APIURL_LOCAL}/api/v1.0/products/${warehouse.saleId}/sale_product`)
+          this._httpClient.get<SaleList[]>(`${environment.APIURL_LOCAL}/api/v1.0/sales_all/${warehouse.saleId}`)
         ]);
 
         return forkJoin(requests).pipe(
 
           map((responses: [
-            SaleProducts[]
+            SaleList[]
           ][]) => {
 
-            warehouse.courseId = responses[0][0];
+            // warehouse.courseId = responses[0][0];
 
             this._sale.next(warehouse);
 
