@@ -187,7 +187,7 @@ export class ZimViewCustomerComponent implements OnInit {
 
     this.saleForm.reset();
     this.saleEmployeeForm.reset();
-    this.saleProductForm.reset();
+    this.pros = '';
     this.saleForm.patchValue({ cusId: this.cus_id })
     this.saleForm.markAsPristine();
 
@@ -210,10 +210,13 @@ export class ZimViewCustomerComponent implements OnInit {
             }
           }
         });
-
-      this._serivceCustomer.getSaleList(data.saleId).pipe(takeUntil(this._unsubscribeAll))
+      this._serviceSale.getSaleByIdPo(data.saleId).pipe(takeUntil(this._unsubscribeAll))
         .subscribe(product => {
-          this.pros = product
+          if (typeof product === 'object') {
+            if (product.courseId) {
+              this.pros = product.courseId
+            }
+          }
         });
     }
     this.ModalList = this.modalService.show(
@@ -245,7 +248,6 @@ export class ZimViewCustomerComponent implements OnInit {
       console.log('ข้อมูลพนักงาน', saleEmployeeData);
       console.log('ข้อมูลสินค้า', saleProductData);
       if (saleViewData.saleId) {
-        // // no need to update anymore
         this._serviceSale.updateAll(
           saleViewData.saleId,
           saleViewData.saleNumber,
@@ -276,8 +278,7 @@ export class ZimViewCustomerComponent implements OnInit {
               showConfirmButton: false,
               timer: 2000,
             }).then((result) => {
-              console.log('ข้อมูล', result);
-              window.location.reload();
+              // window.location.reload();
             });
           }
           );
@@ -311,7 +312,6 @@ export class ZimViewCustomerComponent implements OnInit {
               showConfirmButton: false,
               timer: 2000,
             }).then((result) => {
-              console.log('ข้อมูล', result);
               window.location.reload();
             });
           }

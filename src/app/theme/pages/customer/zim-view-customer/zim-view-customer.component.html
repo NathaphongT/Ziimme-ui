@@ -163,15 +163,13 @@
       <mat-form-field class="tw-w-[45%] tw-p-3" appearance="outline">
         <mat-label>สินค้าและบริการ</mat-label>
         <!-- <mat-label>สินค้าและบริการ : {{i+1}}</mat-label> -->
-        <input type="text" value="{{item.courseCode}}" [disabled]="isDisabled[i]" [textContent]="textValues[i]"
-          matInput />
+        <input type="text" value="{{item.courseNameTh}}" matInput />
 
       </mat-form-field>
       <mat-form-field class="tw-w-[45%] tw-p-3" appearance="outline">
         <mat-label>จำนวนครั้ง</mat-label>
         <!-- <mat-label>จำนวนครั้ง : {{i+1}}</mat-label> -->
-        <input type="text" value="{{item.saleCount}}" [disabled]="isDisabled[i]" [textContent]="textValues2[i]"
-          matInput />
+        <input type="text" value="{{item.saleCount}}" matInput />
       </mat-form-field>
 
       <button (click)="removeURL(i)"

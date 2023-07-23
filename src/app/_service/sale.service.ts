@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, ReplaySubject, concatMap, forkJoin, map, of, switchMap, take, tap, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@environments/environment';
-import { SaleCut } from '@app/theme/pages/basic-data/basic.model';
+import { Course, SaleCut } from '@app/theme/pages/basic-data/basic.model';
 import { Employee, Sale, SaleEmployee, SaleProducts } from './main.types';
 import { PaginationResponse, SalePagination } from './pagination.types';
 import { SaleList } from './user.types';
@@ -19,11 +19,8 @@ export class SaleService {
   private _sales: BehaviorSubject<Sale[] | null> = new BehaviorSubject(null);
   private _salePagination: BehaviorSubject<SalePagination | null> = new BehaviorSubject(null);
 
-  private _saleemps: BehaviorSubject<SaleEmployee[] | null> = new BehaviorSubject(null);
-  private _saleemp: BehaviorSubject<SaleEmployee | null> = new BehaviorSubject(null);
 
-  private _salepros: BehaviorSubject<SaleProducts[] | null> = new BehaviorSubject(null);
-  private _salepro: BehaviorSubject<SaleProducts | null> = new BehaviorSubject(null);
+  private _courses: BehaviorSubject<Course[] | null> = new BehaviorSubject(null);
 
   private _salecut: ReplaySubject<SaleCut> = new ReplaySubject<SaleCut>(1);
   private _salescut: BehaviorSubject<SaleCut[]> = new BehaviorSubject<SaleCut[]>(null);
@@ -199,6 +196,15 @@ export class SaleService {
     );
   }
 
+  getTypesocial(): Observable<Course[]> {
+    return this._httpClient.get(this._apiPath + '/social_type').pipe(
+      map((res: any) => res.data),
+      tap((socials: Course[]) => {
+        this._courses.next(socials);
+      })
+    );
+  }
+
   getSaleBYIDConsult(id): Observable<any> {
     return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sales/${id}/sale_employee`).pipe(
       tap((sale: any) => {
@@ -296,7 +302,7 @@ export class SaleService {
     )
   }
 
-  updateAll(saleId, saleNumber, salePayBalance, salePay, saleOverdue, cusId, consultantList, ProductList): Observable<any> {
+  updateAll(saleId, saleNumber, salePayBalance, salePay, saleOverdue, cusId, consultantList, socials = []): Observable<any> {
     return this.updateSale(
       saleId,
       saleNumber,
@@ -308,7 +314,7 @@ export class SaleService {
       concatMap(wh => this.deleteSaleEmployee(wh.saleId).pipe(
         concatMap(() => this.saveSaleEmployee(wh.saleId, wh.cusId, consultantList).pipe(
           concatMap(() => this.deleteSaleProduct(wh.saleId).pipe(
-            concatMap(() => this.saveSaleProduct(wh.saleId, wh.cusId, wh.saleCount, ProductList).pipe(
+            concatMap(() => this.saveSaleProduct(wh.saleId, wh.cusId, wh.saleCount, socials).pipe(
               map(() => wh)
             ))
           ))
@@ -486,16 +492,16 @@ export class SaleService {
       switchMap(warehouse => {
 
         const requests = forkJoin([
-          this._httpClient.get<SaleList[]>(`${environment.APIURL_LOCAL}/api/v1.0/sales_all/${warehouse.saleId}`)
+          this._httpClient.get<SaleProducts[]>(`${environment.APIURL_LOCAL}/api/v1.0/sales_all_sale/${warehouse.saleId}`)
         ]);
 
         return forkJoin(requests).pipe(
 
           map((responses: [
-            SaleList[]
+            SaleProducts[]
           ][]) => {
 
-            // warehouse.courseId = responses[0][0];
+            warehouse.courseId = responses[0][0];
 
             this._sale.next(warehouse);
 
