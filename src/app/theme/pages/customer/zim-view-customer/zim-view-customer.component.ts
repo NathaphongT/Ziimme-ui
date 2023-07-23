@@ -186,6 +186,8 @@ export class ZimViewCustomerComponent implements OnInit {
   openModal(template: TemplateRef<any>, data = null) {
 
     this.saleForm.reset();
+    this.saleEmployeeForm.reset();
+    this.saleProductForm.reset();
     this.saleForm.patchValue({ cusId: this.cus_id })
     this.saleForm.markAsPristine();
 

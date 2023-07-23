@@ -7,8 +7,8 @@ import { ZimViewCustomerComponent } from './zim-view-customer/zim-view-customer.
 import { CustomerIDResolver, CustomerResolver, ProvinceResolver, SaleByIdSlaeResolver, SaleEmployeeByIdCusResolver, SubDistrictsResolver, SaleListResolver, SaleCutOrderResolver } from './customer.resolver';
 import { ZimViewHistoryComponent } from './zim-view-history/zim-view-history.component';
 import { ZimViewBirthdayComponent } from './zim-view-birthday/zim-view-birthday.component';
-import { CourseResolver } from '../basic-data/basic.resolver';
-import { EmployeeResolver } from '../employee/employee.resolver';
+import { CourseAllResolver, CourseResolver } from '../basic-data/basic.resolver';
+import { EmployeeAllResolver, EmployeeResolver } from '../employee/employee.resolver';
 
 const routes: Routes = [
   {
@@ -50,8 +50,8 @@ const routes: Routes = [
             component: ZimViewCustomerComponent,
             resolve: {
               sales: SaleListResolver,
-              courses: CourseResolver,
-              employee: EmployeeResolver,
+              courses: CourseAllResolver,
+              employee: EmployeeAllResolver,
             }
           },
           {

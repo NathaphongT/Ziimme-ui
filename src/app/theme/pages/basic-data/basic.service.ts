@@ -99,7 +99,7 @@ export class BasicService {
     }
 
     // ignored pagination
-    getAllCourse(): Observable<Position[]> {
+    getAllCourse(): Observable<Course[]> {
         return this._httpClient.get(this._apiPath + '/courses', {
             params: {
                 q: '',

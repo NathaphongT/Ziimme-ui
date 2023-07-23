@@ -29,6 +29,18 @@ export class EmployeeResolver implements Resolve<any> {
 @Injectable({
   providedIn: 'root'
 })
+export class EmployeeAllResolver implements Resolve<any> {
+
+  constructor(private _service: EmployeeService) { }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Employee[]> {
+    return this._service.getAllEmployee();
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
 export class SaleResolver implements Resolve<any> {
 
   constructor(private _service: SaleService) {

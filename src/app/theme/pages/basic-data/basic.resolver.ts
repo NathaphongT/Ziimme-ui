@@ -31,12 +31,22 @@ export class UserResolver implements Resolve<any> {
 })
 export class CourseResolver implements Resolve<any> {
 
-  constructor(private _service: BasicService) {
-
-  }
+  constructor(private _service: BasicService) { }
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<{ pagination: CoursePagination, courses: Course[] }> {
     return this._service.getCourse();
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CourseAllResolver implements Resolve<any> {
+
+  constructor(private _service: BasicService) { }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Course[]> {
+    return this._service.getAllCourse();
   }
 }
 
