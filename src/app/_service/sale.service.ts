@@ -196,11 +196,17 @@ export class SaleService {
     );
   }
 
-  getTypesocial(): Observable<Course[]> {
-    return this._httpClient.get(this._apiPath + '/social_type').pipe(
+  getAllCourse(): Observable<Course[]> {
+    return this._httpClient.get(this._apiPath + '/courses', {
+      params: {
+        q: '',
+        page: '1',
+        limit: 300
+      }
+    }).pipe(
       map((res: any) => res.data),
-      tap((socials: Course[]) => {
-        this._courses.next(socials);
+      tap((courseId: any) => {
+        this._courses.next(courseId);
       })
     );
   }
@@ -247,13 +253,13 @@ export class SaleService {
 
 
   deleteSaleEmployee(saleId): Observable<any> {
-    return this._httpClient.delete(`${environment.APIURL_LOCAL}/api/v1.0/sales/${saleId}/sale_employee`).pipe(
+    return this._httpClient.delete(`${environment.APIURL_LOCAL}/api/v1.0/sale_employee/${saleId}`).pipe(
       tap((v) => console.log("deleteSaleEmployee", v))
     )
   }
 
   deleteSaleProduct(saleId): Observable<any> {
-    return this._httpClient.delete(`${environment.APIURL_LOCAL}/api/v1.0/products/${saleId}/sale_product`).pipe(
+    return this._httpClient.delete(`${environment.APIURL_LOCAL}/api/v1.0/sale_product/${saleId}`).pipe(
       tap((v) => console.log("deleteSaleProduct", v))
     )
   }
@@ -270,19 +276,40 @@ export class SaleService {
     )
   }
 
-  updateSale(slaeId, saleNumber, salePayBalance, salePay, saleOverdue, cusId): Observable<any> {
-    return this._httpClient.put(`${environment.APIURL_LOCAL}/api/v1.0/sales/${slaeId}`, {
-      saleNumber,
-      salePayBalance,
-      salePay,
-      saleOverdue,
-      cusId,
-    }).pipe(
+  updateSale(id: number): Observable<any> {
+    return this._httpClient.delete(`${environment.APIURL_LOCAL}/api/v1.0/sales/${id}`).pipe(
       tap((v) => console.log("saveAll", v))
     )
   }
 
-  saveAll(saleNumber, salePayBalance, salePay, saleOverdue, cusId, consultantList, ProductList): Observable<any> {
+  deleteSale(id: number): Observable<boolean> {
+    return this.sales$.pipe(
+      take(1),
+      switchMap((sales) =>
+        this._httpClient
+          .delete<boolean>(this._apiPath + '/sales/' + id)
+          .pipe(
+            map((isDeleted: boolean) => {
+              // Find the index of the deleted category
+              // const index = sales.findIndex(
+              //   (item) => item.saleId === id
+              // );
+
+              // Delete the category
+              // sales.splice(index, 1);
+
+              // Update the sales
+              this._sales.next(sales);
+
+              // Return the deleted status
+              return isDeleted;
+            })
+          )
+      )
+    );
+  }
+
+  saveAll(saleNumber, salePayBalance, salePay, saleOverdue, cusId, consultantList, courseId = []): Observable<any> {
     return this.saveSale(
       saleNumber,
       salePayBalance,
@@ -290,34 +317,9 @@ export class SaleService {
       saleOverdue,
       cusId,
     ).pipe(
-      concatMap(wh => this.deleteSaleEmployee(wh.saleId).pipe(
-        concatMap(() => this.saveSaleEmployee(wh.saleId, wh.cusId, consultantList).pipe(
-          concatMap(() => this.deleteSaleProduct(wh.saleId).pipe(
-            concatMap(() => this.saveSaleProduct(wh.saleId, wh.cusId, wh.saleCount, ProductList).pipe(
-              map(() => wh)
-            ))
-          ))
-        ))
-      ))
-    )
-  }
-
-  updateAll(saleId, saleNumber, salePayBalance, salePay, saleOverdue, cusId, consultantList, socials = []): Observable<any> {
-    return this.updateSale(
-      saleId,
-      saleNumber,
-      salePayBalance,
-      salePay,
-      saleOverdue,
-      cusId,
-    ).pipe(
-      concatMap(wh => this.deleteSaleEmployee(wh.saleId).pipe(
-        concatMap(() => this.saveSaleEmployee(wh.saleId, wh.cusId, consultantList).pipe(
-          concatMap(() => this.deleteSaleProduct(wh.saleId).pipe(
-            concatMap(() => this.saveSaleProduct(wh.saleId, wh.cusId, wh.saleCount, socials).pipe(
-              map(() => wh)
-            ))
-          ))
+      concatMap(wh => this.saveSaleEmployee(wh.saleId, wh.cusId, consultantList).pipe(
+        concatMap(() => this.saveSaleProduct(wh.saleId, wh.cusId, wh.saleCount, courseId).pipe(
+          map(() => wh)
         ))
       ))
     )
@@ -346,33 +348,6 @@ export class SaleService {
 
               // Return the updated sales
               return updatedSale;
-            })
-          )
-      )
-    );
-  }
-
-  deleteSale(id: number): Observable<boolean> {
-    return this.sales$.pipe(
-      take(1),
-      switchMap((sales) =>
-        this._httpClient
-          .delete<boolean>(`${environment.APIURL_LOCAL}/api/v1.0/sales/${id}`)
-          .pipe(
-            map((isDeleted: boolean) => {
-              // Find the index of the deleted user
-              const index = sales.findIndex(
-                (item) => item.saleId === id
-              );
-
-              // Delete the user
-              sales.splice(index, 1);
-
-              // Update the sales
-              this._sales.next(sales);
-
-              // Return the deleted status
-              return isDeleted;
             })
           )
       )

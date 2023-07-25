@@ -23,6 +23,9 @@ export class ZimViewCustomerComponent implements OnInit {
   saleForm: FormGroup;
   saleEmployeeForm: FormGroup;
   saleProductForm: FormGroup;
+
+  cutSaleForm: FormGroup;
+
   ColumnMode = ColumnMode;
   rows = [];
   groups = [];
@@ -81,6 +84,7 @@ export class ZimViewCustomerComponent implements OnInit {
     private _serivceCustomer: CustomerService,
     private _SerivceBasic: BasicService,
     private _activatedRoute: ActivatedRoute,
+    private _changeDetectorRef: ChangeDetectorRef
   ) {
     this._activatedRoute.paramMap.subscribe(params => {
       this.cus_id = params.get('id')
@@ -100,13 +104,21 @@ export class ZimViewCustomerComponent implements OnInit {
 
     this.saleEmployeeForm = this._formBuilder.group({
       empId: [{ value: [], enabled: !!this.cus_id }, Validators.required],
-      // cusId: [this.cus_id],
     })
 
     this.saleProductForm = this._formBuilder.group({
-      // courseId: [{ value: [], enabled: !!this.cus_id }, Validators.required],
-      // cusId: [this.cus_id],
       selectedData: [null]
+    })
+
+    this.cutSaleForm = this._formBuilder.group({
+      saleCutId: [null],
+      saleCutCourse: [{ value: '', disabled: true }],
+      saleCutCount: [{ value: '', disabled: true }],
+      saleCutVitamin: [''],
+      saleCutMark: [''],
+      saleCutTherapist: [''],
+      saleCutDoctor: [''],
+      saleCutDetail: [''],
     })
 
     this.sale$ = this._serviceSale.sale$;
@@ -152,7 +164,6 @@ export class ZimViewCustomerComponent implements OnInit {
           "saleCount": item.saleCount,
         })
       });
-      console.log("url", socialData);
     }
     else {
       const id = this.saleProductForm.getRawValue().selectedData;
@@ -166,13 +177,10 @@ export class ZimViewCustomerComponent implements OnInit {
       }
 
     }
-    console.log(this.urlData);
-    console.log("socialData", socialData);
     return socialData;
   }
 
   editUrl(index: number): void {
-    console.log(index, this.isDisabled[index])
     this.isDisabled[index] = !this.isDisabled[index];
   }
 
@@ -193,10 +201,8 @@ export class ZimViewCustomerComponent implements OnInit {
 
     if (data) {
       //Get ข้อมูลพนักงาน
-
       this._serviceSale.getSaleById(data.saleId).pipe(takeUntil(this._unsubscribeAll))
         .subscribe(warehouse => {
-          console.log('ข้อมูลพนักงาน', warehouse);
           if (typeof warehouse === 'object') {
             this.saleForm.patchValue(warehouse);
             if (warehouse.empId) {
@@ -210,6 +216,7 @@ export class ZimViewCustomerComponent implements OnInit {
             }
           }
         });
+
       this._serviceSale.getSaleByIdPo(data.saleId).pipe(takeUntil(this._unsubscribeAll))
         .subscribe(product => {
           if (typeof product === 'object') {
@@ -227,7 +234,7 @@ export class ZimViewCustomerComponent implements OnInit {
 
   get f() { return this.saleForm.controls; }
 
-  save() {
+  saveSale() {
 
     // Return if the form is invalid
     if (this.saleForm.invalid) {
@@ -237,116 +244,84 @@ export class ZimViewCustomerComponent implements OnInit {
     this.submitted = true;
     this.isLoading = true;
 
-    let saveData: Sale = this.saleForm.getRawValue();
+    const saleViewData = this.saleForm.getRawValue();
+    const saleEmployeeData = this.saleEmployeeForm.getRawValue();
+    const saleProductData = this.getSocialData();
 
+    this._serviceSale.saveAll(
+      saleViewData.saleNumber,
+      saleViewData.salePayBalance,
+      saleViewData.salePay,
+      saleViewData.saleOverdue,
+      saleViewData.cusId,
+      saleEmployeeData.empId,
+      saleProductData,)
+      .pipe(
+        catchError((err) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'เพิ่มข้อมูลไม่สำเร็จ',
+            showConfirmButton: false,
+            timer: 2000,
+          });
+          return throwError(err);
+        })
+      )
+      .subscribe((v) => {
+        this.ModalList.hide();
+        Swal.fire({
+          icon: 'success',
+          title: 'เพิ่มข้อมูลสำเร็จแล้ว',
+          showConfirmButton: false,
+          timer: 2000,
+        }).then((result) => {
+          window.location.reload();
+        });
+      }
+      );
+  }
 
-    if (saveData) {
-      const saleViewData = this.saleForm.getRawValue();
-      const saleEmployeeData = this.saleEmployeeForm.getRawValue();
-      const saleProductData = this.getSocialData();
-      console.log('ข้อมูลขาย', saleViewData);
-      console.log('ข้อมูลพนักงาน', saleEmployeeData);
-      console.log('ข้อมูลสินค้า', saleProductData);
-      if (saleViewData.saleId) {
-        this._serviceSale.updateAll(
-          saleViewData.saleId,
-          saleViewData.saleNumber,
-          saleViewData.salePayBalance,
-          saleViewData.salePay,
-          saleViewData.saleOverdue,
-          saleViewData.cusId,
-          saleEmployeeData.empId,
-          saleProductData,
-        )
-          .pipe(
-            catchError((err) => {
-              Swal.fire({
-                icon: 'error',
-                title: 'แก้ไขข้อมูลไม่สำเร็จ',
-                showConfirmButton: false,
-                timer: 2000,
-              });
-              return throwError(err);
-            })
-          )
-          .subscribe((v) => {
-            this.ModalList.hide();
-            console.log('กรอกเรียบร้อย', v);
+  delete(row) {
+    Swal.fire({
+      title: 'คุณแน่ใจหรือว่าต้องการลบ?',
+      text:
+        'คุณจะไม่สามารถกู้ข้อมูลคอร์ส ' + row.courseNameTh + ' ได้!',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'ยืนยัน',
+      cancelButtonText: 'ยกเลิก',
+    }).then((result) => {
+      if (result.isConfirmed) {
+
+        this._serviceSale.deleteSale(row.saleId).pipe(take(1))
+          .subscribe(() => {
             Swal.fire({
               icon: 'success',
-              title: 'แก้ไขข้อมูลสำเร็จแล้ว',
+              title: 'ลบข้อมูลสำเร็จ',
               showConfirmButton: false,
               timer: 2000,
-            }).then((result) => {
-              // window.location.reload();
             });
-          }
-          );
-      }
-      else {
-        this._serviceSale.saveAll(
-          saleViewData.saleNumber,
-          saleViewData.salePayBalance,
-          saleViewData.salePay,
-          saleViewData.saleOverdue,
-          saleViewData.cusId,
-          saleEmployeeData.empId,
-          saleProductData,)
-          .pipe(
-            catchError((err) => {
-              Swal.fire({
-                icon: 'error',
-                title: 'เพิ่มข้อมูลไม่สำเร็จ',
-                showConfirmButton: false,
-                timer: 2000,
-              });
-              return throwError(err);
-            })
-          )
-          .subscribe((v) => {
-            this.ModalList.hide();
-            console.log('กรอกเรียบร้อย', v);
-            Swal.fire({
-              icon: 'success',
-              title: 'เพิ่มข้อมูลสำเร็จแล้ว',
-              showConfirmButton: false,
-              timer: 2000,
-            }).then((result) => {
-              window.location.reload();
-            });
-          }
-          );
-      }
-    }
-  }
+            window.location.reload();
+            this._changeDetectorRef.markForCheck();
+          })
 
-  onEmployeeSelectionChange(checked: boolean, categoryId: number): void {
-    if (checked) {
-      this.selectedEmployee.push(categoryId);
-    } else {
-      const index = this.selectedEmployee.indexOf(categoryId);
-      if (index !== -1) {
-        this.selectedEmployee.splice(index, 1);
       }
-    }
-  }
-
-  selectEmployee(empIds: number[]): void {
-    this.selectedEmployee = empIds;
-  }
-
-  onCourseSelectionChange(checked: boolean, categoryId: number): void {
-    if (checked) {
-      this.selectedCourse.push(categoryId);
-    } else {
-      const index = this.selectedCourse.indexOf(categoryId);
-      if (index !== -1) {
-        this.selectedCourse.splice(index, 1);
-      }
-    }
+    });
   }
 
   selectCourse(courseIds: number[]): void {
     this.selectedCourse = courseIds;
+  }
+
+  openModalCutCourse(cutcourse: TemplateRef<any>, data = null) {
+    if (data) {
+      this.cutSaleForm.patchValue({ saleCutCourse: data.courseNameTh })
+      this.cutSaleForm.patchValue({ saleCutCount: + 1 })
+      console.log(data);
+    }
+    this.ModalList = this.modalService.show(
+      cutcourse,
+      Object.assign({}, { class: 'gray modal-lg' })
+    );
   }
 }
