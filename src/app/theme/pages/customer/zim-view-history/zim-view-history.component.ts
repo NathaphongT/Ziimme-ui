@@ -190,8 +190,8 @@ export class ZimViewHistoryComponent implements OnInit {
 
     let saveData: SaleCut = this.salecutForm.getRawValue();
 
-    if (saveData.sale_cut_id) {
-      this._ServiceSale.updateSaleCut(saveData.sale_cut_id, saveData).subscribe((res) => {
+    if (saveData.saleCutId) {
+      this._ServiceSale.updateSaleCut(saveData.saleCutId, saveData).subscribe((res) => {
         this.ModalList.hide();
         if (res) {
           Swal.fire({

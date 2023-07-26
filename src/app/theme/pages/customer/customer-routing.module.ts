@@ -4,7 +4,7 @@ import { CustomerComponent } from './customer.component';
 import { ZimCustomerComponent } from './zim-customer/zim-customer.component';
 import { ZimCustomersComponent } from './zim-customers/zim-customers.component';
 import { ZimViewCustomerComponent } from './zim-view-customer/zim-view-customer.component';
-import { CustomerIDResolver, CustomerResolver, ProvinceResolver, SaleByIdSlaeResolver, SaleEmployeeByIdCusResolver, SubDistrictsResolver, SaleListResolver, SaleCutOrderResolver } from './customer.resolver';
+import { CustomerIDResolver, CustomerResolver, ProvinceResolver, SaleByIdSlaeResolver, SaleEmployeeByIdCusResolver, SubDistrictsResolver, SaleListResolver } from './customer.resolver';
 import { ZimViewHistoryComponent } from './zim-view-history/zim-view-history.component';
 import { ZimViewBirthdayComponent } from './zim-view-birthday/zim-view-birthday.component';
 import { CourseAllResolver, CourseResolver } from '../basic-data/basic.resolver';
@@ -52,15 +52,6 @@ const routes: Routes = [
               sales: SaleListResolver,
               courses: CourseAllResolver,
               employee: EmployeeAllResolver,
-            }
-          },
-          {
-            path: 'views/history/:id',
-            component: ZimViewHistoryComponent,
-            resolve: {
-              employees: EmployeeResolver,
-              saleByIdSale: SaleByIdSlaeResolver,
-              saleCutAll: SaleCutOrderResolver,
             }
           },
         ]

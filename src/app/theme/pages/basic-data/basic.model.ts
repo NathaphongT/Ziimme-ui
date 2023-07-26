@@ -70,17 +70,17 @@ export interface Salary {
 }
 
 export interface SaleCut {
-    sale_cut_id: number;
-    sale_cut_count: number;
-    sale_cut_vitamin: string;
-    sale_cut_mark: string;
-    sale_cut_therapist: number;
-    sale_cut_doctor: string;
-    sale_cut_pay_balance: number;
-    sale_cut_pay: number;
-    sale_cut_overdue: number;
-    sale_cut_detail: string;
-    sale_id: number;
+    saleCutId: number;
+    saleCutCourse: string;
+    saleCutCount: number;
+    saleCutVitamin: string;
+    saleCutMark: string;
+    saleCutTherapist: number;
+    saleCutDoctor: string;
+    saleCutDetail: string;
+    saleId: number;
+    saleProductId: number;
+    courseId: number;
     recordStatus: string;
     createdTime: Date;
     createdBy: string;

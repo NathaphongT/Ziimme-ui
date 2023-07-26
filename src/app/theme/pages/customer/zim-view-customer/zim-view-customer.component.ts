@@ -8,7 +8,7 @@ import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import { SaleService } from '@app/_service/sale.service';
 import Swal from 'sweetalert2';
 import { CustomerService } from '@app/theme/pages/customer/customer.service';
-import { Course } from '../../basic-data/basic.model';
+import { Course, SaleCut } from '../../basic-data/basic.model';
 import { Employee, Sale } from '@app/_service/main.types';
 import { EmployeeService } from '../../employee/employee.service';
 import { SalePagination } from '@app/_service/pagination.types';
@@ -24,7 +24,8 @@ export class ZimViewCustomerComponent implements OnInit {
   saleEmployeeForm: FormGroup;
   saleProductForm: FormGroup;
 
-  cutSaleForm: FormGroup;
+  saleCutForm: FormGroup;
+  salePayForm: FormGroup;
 
   ColumnMode = ColumnMode;
   rows = [];
@@ -47,7 +48,7 @@ export class ZimViewCustomerComponent implements OnInit {
   employees$: Observable<Employee[]>;
 
   employee: Employee[] = [];
-  employ: any
+  employ: any;
 
 
   selectedEmployee: number[] = []; // Assuming selectedEmployeeId is a number
@@ -124,15 +125,29 @@ export class ZimViewCustomerComponent implements OnInit {
       selectedData: [null]
     })
 
-    this.cutSaleForm = this._formBuilder.group({
+    this.saleCutForm = this._formBuilder.group({
       saleCutId: [null],
-      saleCutCourse: [{ value: '', disabled: true }],
-      saleCutCount: [{ value: '', disabled: true }],
+      saleCutCourse: [''],
+      saleCutCount: [''],
       saleCutVitamin: [''],
       saleCutMark: [''],
       saleCutTherapist: [''],
       saleCutDoctor: [''],
       saleCutDetail: [''],
+      saleId: [''],
+      saleProductId: [''],
+      courseId: [''],
+    })
+
+    this.salePayForm = this._formBuilder.group({
+      salePayId: [null],
+      saleExtraPay: [''],
+      saleId: [''],
+      saleProductId: [''],
+      courseId: [''],
+      salePayCourse: [{ value: '', disabled: true }],
+      salePayBaLance: [{ value: '', disabled: true }],
+      salePayOver: [{ value: '', disabled: true }],
     })
 
     this.sale$ = this._serviceSale.sale$;
@@ -151,6 +166,7 @@ export class ZimViewCustomerComponent implements OnInit {
 
       this.isLoading = false;
     })
+
   }
 
   addURL(data: any, data2: any): void {
@@ -328,11 +344,13 @@ export class ZimViewCustomerComponent implements OnInit {
   }
 
   openModalCutCourse(cutcourse: TemplateRef<any>, data = null) {
-    if (data) {
-      this.cutSaleForm.patchValue({ saleCutCourse: data.courseNameTh })
-      this.cutSaleForm.patchValue({ saleCutCount: + 1 })
-      console.log(data);
-    }
+    this.saleCutForm.patchValue({ saleId: data.saleId })
+    this.saleCutForm.patchValue({ saleProductId: data.saleProductId })
+    this.saleCutForm.patchValue({ courseId: data.courseId })
+    this.saleCutForm.patchValue({ saleCutCourse: data.courseNameTh })
+    this.saleCutForm.patchValue({ saleCutCount: + 1 })
+
+
     this.ModalList = this.modalService.show(
       cutcourse,
       Object.assign({}, { class: 'gray modal-lg' })
@@ -340,14 +358,52 @@ export class ZimViewCustomerComponent implements OnInit {
   }
 
   openModalPayment(payment: TemplateRef<any>, data = null) {
+    this.salePayForm.patchValue({ saleId: data.saleId })
+    this.salePayForm.patchValue({ saleProductId: data.saleProductId })
+    this.salePayForm.patchValue({ courseId: data.courseId })
+    this.salePayForm.patchValue({ salePayCourse: data.courseNameTh })
+    this.salePayForm.patchValue({ salePayBaLance: data.salePayBalance })
+    this.salePayForm.patchValue({ salePayOver: data.saleOverdue })
+
+
+
     if (data) {
-      this.cutSaleForm.patchValue({ saleCutCourse: data.courseNameTh })
-      this.cutSaleForm.patchValue({ saleCutCount: + 1 })
       console.log(data);
     }
     this.ModalList = this.modalService.show(
       payment,
       Object.assign({}, { class: 'gray modal-lg' })
     );
+  }
+
+  saveSaleCut() {
+    console.log(this.saleCutForm.value);
+    //Return if the form is invalid
+    if (this.saleCutForm.invalid) {
+      return;
+    }
+
+
+    this.submitted = true;
+    this.isLoading = true;
+
+    let saveData: SaleCut = this.saleCutForm.getRawValue();
+    this._serviceSale.createSaleCut(saveData).subscribe((res) => {
+      this.ModalList.hide();
+      if (res) {
+        Swal.fire({
+          icon: 'success',
+          title: 'เพิ่มข้อมูลสำเร็จแล้ว',
+          showConfirmButton: false,
+          timer: 2000,
+          // timerProgressBar: true,
+        });
+        window.location.reload();
+      }
+    });
+  }
+
+  saveSalePay() {
+    console.log(this.salePayForm.value);
   }
 }

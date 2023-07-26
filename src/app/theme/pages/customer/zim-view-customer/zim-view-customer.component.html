@@ -233,7 +233,7 @@
     </button>
   </div>
   <div class="modal-body">
-    <div class="tw-flex tw-flex-wrap" [formGroup]="cutSaleForm">
+    <div class="tw-flex tw-flex-wrap" [formGroup]="saleCutForm">
       <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>ชื่อคอร์ส</mat-label>
         <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'saleCutCourse'" matInput>
@@ -279,7 +279,7 @@
   <div class="modal-footer">
     <button
       class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
-      type="submit" (click)="saveSale()">บันทึก</button>
+      type="submit" (click)="saveSaleCut()">บันทึก</button>
     <a class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
       (click)="ModalList.hide()">ปิด</a>
   </div>
@@ -295,21 +295,29 @@
     </button>
   </div>
   <div class="modal-body">
-    <div class="tw-flex tw-flex-wrap" [formGroup]="cutSaleForm">
+    <div class="tw-flex tw-flex-wrap" [formGroup]="salePayForm">
       <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>ชื่อคอร์ส</mat-label>
-        <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'saleCutCourse'" matInput>
+        <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'salePayCourse'" matInput>
       </mat-form-field>
       <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
-        <mat-label>จำนวนครั้ง</mat-label>
-        <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'saleCutCount'" matInput>
+        <mat-label>ยอดทั้งหมด</mat-label>
+        <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'salePayBaLance'" matInput>
+      </mat-form-field>
+      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
+        <mat-label>ยอดคงเหลือ</mat-label>
+        <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'salePayOver'" matInput>
+      </mat-form-field>
+      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
+        <mat-label>ชำระเพิ่ม</mat-label>
+        <input class="tw-text-black" [formControlName]="'saleExtraPay'" matInput>
       </mat-form-field>
     </div>
   </div>
   <div class="modal-footer">
     <button
       class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
-      type="submit" (click)="saveSale()">บันทึก</button>
+      type="submit" (click)="saveSalePay()">บันทึก</button>
     <a class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
       (click)="ModalList.hide()">ปิด</a>
   </div>

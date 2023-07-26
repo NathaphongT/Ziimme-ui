@@ -106,7 +106,6 @@ export class SaleService {
     );
   }
 
-
   getSaleCus(search: string = "", page: number = 1, limit: number = 10, saleId: number = 0, sort: string = 'createdTime', order: 'asc' | 'desc' | '' = 'asc'): Observable<{ pagination: SalePagination, sales: Sale[] }> {
 
     const params = {
@@ -180,33 +179,10 @@ export class SaleService {
     );
   }
 
-  getSaleBYIDCus(id): Observable<Sale[]> {
-    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sale_cus/${id}`).pipe(
-      tap((sale: Sale[]) => {
-        this._sales.next(sale);
-      })
-    );
-  }
-
   getSaleBYIDSale(id): Observable<Sale[]> {
     return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sales/${id}`).pipe(
       tap((sale: Sale[]) => {
         this._sales.next(sale);
-      })
-    );
-  }
-
-  getAllCourse(): Observable<Course[]> {
-    return this._httpClient.get(this._apiPath + '/courses', {
-      params: {
-        q: '',
-        page: '1',
-        limit: 300
-      }
-    }).pipe(
-      map((res: any) => res.data),
-      tap((courseId: any) => {
-        this._courses.next(courseId);
       })
     );
   }
@@ -233,7 +209,6 @@ export class SaleService {
     )
   }
 
-
   saveSaleEmployee(saleId, cusId, consultantList): Observable<any> {
     return this._httpClient.post(`${environment.APIURL_LOCAL}/api/v1.0/sales/${saleId}/sale_employee`, consultantList.map(empId => {
       return { saleId, cusId, empId: empId }
@@ -242,7 +217,6 @@ export class SaleService {
     )
   }
 
-
   saveSaleProduct(saleId, cusId, saleCount, ProductList): Observable<any> {
     return this._httpClient.post(`${environment.APIURL_LOCAL}/api/v1.0/products/${saleId}/sale_product`, ProductList.map(courseId => {
       return { saleId, cusId, saleCount, ...courseId }
@@ -250,7 +224,6 @@ export class SaleService {
       tap((v) => console.log("saveAllSaleProduct", v))
     )
   }
-
 
   deleteSaleEmployee(saleId): Observable<any> {
     return this._httpClient.delete(`${environment.APIURL_LOCAL}/api/v1.0/sale_employee/${saleId}`).pipe(
@@ -362,16 +335,9 @@ export class SaleService {
     );
   }
 
-  getSaleCutBYID(id): Observable<SaleCut[]> {
+  getSaleBYIDSaleCut(id): Observable<SaleCut[]> {
     return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sale_cut/${id}`).pipe(
-      tap((salecut: SaleCut[]) => {
-        this._salescut.next(salecut);
-      })
-    );
-  }
-
-  getSaleCutBYIDOrder(id): Observable<SaleCut[]> {
-    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sale_cut_order/${id}`).pipe(
+      map((res: any) => res.data),
       tap((salecut: SaleCut[]) => {
         this._salescut.next(salecut);
       })
@@ -409,7 +375,7 @@ export class SaleService {
             map((updatedSale: SaleCut) => {
               // Find the index of the updated salescut
               const index = salescut.findIndex(
-                (item) => item.sale_cut_id === id
+                (item) => item.saleCutId === id
               );
 
               // Update the salescut

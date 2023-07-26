@@ -107,21 +107,6 @@ export class SaleResolver implements Resolve<any> {
 
 }
 
-
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SaleByIdCusResolver implements Resolve<any> {
-
-  constructor(private _saleService: SaleService) { }
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Sale[]> {
-    return this._saleService.getSaleBYIDCus(route.paramMap.get('id'));
-  }
-
-}
-
 @Injectable({
   providedIn: 'root'
 })
@@ -160,22 +145,6 @@ export class SaleListResolver implements Resolve<any> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
     return this._customerService.getSaleList(route.paramMap.get('id'));
-  }
-
-}
-
-
-//zimViewHistory
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SaleCutOrderResolver implements Resolve<any> {
-
-  constructor(private _saleService: SaleService) { }
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | SaleCut[]> {
-    return this._saleService.getSaleCutBYIDOrder(route.paramMap.get('id'));
   }
 
 }
