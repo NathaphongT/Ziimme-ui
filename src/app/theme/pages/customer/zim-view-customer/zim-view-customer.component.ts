@@ -62,15 +62,29 @@ export class ZimViewCustomerComponent implements OnInit {
   sales: any;
   Products = '';
   Counts = '';
-  // items: any[] = []; // Array of items
+
   isDisabled: boolean[] = [];
 
   textValues: string[] = []; // Array to store input values
   textValues2: string[] = []; // Array to store input values
-  // isDisabled: boolean = true;
   newUrl: string = '';
 
   urlData: any = [];
+
+  Docter = [
+    {
+      id: 0,
+      name: '-',
+    },
+    {
+      id: 1,
+      name: 'Dr.โจ'
+    },
+    {
+      id: 2,
+      name: 'Dr.หนุ่ย'
+    }
+  ]
 
 
 
@@ -321,6 +335,18 @@ export class ZimViewCustomerComponent implements OnInit {
     }
     this.ModalList = this.modalService.show(
       cutcourse,
+      Object.assign({}, { class: 'gray modal-lg' })
+    );
+  }
+
+  openModalPayment(payment: TemplateRef<any>, data = null) {
+    if (data) {
+      this.cutSaleForm.patchValue({ saleCutCourse: data.courseNameTh })
+      this.cutSaleForm.patchValue({ saleCutCount: + 1 })
+      console.log(data);
+    }
+    this.ModalList = this.modalService.show(
+      payment,
       Object.assign({}, { class: 'gray modal-lg' })
     );
   }
