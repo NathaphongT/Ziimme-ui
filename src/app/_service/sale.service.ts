@@ -335,12 +335,9 @@ export class SaleService {
     );
   }
 
-  getSaleBYIDSaleCut(id): Observable<SaleCut[]> {
+  getSaleBYIDSaleCut(id: number): Observable<any> {
     return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sale_cut/${id}`).pipe(
-      map((res: any) => res.data),
-      tap((salecut: SaleCut[]) => {
-        this._salescut.next(salecut);
-      })
+      map((res: any) => res.data)
     );
   }
 

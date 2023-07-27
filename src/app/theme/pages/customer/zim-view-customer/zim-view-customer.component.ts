@@ -343,12 +343,27 @@ export class ZimViewCustomerComponent implements OnInit {
     this.selectedCourse = courseIds;
   }
 
+  cutOderBy = [];
+  cutOderByID: any
+  cutOderByAlways: any = "";
   openModalCutCourse(cutcourse: TemplateRef<any>, data = null) {
     this.saleCutForm.patchValue({ saleId: data.saleId })
     this.saleCutForm.patchValue({ saleProductId: data.saleProductId })
     this.saleCutForm.patchValue({ courseId: data.courseId })
     this.saleCutForm.patchValue({ saleCutCourse: data.courseNameTh })
-    this.saleCutForm.patchValue({ saleCutCount: + 1 })
+    console.log('ข้อมูลจากตาราง', data);
+
+    this._serviceSale.getSaleBYIDSaleCut(data.saleProductId).subscribe((res) => {
+      this.cutOderBy = res
+      this.cutOderByID = Object.assign({}, res);
+      this.cutOderByAlways = this.cutOderByID[0]?.saleCutCount
+
+      if (this.cutOderBy.length <= 0) {
+        this.saleCutForm.patchValue({ saleCutCount: 1 })
+      } else {
+        this.saleCutForm.patchValue({ saleCutCount: this.cutOderByAlways + 1 })
+      }
+    })
 
 
     this.ModalList = this.modalService.show(
@@ -365,8 +380,6 @@ export class ZimViewCustomerComponent implements OnInit {
     this.salePayForm.patchValue({ salePayBaLance: data.salePayBalance })
     this.salePayForm.patchValue({ salePayOver: data.saleOverdue })
 
-
-
     if (data) {
       console.log(data);
     }
@@ -377,12 +390,12 @@ export class ZimViewCustomerComponent implements OnInit {
   }
 
   saveSaleCut() {
+
     console.log(this.saleCutForm.value);
     //Return if the form is invalid
     if (this.saleCutForm.invalid) {
       return;
     }
-
 
     this.submitted = true;
     this.isLoading = true;
