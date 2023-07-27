@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, ReplaySubject, concatMap, forkJoin, map, of, switchMap, take, tap, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@environments/environment';
-import { Course, SaleCut } from '@app/theme/pages/basic-data/basic.model';
+import { Course, SaleCut, SalePay } from '@app/theme/pages/basic-data/basic.model';
 import { Employee, Sale, SaleEmployee, SaleProducts } from './main.types';
 import { PaginationResponse, SalePagination } from './pagination.types';
 import { SaleList } from './user.types';
@@ -24,6 +24,9 @@ export class SaleService {
 
   private _salecut: ReplaySubject<SaleCut> = new ReplaySubject<SaleCut>(1);
   private _salescut: BehaviorSubject<SaleCut[]> = new BehaviorSubject<SaleCut[]>(null);
+
+  private _salepay: ReplaySubject<SalePay> = new ReplaySubject<SalePay>(1);
+  private _salepays: BehaviorSubject<SalePay[]> = new BehaviorSubject<SalePay[]>(null);
 
   constructor(private _httpClient: HttpClient) { }
 
@@ -56,6 +59,14 @@ export class SaleService {
 
   get salescut$(): Observable<SaleCut[]> {
     return this._salescut.asObservable();
+  }
+
+  get salepay$(): Observable<SalePay> {
+    return this._salepay.asObservable();
+  }
+
+  get salepays$(): Observable<SalePay[]> {
+    return this._salepays.asObservable();
   }
 
   getAllSale(): Observable<Sale[]> {
@@ -347,15 +358,6 @@ export class SaleService {
       switchMap((salescut) =>
         this._httpClient
           .post<SaleCut>(`${environment.APIURL_LOCAL}/api/v1.0/sale_cut`, data)
-          .pipe(
-            map((newSaleCut) => {
-              // Update the Sale with the new Sale
-              this._salescut.next([...salescut, newSaleCut]);
-
-              // Return the new Sales from observable
-              return newSaleCut;
-            })
-          )
       )
     );
   }
@@ -389,6 +391,36 @@ export class SaleService {
     );
   }
 
+  createSalePay(data: SalePay): Observable<SalePay> {
+    return this.salepays$.pipe(
+      take(1),
+      switchMap((salepays) =>
+        this._httpClient
+          .post<SalePay>(`${environment.APIURL_LOCAL}/api/v1.0/sale_pay`, data)
+      )
+    );
+  }
+
+  getAllSalePay(): Observable<SalePay[]> {
+    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sale_pay/`).pipe(
+      tap((salepay: SalePay[]) => {
+        this._salepays.next(salepay)
+      })
+    );
+  }
+
+
+  getSaleBYIDSalePay(id: number): Observable<any> {
+    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sale_pay/${id}`).pipe(
+      map((res: any) => res.data)
+    );
+  }
+
+  getSaleBYIDSaleCus(id: number): Observable<any> {
+    return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/sale_pay_cus/1`).pipe(
+      map((res: any) => res.data)
+    );
+  }
 
   getSaleById(id): Observable<Sale | boolean> {
     return this._httpClient.get<Sale>(`${environment.APIURL_LOCAL}/api/v1.0/sales/${id}`).pipe(

@@ -8,7 +8,7 @@ import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import { SaleService } from '@app/_service/sale.service';
 import Swal from 'sweetalert2';
 import { CustomerService } from '@app/theme/pages/customer/customer.service';
-import { Course, SaleCut } from '../../basic-data/basic.model';
+import { Course, SaleCut, SalePay } from '../../basic-data/basic.model';
 import { Employee, Sale } from '@app/_service/main.types';
 import { EmployeeService } from '../../employee/employee.service';
 import { SalePagination } from '@app/_service/pagination.types';
@@ -36,6 +36,7 @@ export class ZimViewCustomerComponent implements OnInit {
   ModalList: BsModalRef;
 
   cus_id = null
+  pro_id = null
 
   isLoading: boolean;
   submitted: boolean;
@@ -88,6 +89,21 @@ export class ZimViewCustomerComponent implements OnInit {
   ]
 
 
+  cutOderBy = [];
+  cutOderByID: any
+  cutOderByAlways: any = "";
+
+  salePayOderBy = [];
+  salePayOderByID: any
+  salePayOderByBalance: any = "";
+  salePayOderByOver: any = "";
+  salePayOderByEx: any = "";
+
+  salePayShow = [];
+  salePayShowDataOver: any = "";
+  salePayShowDataEx: any = "";
+
+
 
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -127,8 +143,8 @@ export class ZimViewCustomerComponent implements OnInit {
 
     this.saleCutForm = this._formBuilder.group({
       saleCutId: [null],
-      saleCutCourse: [''],
-      saleCutCount: [''],
+      saleCutCourse: [{ value: '', disabled: true }],
+      saleCutCount: [{ value: '', disabled: true }],
       saleCutVitamin: [''],
       saleCutMark: [''],
       saleCutTherapist: [''],
@@ -145,6 +161,7 @@ export class ZimViewCustomerComponent implements OnInit {
       saleId: [''],
       saleProductId: [''],
       courseId: [''],
+      cusId: [''],
       salePayCourse: [{ value: '', disabled: true }],
       salePayBaLance: [{ value: '', disabled: true }],
       salePayOver: [{ value: '', disabled: true }],
@@ -167,6 +184,14 @@ export class ZimViewCustomerComponent implements OnInit {
       this.isLoading = false;
     })
 
+
+    this._serviceSale.getSaleBYIDSaleCus(this.cus_id).subscribe((res) => {
+      this.salePayShow = res
+      this.salePayShowDataOver = this.salePayShow[0]?.salePayOver //ยอดค้างล่าสุด
+      this.salePayShowDataEx = this.salePayShow[0]?.saleExtraPay //ยอดชำระล่าสุด
+      console.log((this.salePayShowDataOver) - (this.salePayShowDataEx));
+
+    })
   }
 
   addURL(data: any, data2: any): void {
@@ -343,9 +368,7 @@ export class ZimViewCustomerComponent implements OnInit {
     this.selectedCourse = courseIds;
   }
 
-  cutOderBy = [];
-  cutOderByID: any
-  cutOderByAlways: any = "";
+
   openModalCutCourse(cutcourse: TemplateRef<any>, data = null) {
     this.saleCutForm.patchValue({ saleId: data.saleId })
     this.saleCutForm.patchValue({ saleProductId: data.saleProductId })
@@ -372,26 +395,8 @@ export class ZimViewCustomerComponent implements OnInit {
     );
   }
 
-  openModalPayment(payment: TemplateRef<any>, data = null) {
-    this.salePayForm.patchValue({ saleId: data.saleId })
-    this.salePayForm.patchValue({ saleProductId: data.saleProductId })
-    this.salePayForm.patchValue({ courseId: data.courseId })
-    this.salePayForm.patchValue({ salePayCourse: data.courseNameTh })
-    this.salePayForm.patchValue({ salePayBaLance: data.salePayBalance })
-    this.salePayForm.patchValue({ salePayOver: data.saleOverdue })
-
-    if (data) {
-      console.log(data);
-    }
-    this.ModalList = this.modalService.show(
-      payment,
-      Object.assign({}, { class: 'gray modal-lg' })
-    );
-  }
-
   saveSaleCut() {
 
-    console.log(this.saleCutForm.value);
     //Return if the form is invalid
     if (this.saleCutForm.invalid) {
       return;
@@ -401,22 +406,103 @@ export class ZimViewCustomerComponent implements OnInit {
     this.isLoading = true;
 
     let saveData: SaleCut = this.saleCutForm.getRawValue();
+
+    console.log(saveData);
+
     this._serviceSale.createSaleCut(saveData).subscribe((res) => {
-      this.ModalList.hide();
+      const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          confirmButton: 'btn btn-success',
+          cancelButton: 'btn btn-danger'
+        },
+        buttonsStyling: false
+      })
       if (res) {
-        Swal.fire({
+        swalWithBootstrapButtons.fire({
+          title: 'บันทึกการตัดคอร์สเสร็จสิ้น',
+          text: "กรุณากดปุ่ม ตกลง เพื่อดำเนินการต่อ",
           icon: 'success',
-          title: 'เพิ่มข้อมูลสำเร็จแล้ว',
-          showConfirmButton: false,
-          timer: 2000,
-          // timerProgressBar: true,
-        });
-        window.location.reload();
+          confirmButtonText: 'ตกลง',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.reload();
+          }
+        })
+
       }
     });
   }
 
+  openModalPayment(payment: TemplateRef<any>, data = null) {
+
+    console.log(data);
+    
+    this.salePayForm.patchValue({ saleId: data.saleId })
+    this.salePayForm.patchValue({ saleProductId: data.saleProductId })
+    this.salePayForm.patchValue({ courseId: data.courseId })
+    this.salePayForm.patchValue({ salePayCourse: data.courseNameTh })
+    this.salePayForm.patchValue({ cusId: data.cusId })
+
+    this._serviceSale.getSaleBYIDSalePay(data.saleProductId).subscribe((res) => {
+      this.salePayOderBy = res
+      this.salePayOderByID = Object.assign({}, res);
+      console.log(this.salePayOderBy);
+      this.salePayOderByBalance = this.salePayOderByID[0]?.salePayBaLance
+      this.salePayOderByOver = this.salePayOderByID[0]?.salePayOver
+      this.salePayOderByEx = this.salePayOderByID[0]?.saleExtraPay
+
+      if (this.salePayOderBy.length <= 0) {
+        this.salePayForm.patchValue({ salePayBaLance: data.salePayBalance })
+        this.salePayForm.patchValue({ salePayOver: data.saleOverdue })
+      } else {
+        this.salePayForm.patchValue({ salePayBaLance: this.salePayOderByBalance })
+        this.salePayForm.patchValue({ salePayOver: this.salePayOderByOver - this.salePayOderByEx })
+      }
+    })
+
+    this.ModalList = this.modalService.show(
+      payment,
+      Object.assign({}, { class: 'gray modal-lg' })
+    );
+  }
+
+
+
   saveSalePay() {
-    console.log(this.salePayForm.value);
+    //Return if the form is invalid
+    if (this.salePayForm.invalid) {
+      return;
+    }
+
+    this.submitted = true;
+    this.isLoading = true;
+
+    let saveData: SalePay = this.salePayForm.getRawValue();
+
+    console.log(saveData);
+
+    this._serviceSale.createSalePay(saveData).subscribe((res) => {
+      const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          confirmButton: 'btn btn-success',
+        },
+        buttonsStyling: false
+      })
+      if (res) {
+        swalWithBootstrapButtons.fire({
+          title: 'บันทึกการชำระเงินเรียบร้อยแล้ว !',
+          text: "กรุณากดปุ่ม ตกลง เพื่อดำเนินการต่อ",
+          icon: 'success',
+          confirmButtonText: 'ตกลง',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.reload();
+          }
+        })
+
+      }
+    });
   }
 }

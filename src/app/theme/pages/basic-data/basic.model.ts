@@ -87,3 +87,20 @@ export interface SaleCut {
     updatedTime: Date;
     updatedBy: string
 }
+
+export interface SalePay {
+    salePayId: number;
+    salePayCourse: string;
+    saleExtraPay: number;
+    salePayBaLance: number;
+    salePayOver: number;
+    saleId: number;
+    cusId: number;
+    saleProductId: number;
+    courseId: number;
+    recordStatus: string;
+    createdTime: Date;
+    createdBy: string;
+    updatedTime: Date;
+    updatedBy: string
+}

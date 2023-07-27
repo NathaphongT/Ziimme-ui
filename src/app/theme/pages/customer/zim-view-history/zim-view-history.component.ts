@@ -213,15 +213,40 @@ export class ZimViewHistoryComponent implements OnInit {
     }
     else {
       this._ServiceSale.createSaleCut(saveData).subscribe((res) => {
-        this.ModalList.hide();
+        const swalWithBootstrapButtons = Swal.mixin({
+          customClass: {
+            confirmButton: 'btn btn-success',
+            cancelButton: 'btn btn-danger'
+          },
+          buttonsStyling: false
+        })
         if (res) {
-          Swal.fire({
-            icon: 'success',
-            title: 'เพิ่มข้อมูลสำเร็จแล้ว',
-            showConfirmButton: false,
-            timer: 2000,
-            // timerProgressBar: true,
-          });
+          swalWithBootstrapButtons.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true
+          }).then((result) => {
+            if (result.isConfirmed) {
+              swalWithBootstrapButtons.fire(
+                'Deleted!',
+                'Your file has been deleted.',
+                'success'
+              )
+            } else if (
+              /* Read more about handling dismissals below */
+              result.dismiss === Swal.DismissReason.cancel
+            ) {
+              swalWithBootstrapButtons.fire(
+                'Cancelled',
+                'Your imaginary file is safe :)',
+                'error'
+              )
+            }
+          })
           window.location.reload();
         }
       });
