@@ -186,10 +186,10 @@ export class ZimViewCustomerComponent implements OnInit {
 
 
     this._serviceSale.getSaleBYIDSaleCus(this.cus_id).subscribe((res) => {
-      this.salePayShow = res
-      this.salePayShowDataOver = this.salePayShow[0]?.salePayOver //ยอดค้างล่าสุด
-      this.salePayShowDataEx = this.salePayShow[0]?.saleExtraPay //ยอดชำระล่าสุด
-      console.log((this.salePayShowDataOver) - (this.salePayShowDataEx));
+      // this.salePayShow = res
+      // this.salePayShowDataOver = this.salePayShow[0]?.salePayOver //ยอดค้างล่าสุด
+      // this.salePayShowDataEx = this.salePayShow[0]?.saleExtraPay //ยอดชำระล่าสุด
+      // console.log((this.salePayShowDataOver) - (this.salePayShowDataEx));
 
     })
   }
