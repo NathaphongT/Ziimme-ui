@@ -18,13 +18,13 @@ export interface Employee {
 
 export interface Sale {
     saleId: number;
-    saleNumbder: number;
+    saleNumbder: string;
     saleConsultant: number;
     saleProduct: number;
     saleCount: number;
-    salePayBalance: number;
-    salePay: number;
-    saleOverdue: number;
+    salePayBalance: string;
+    salePay: string;
+    saleOverdue: string;
     cusId: number;
     recordStatus: string;
     createdTime: Date;

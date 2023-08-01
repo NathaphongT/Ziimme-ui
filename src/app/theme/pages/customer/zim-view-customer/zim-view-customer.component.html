@@ -25,48 +25,55 @@
       <ng-template let-group="group" let-expanded="expanded" ngx-datatable-group-header-template>
         <div class="tw-flex tw-flex-row tw-items-center tw-p-3">
           <div class="tw-basis-1/4 tw-border-r-2">
-            <div class="tw-flex tw-items-center tw-mb-1">
-              <b>เลขที่เอกสาร : {{group.value[0].saleNumber}}</b>
+            <div class="tw-flex tw-items-center  tw-mb-1.5">
+              <span class="tw-text-lg tw-font-semibold tw-rounded-md tw-mr-3">
+                เลขที่เอกสาร : {{group.value[0].saleNumber}}</span>
               <button
                 class="tw-w-1/6 tw-p-1.5 tw-mx-2 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
                 (click)="delete(group.value[0])">ลบคอร์ส</button>
-              <button
-                class="tw-mr-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
-                (click)="openModalPayment(payment, group.value[0])">ชำระเงิน</button>
             </div>
-            <b>พนักงาน : {{group.value[0].empFullname}}</b>
+            <div class="tw-flex tw-items-center tw-mb-2">
+              <b>พนักงาน : {{group.value[0].empFullname}}</b>
+            </div>
           </div>
           <div class="tw-basis-1/2">
             <div class="tw-flex tw-flex-col tw-mx-2 tw-p-2">
-              <div class="tw-mb-1.5">
-                <span class="tw-text-lg tw-font-semibold tw-rounded-md">
+              <div class="tw-flex  tw-mb-1.5">
+                <span class="tw-text-lg tw-font-semibold tw-rounded-md tw-mr-3">
                   ราคารวม:
                   {{group.value[0].salePayBalance}}
                 </span>
-
+                <div *ngIf="group.value[0].saleOverdue != group.value[0].saleExtraPay">
+                  <button
+                    class="tw-mr-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
+                    (click)="openModalPayment(payment, group.value[0])">ชำระเงิน</button>
+                  <button
+                    class="tw-mr-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-blue-500 hover:tw-bg-blue-600"
+                    (click)="openModalHistoryPayment(historypayment, group.value[0])">ประวัติการชำระเงิน</button>
+                </div>
+                <div *ngIf="group.value[0].saleOverdue == group.value[0].saleExtraPay">
+                  <button
+                    class="tw-mr-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-blue-500 hover:tw-bg-blue-600"
+                    (click)="openModalHistoryPayment(historypayment, group.value[0])">ประวัติการชำระเงิน</button>
+                </div>
               </div>
-              <div *ngIf="this.salePayShow == this.pro_id.saleId">
-
+              <div class="tw-flex tw-items-center tw-mb-2" *ngIf="group.value[0].saleExtraPay == null">
+                <span class="tw-text-base tw-font-medium tw-mr-1">ยอดชำระล่าสุด: {{group.value[0].salePay}}</span>
+                <span class="tw-text-base tw-font-medium tw-ml-1">ยอดคงเหลือล่าสุด:
+                  {{group.value[0].saleOverdue}}</span>
               </div>
-              <container-element class="tw-flex" [ngSwitch]="this.salePayShow.length">
-                <some-element *ngSwitchCase="0">
-                  <span class="tw-text-base tw-font-medium tw-mr-1">ยอดชำระล่าสุด: {{group.value[0].salePay}}</span>
-                  <span class="tw-text-base tw-font-medium tw-ml-1">ยอดคงเหลือล่าสุด:
-                    {{group.value[0].saleOverdue}}</span>
-                </some-element>
 
-                <some-element *ngSwitchDefault>
-                  <span class="tw-text-base tw-font-medium tw-mr-1">ยอดชำระล่าสุด: {{this.salePayShowDataEx}}</span>
-                  <span class="tw-text-base tw-font-medium tw-ml-1">ยอดคงเหลือล่าสุด: {{this.salePayShowDataOver -
-                    this.salePayShowDataEx}}</span>
-                </some-element>
-              </container-element>
+              <div class="tw-flex tw-items-center tw-mb-2" *ngIf="group.value[0].saleExtraPay !== null">
+                <span class="tw-text-base tw-font-medium tw-mr-1">ยอดชำระล่าสุด: {{group.value[0].saleExtraPay}}</span>
+                <span class="tw-text-base tw-font-medium tw-ml-1">ยอดคงเหลือล่าสุด:
+                  {{group.value[0].salePayOver - group.value[0].saleExtraPay}} </span>
+              </div>
             </div>
           </div>
         </div>
       </ng-template>
     </ngx-datatable-group-header>
-    <ngx-datatable-column name="คอร์ส" editable="true" frozenLeft="True" [flexGrow]="3">
+    <ngx-datatable-column name="คอร์ส" editable="true" frozenLeft="True" [flexGrow]="2">
       <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row"
         let-group="group">
         <b>{{row.courseNameTh}} : ({{row?.courseCode}})</b>
@@ -75,31 +82,48 @@
     <ngx-datatable-column name="จำนวนทั้งหมด" editable="true" [flexGrow]="1">
       <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row"
         let-group="group">
-        <b>จำนวน <b class="tw-text-lg tw-font-bold">{{ row.saleCount }}</b> ครั้ง </b>
+        <div>
+          จำนวน
+          <b class="tw-text-lg tw-font-bold">{{ row?.saleCount }}</b>
+          ครั้ง
+        </div>
       </ng-template>
     </ngx-datatable-column>
     <ngx-datatable-column name="ใช้ไปทั้งหมด" editable="true" [flexGrow]="1">
       <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row"
         let-group="group">
-        <b>ใช้ไป <b class="tw-text-lg tw-font-bold">{{ row.saleCount }}</b> ครั้ง </b>
+        <b *ngIf="row?.saleCutCount == null" class="tw-text-lg tw-font-bold">ยังไม่เริ่มใช้บริการ</b>
+        <div class="tw-flex tw-items-center" *ngIf="row?.saleCutCount !== null">
+          <div>
+            ใช้ไป
+            <b class="tw-text-lg tw-font-bold">{{ row?.saleCutCount }}</b>
+            ครั้ง
+          </div>
+          <div class="tw-rounded-l tw-p-1" *ngIf="row.saleCount == row.saleCutCount">
+            <b class="tw-text-lg tw-font-bold tw-text-red-600">ใช้บริการครบแล้ว</b>
+          </div>
+        </div>
       </ng-template>
     </ngx-datatable-column>
     <ngx-datatable-column name="" [sortable]="false" [cellClass]="'cellColumn'" [flexGrow]="3">
       <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
         <div class="tw-flex">
-
-          <button
-            class="tw-ml-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-blue-500 hover:tw-bg-blue-600"
-            (click)="openModalCutCourse(cutcourse,row)">ตัดคอร์ส</button>
+          <div *ngIf="row.saleCount != row.saleCutCount">
+            <button
+              class="tw-ml-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-blue-500 hover:tw-bg-blue-600"
+              (click)="openModalCutCourse(cutcourse,row)">ตัดคอร์ส</button>
+            <button
+              class="tw-ml-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-yellow-500 hover:tw-bg-yellow-600"
+              (click)="openModalHistoryCutCourse(historycutcourse,row)">ประวัติการเข้าใช้งาน</button>
+          </div>
+          <div *ngIf="row.saleCount == row.saleCutCount">
+            <button
+              class="tw-ml-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-yellow-500 hover:tw-bg-yellow-600"
+              (click)="openModalHistoryCutCourse(historycutcourse,row)">ประวัติการเข้าใช้งาน</button>
+          </div>
         </div>
       </ng-template>
     </ngx-datatable-column>
-    <!-- <ngx-datatable-column name="" [sortable]="false" [cellClass]="'cellColumn'">
-      <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
-        <button class="tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-blue-500 hover:tw-bg-blue-600"
-          routerLink="../history/{{row.saleProductId}}">ตัดคอร์ส</button>
-      </ng-template>
-    </ngx-datatable-column> -->
   </ngx-datatable>
 </div>
 
@@ -202,7 +226,7 @@
       <mat-form-field class="tw-w-[45%] tw-p-3" appearance="outline">
         <mat-label>จำนวนครั้ง</mat-label>
         <!-- <mat-label>จำนวนครั้ง : {{i+1}}</mat-label> -->
-        <input type="text" value="{{item.saleCount}}" matInput />
+        <input type="text" value="{{item?.saleCount}}" matInput />
       </mat-form-field>
 
       <button (click)="removeURL(i)"
@@ -219,7 +243,7 @@
       <mat-form-field class="tw-w-[45%] tw-p-3" appearance="outline">
         <mat-label>จำนวนครั้ง</mat-label>
         <!-- <mat-label>จำนวนครั้ง : {{i+1}}</mat-label> -->
-        <input type="text" value="{{item.saleCount}}" [disabled]="isDisabled[i]" [textContent]="textValues2[i]"
+        <input type="text" value="{{item?.saleCount}}" [disabled]="isDisabled[i]" [textContent]="textValues2[i]"
           matInput />
       </mat-form-field>
 
@@ -247,13 +271,19 @@
   </div>
   <div class="modal-body">
     <div class="tw-flex tw-flex-wrap" [formGroup]="saleCutForm">
-      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
+      <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>ชื่อคอร์ส</mat-label>
         <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'saleCutCourse'" matInput>
       </mat-form-field>
-      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
+      <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>จำนวนครั้ง</mat-label>
         <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'saleCutCount'" matInput>
+      </mat-form-field>
+      <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
+        <mat-label>วันที่เข้าใช้บริการ</mat-label>
+        <input [formControlName]="'saleCutDate'" matInput [matDatepicker]="picker">
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker touchUi #picker></mat-datepicker>
       </mat-form-field>
       <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>วิตามิน</mat-label>
@@ -299,6 +329,55 @@
 
 </ng-template>
 
+<!--Modal ประวัติการตัดคอร์ส-->
+<ng-template #historycutcourse>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">ประวัติการตัดคอร์ส</h4>
+    <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="ModalList.hide()">
+      <span aria-hidden="true" class="visually-hidden">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
+      [footerHeight]="50" [rowHeight]="50" [rows]="rowsCutCourse" [loadingIndicator]="isLoading">
+      <ngx-datatable-column name="จำนวนครั้งที่" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row?.saleCutCount }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="วิตามิน"[cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row?.saleCutVitamin }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="มาร์คหน้า"[cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row?.saleCutMark }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="พนักงานนวด"[cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{getNameEmp(row?.saleCutTherapist)}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="หมอ"[cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row?.saleCutDoctor}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="รายละเอียด"[cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row?.saleCutDetail}}
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
+  </div>
+  <div class="modal-footer">
+    <a class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
+      (click)="ModalList.hide()">ปิด</a>
+  </div>
+</ng-template>
+
 <!--Modal ชำระเงิน-->
 <ng-template #payment>
   <div class="modal-header">
@@ -331,6 +410,23 @@
     <button
       class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
       type="submit" (click)="saveSalePay()">บันทึก</button>
+    <a class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
+      (click)="ModalList.hide()">ปิด</a>
+  </div>
+</ng-template>
+
+<!--Modal ประวัติการชำระเงิน-->
+<ng-template #historypayment>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">ประวัติการชำระเงิน</h4>
+    <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="ModalList.hide()">
+      <span aria-hidden="true" class="visually-hidden">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+
+  </div>
+  <div class="modal-footer">
     <a class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
       (click)="ModalList.hide()">ปิด</a>
   </div>
