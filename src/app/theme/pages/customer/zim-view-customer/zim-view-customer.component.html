@@ -345,27 +345,27 @@
           {{ row?.saleCutCount }}
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column name="วิตามิน"[cellClass]="'cellColumn'">
+      <ngx-datatable-column name="วิตามิน" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
           {{ row?.saleCutVitamin }}
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column name="มาร์คหน้า"[cellClass]="'cellColumn'">
+      <ngx-datatable-column name="มาร์คหน้า" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
           {{ row?.saleCutMark }}
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column name="พนักงานนวด"[cellClass]="'cellColumn'">
+      <ngx-datatable-column name="พนักงานนวด" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
           {{getNameEmp(row?.saleCutTherapist)}}
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column name="หมอ"[cellClass]="'cellColumn'">
+      <ngx-datatable-column name="หมอ" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
           {{row?.saleCutDoctor}}
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column name="รายละเอียด"[cellClass]="'cellColumn'">
+      <ngx-datatable-column name="รายละเอียด" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
           {{row?.saleCutDetail}}
         </ng-template>
@@ -424,7 +424,24 @@
     </button>
   </div>
   <div class="modal-body">
-
+    <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
+      [footerHeight]="50" [rowHeight]="50" [rows]="rowsSalepay" [loadingIndicator]="isLoading">
+      <ngx-datatable-column name="ชื่อคอร์ส" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row?.salePayCourse }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="ชำระเงินล่าสุด" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row?.saleExtraPay }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="ยอดคงเหลือ" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row?.salePayOver }}
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
   </div>
   <div class="modal-footer">
     <a class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"

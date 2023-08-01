@@ -30,6 +30,7 @@ export class ZimViewCustomerComponent implements OnInit {
   ColumnMode = ColumnMode;
   rows = [];
   rowsCutCourse = [];
+  rowsSalepay = [];
   groups = [];
 
   pros: any;
@@ -521,6 +522,15 @@ export class ZimViewCustomerComponent implements OnInit {
   }
 
   openModalHistoryPayment(historypayment: TemplateRef<any>, data = null) {
+
+    this._serviceSale.getSaleBYIDSalePay(data.saleProductId).subscribe((res) => {
+
+      this.rowsSalepay = res;
+      console.log(this.rowsSalepay);
+      this.rowsSalepay = [...this.rowsSalepay];
+
+      this.isLoading = false;
+    })
 
     this.ModalList = this.modalService.show(
       historypayment,
