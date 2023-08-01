@@ -44,15 +44,21 @@ export interface Customer {
 }
 
 export interface SaleList {
+  saleProductId: number;
   saleId: number;
-  saleNumber: number;
-  salePayBalance: number;
-  salePay: number;
-  saleOverdue: number;
   cusId: number;
-  empFullname: string;
   courseId: number;
   saleCount: number;
+  saleCutCount: number;
+  saleNumber: number;
+  courseCode: string;
+  courseNameTh: string;
+  empFullname: string;
+  salePayBalance: number;
+  salePay: string;
+  saleOverdue: string;
+  saleExtraPay: number;
+  salePayOver: string;
 }
 
 export interface SaleListEmp {

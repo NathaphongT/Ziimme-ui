@@ -72,12 +72,14 @@ export interface Salary {
 export interface SaleCut {
     saleCutId: number;
     saleCutCourse: string;
-    saleCutCount: number;
+    saleCutCount: string;
+    saleCount: number;
     saleCutVitamin: string;
     saleCutMark: string;
     saleCutTherapist: number;
     saleCutDoctor: string;
     saleCutDetail: string;
+    saleCutDate: Date;
     saleId: number;
     saleProductId: number;
     courseId: number;
@@ -91,9 +93,9 @@ export interface SaleCut {
 export interface SalePay {
     salePayId: number;
     salePayCourse: string;
-    saleExtraPay: number;
+    saleExtraPay: string;
     salePayBaLance: number;
-    salePayOver: number;
+    salePayOver: string;
     saleId: number;
     cusId: number;
     saleProductId: number;

@@ -29,6 +29,8 @@ export class ZimViewCustomerComponent implements OnInit {
 
   ColumnMode = ColumnMode;
   rows = [];
+  rowsCutCourse = [];
+  rowsSalepay = [];
   groups = [];
 
   pros: any;
@@ -48,7 +50,7 @@ export class ZimViewCustomerComponent implements OnInit {
 
   employees$: Observable<Employee[]>;
 
-  employee: Employee[] = [];
+  Employee: Employee[] = [];
   employ: any;
 
 
@@ -145,11 +147,13 @@ export class ZimViewCustomerComponent implements OnInit {
       saleCutId: [null],
       saleCutCourse: [{ value: '', disabled: true }],
       saleCutCount: [{ value: '', disabled: true }],
+      saleCount: [''],
       saleCutVitamin: [''],
       saleCutMark: [''],
       saleCutTherapist: [''],
       saleCutDoctor: [''],
       saleCutDetail: [''],
+      saleCutDate: [''],
       saleId: [''],
       saleProductId: [''],
       courseId: [''],
@@ -168,7 +172,11 @@ export class ZimViewCustomerComponent implements OnInit {
     })
 
     this.sale$ = this._serviceSale.sale$;
+
     this.employees$ = this._SerivceEmp.employees$;
+    this._SerivceEmp.employees$.pipe(takeUntil(this._unsubscribeAll)).subscribe(emps => {
+      this.Employee = emps;
+    })
 
     this.coures$ = this._SerivceBasic.courses$;
     this._SerivceBasic.courses$.pipe(takeUntil(this._unsubscribeAll)).subscribe(courses => {
@@ -182,15 +190,6 @@ export class ZimViewCustomerComponent implements OnInit {
       this.rows = [...this.rows];
 
       this.isLoading = false;
-    })
-
-
-    this._serviceSale.getSaleBYIDSaleCus(this.cus_id).subscribe((res) => {
-      // this.salePayShow = res
-      // this.salePayShowDataOver = this.salePayShow[0]?.salePayOver //ยอดค้างล่าสุด
-      // this.salePayShowDataEx = this.salePayShow[0]?.saleExtraPay //ยอดชำระล่าสุด
-      // console.log((this.salePayShowDataOver) - (this.salePayShowDataEx));
-
     })
   }
 
@@ -368,12 +367,12 @@ export class ZimViewCustomerComponent implements OnInit {
     this.selectedCourse = courseIds;
   }
 
-
   openModalCutCourse(cutcourse: TemplateRef<any>, data = null) {
     this.saleCutForm.patchValue({ saleId: data.saleId })
     this.saleCutForm.patchValue({ saleProductId: data.saleProductId })
     this.saleCutForm.patchValue({ courseId: data.courseId })
     this.saleCutForm.patchValue({ saleCutCourse: data.courseNameTh })
+    this.saleCutForm.patchValue({ saleCount: data.saleCount })
     console.log('ข้อมูลจากตาราง', data);
 
     this._serviceSale.getSaleBYIDSaleCut(data.saleProductId).subscribe((res) => {
@@ -387,7 +386,6 @@ export class ZimViewCustomerComponent implements OnInit {
         this.saleCutForm.patchValue({ saleCutCount: this.cutOderByAlways + 1 })
       }
     })
-
 
     this.ModalList = this.modalService.show(
       cutcourse,
@@ -434,10 +432,29 @@ export class ZimViewCustomerComponent implements OnInit {
     });
   }
 
+  openModalHistoryCutCourse(historycutcourse: TemplateRef<any>, data = null) {
+
+
+
+    this._serviceSale.getSaleBYIDSaleCut(data.saleProductId).subscribe((res) => {
+
+      this.rowsCutCourse = res;
+      console.log(this.rowsCutCourse);
+      this.rowsCutCourse = [...this.rowsCutCourse];
+
+      this.isLoading = false;
+    })
+
+    this.ModalList = this.modalService.show(
+      historycutcourse,
+      Object.assign({}, { class: 'gray modal-lg' })
+    );
+  }
+
   openModalPayment(payment: TemplateRef<any>, data = null) {
 
     console.log(data);
-    
+
     this.salePayForm.patchValue({ saleId: data.saleId })
     this.salePayForm.patchValue({ saleProductId: data.saleProductId })
     this.salePayForm.patchValue({ courseId: data.courseId })
@@ -453,8 +470,8 @@ export class ZimViewCustomerComponent implements OnInit {
       this.salePayOderByEx = this.salePayOderByID[0]?.saleExtraPay
 
       if (this.salePayOderBy.length <= 0) {
-        this.salePayForm.patchValue({ salePayBaLance: data.salePayBalance })
-        this.salePayForm.patchValue({ salePayOver: data.saleOverdue })
+        this.salePayForm.patchValue({ salePayBaLance: data?.salePayBalance })
+        this.salePayForm.patchValue({ salePayOver: data?.saleOverdue })
       } else {
         this.salePayForm.patchValue({ salePayBaLance: this.salePayOderByBalance })
         this.salePayForm.patchValue({ salePayOver: this.salePayOderByOver - this.salePayOderByEx })
@@ -466,8 +483,6 @@ export class ZimViewCustomerComponent implements OnInit {
       Object.assign({}, { class: 'gray modal-lg' })
     );
   }
-
-
 
   saveSalePay() {
     //Return if the form is invalid
@@ -505,4 +520,33 @@ export class ZimViewCustomerComponent implements OnInit {
       }
     });
   }
+
+  openModalHistoryPayment(historypayment: TemplateRef<any>, data = null) {
+
+    this._serviceSale.getSaleBYIDSalePay(data.saleProductId).subscribe((res) => {
+
+      this.rowsSalepay = res;
+      console.log(this.rowsSalepay);
+      this.rowsSalepay = [...this.rowsSalepay];
+
+      this.isLoading = false;
+    })
+
+    this.ModalList = this.modalService.show(
+      historypayment,
+      Object.assign({}, { class: 'gray modal-lg' })
+    );
+  }
+
+  getNameEmp(id: number) {
+    let index = this.Employee.findIndex(type => type.empId === id);
+    if (index === -1) {
+      return "-";
+    }
+    else {
+      return this.Employee[index].empFullname;
+    }
+  }
+
+
 }
