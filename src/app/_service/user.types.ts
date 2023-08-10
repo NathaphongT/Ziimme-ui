@@ -54,16 +54,14 @@ export interface SaleList {
   courseCode: string;
   courseNameTh: string;
   empFullname: string;
-  salePayBalance: number;
-  salePay: string;
-  saleOverdue: string;
+  saleBalance: number;
   saleExtraPay: number;
   salePayOver: string;
 }
 
 export interface SaleListEmp {
   saleNumber: number;
-  salePayBalance: number;
+  saleBalance: number;
   cusFullName: string;
   courseId: string;
   empId: number;

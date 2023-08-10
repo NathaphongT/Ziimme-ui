@@ -22,7 +22,7 @@ export class ZimViewHistoryComponent implements OnInit {
   sales$: Observable<Sale[]>;
   Sales: Sale[] = [];
   sale: any = {};
-  salePayBalance: any = "";
+  saleBalance: any = "";
   saleCount: any = "";
 
   salescut$: Observable<SaleCut[]>;
@@ -108,7 +108,7 @@ export class ZimViewHistoryComponent implements OnInit {
     this._ServiceSale.sales$.pipe(takeUntil(this._unsubscribeAll)).subscribe(sales => {
       this.Sales = sales;
       this.sale = Object.assign({}, this.Sales);
-      this.salePayBalance = this.sale.saleOverdue
+      // this.saleBalance = this.sale.saleOverdue
       this.saleCount = this.sale.saleCount
       console.log('sale_cut', this.sale.saleCount);
     })
@@ -163,7 +163,7 @@ export class ZimViewHistoryComponent implements OnInit {
       this.salecutForm.patchValue({ sale_cut_pay_balance: this.sale_cut_pay_balance })
       this.salecutForm.patchValue({ sale_cut_count: this.sale_cut_count + 1 })
     } else {
-      this.salecutForm.patchValue({ sale_cut_pay_balance: this.salePayBalance })
+      this.salecutForm.patchValue({ sale_cut_pay_balance: this.saleBalance })
       this.salecutForm.patchValue({ sale_cut_count: 1 })
     }
     this.salecutForm.patchValue({ sale_id: this.sale_id });

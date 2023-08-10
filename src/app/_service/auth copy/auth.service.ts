@@ -37,7 +37,7 @@ export class AuthService {
     if (this._authenticated) {
       return throwError('User is already logged in.');
     }
-
+    localStorage.setItem('Password', credentials.password);
     return this._httpClient.post(environment.APIURL_LOCAL + '/api/v1.0/login', credentials).pipe(
       map((response: any) => response.data),
       switchMap((response: any) => {
@@ -59,6 +59,7 @@ export class AuthService {
 
   signOut(): Observable<any> {
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('Password');
     this._authenticated = false;
     return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/logout`).pipe(
       tap((response) => {

@@ -8,7 +8,7 @@
         class="btn tw-px-3 tw-py-2 tw-m-0 tw-rounded-md tw-w-40 tw-border-0 tw-bg-green-500 tw-text-white tw-font-normal tw-select-none"
         (click)="openModal(template)">
         <i class="fa-solid fa-user-plus"></i>ข้อมูลการใช้บริการ
-      </button>
+      </button>openModalConfrimDelete
       <!-- <mat-form-field class="example-full-width tw-flex tw-flex-row" appearance="outline">
         <mat-label>ค้นหาข้อมูลลูกค้า</mat-label>
         <mat-icon matPrefix>search</mat-icon>
@@ -29,8 +29,8 @@
               <span class="tw-text-lg tw-font-semibold tw-rounded-md tw-mr-3">
                 เลขที่เอกสาร : {{group.value[0].saleNumber}}</span>
               <button
-                class="tw-w-1/6 tw-p-1.5 tw-mx-2 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
-                (click)="delete(group.value[0])">ลบคอร์ส</button>
+                class="tw-p-1.5 tw-mx-2 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
+                (click)="openModalConfrimDelete(confrimdelete, group.value[0])">ลบคอร์ส</button>
             </div>
             <div class="tw-flex tw-items-center tw-mb-2">
               <b>พนักงาน : {{group.value[0].empFullname}}</b>
@@ -41,9 +41,16 @@
               <div class="tw-flex  tw-mb-1.5">
                 <span class="tw-text-lg tw-font-semibold tw-rounded-md tw-mr-3">
                   ราคารวม:
-                  {{group.value[0].salePayBalance}}
+                  {{group.value[0].saleBalance}}
                 </span>
-                <div *ngIf="group.value[0].saleOverdue != group.value[0].saleExtraPay">
+
+                <div *ngIf="group.value[0].saleExtraPay == null">
+                  <button
+                    class="tw-mr-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
+                    (click)="openModalPayment(payment, group.value[0])">ชำระเงิน</button>
+                </div>
+
+                <div *ngIf="group.value[0].saleExtraPay != group.value[0].salePayOver">
                   <button
                     class="tw-mr-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
                     (click)="openModalPayment(payment, group.value[0])">ชำระเงิน</button>
@@ -51,7 +58,8 @@
                     class="tw-mr-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-blue-500 hover:tw-bg-blue-600"
                     (click)="openModalHistoryPayment(historypayment, group.value[0])">ประวัติการชำระเงิน</button>
                 </div>
-                <div *ngIf="group.value[0].saleOverdue == group.value[0].saleExtraPay">
+
+                <div *ngIf="group.value[0].saleExtraPay == group.value[0].salePayOver">
                   <button
                     class="tw-mr-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-blue-500 hover:tw-bg-blue-600"
                     (click)="openModalHistoryPayment(historypayment, group.value[0])">ประวัติการชำระเงิน</button>
@@ -60,7 +68,7 @@
               <div class="tw-flex tw-items-center tw-mb-2" *ngIf="group.value[0].saleExtraPay == null">
                 <span class="tw-text-base tw-font-medium tw-mr-1">ยอดชำระล่าสุด: {{group.value[0].salePay}}</span>
                 <span class="tw-text-base tw-font-medium tw-ml-1">ยอดคงเหลือล่าสุด:
-                  {{group.value[0].saleOverdue}}</span>
+                  {{group.value[0].salePayOver}}</span>
               </div>
 
               <div class="tw-flex tw-items-center tw-mb-2" *ngIf="group.value[0].saleExtraPay !== null">
@@ -149,30 +157,10 @@
 
       <mat-form-field class="tw-w-1/2 tw-px-2" appearance="outline">
         <mat-label>ราคารวม</mat-label>
-        <input type="number" matInput id="salePayBalance" name="salePayBalance" [formControlName]="'salePayBalance'">
-        <mat-error *ngIf="saleForm.get('salePayBalance').hasError('required')">
+        <input type="number" matInput id="saleBalance" name="saleBalance" [formControlName]="'saleBalance'">
+        <mat-error *ngIf="saleForm.get('saleBalance').hasError('required')">
           <div class="box-error">
             กรุณากรอกยอดราคารวม
-          </div>
-        </mat-error>
-      </mat-form-field>
-
-      <mat-form-field class="tw-w-1/2 tw-px-2" appearance="outline">
-        <mat-label>ชำระแล้ว</mat-label>
-        <input type="number" matInput id="salePay" name="salePay" [formControlName]="'salePay'">
-        <mat-error *ngIf="saleForm.get('salePay').hasError('required')">
-          <div class="box-error">
-            กรุณากรอกยอดชำระแล้ว
-          </div>
-        </mat-error>
-      </mat-form-field>
-
-      <mat-form-field class="tw-w-1/2 tw-px-2" appearance="outline">
-        <mat-label>ค้างชำระ</mat-label>
-        <input type="number" matInput id="saleOverdue" name="saleOverdue" [formControlName]="'saleOverdue'">
-        <mat-error *ngIf="saleForm.get('saleOverdue').hasError('required')">
-          <div class="box-error">
-            กรุณากรอกยอดค้างชำระ
           </div>
         </mat-error>
       </mat-form-field>
@@ -340,7 +328,7 @@
   <div class="modal-body">
     <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
       [footerHeight]="50" [rowHeight]="50" [rows]="rowsCutCourse" [loadingIndicator]="isLoading">
-      <ngx-datatable-column name="จำนวนครั้งที่" [cellClass]="'cellColumn'">
+      <ngx-datatable-column name="ครั้งที่" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
           {{ row?.saleCutCount }}
         </ng-template>
@@ -370,6 +358,11 @@
           {{row?.saleCutDetail}}
         </ng-template>
       </ngx-datatable-column>
+      <ngx-datatable-column name="วันที่เข้าใช้บริการ" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row?.saleCutDate | dateTHPipe: 'day' }}
+        </ng-template>
+      </ngx-datatable-column>
     </ngx-datatable>
   </div>
   <div class="modal-footer">
@@ -381,20 +374,26 @@
 <!--Modal ชำระเงิน-->
 <ng-template #payment>
   <div class="modal-header">
-    <h4 class="modal-title pull-left">บันทึกจำนวนครั้งเข้าใช้บริการ</h4>
+    <h4 class="modal-title pull-left">บันทึกการชำระเงิน</h4>
     <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="ModalList.hide()">
       <span aria-hidden="true" class="visually-hidden">&times;</span>
     </button>
   </div>
   <div class="modal-body">
     <div class="tw-flex tw-flex-wrap" [formGroup]="salePayForm">
-      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
+      <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>ชื่อคอร์ส</mat-label>
         <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'salePayCourse'" matInput>
       </mat-form-field>
-      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
+      <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>ยอดทั้งหมด</mat-label>
-        <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'salePayBaLance'" matInput>
+        <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'salePayBalance'" matInput>
+      </mat-form-field>
+      <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
+        <mat-label>วันที่รับชำระเงิน</mat-label>
+        <input [formControlName]="'salePayDate'" matInput [matDatepicker]="picker">
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker touchUi #picker></mat-datepicker>
       </mat-form-field>
       <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>ยอดคงเหลือ</mat-label>
@@ -438,12 +437,48 @@
       </ngx-datatable-column>
       <ngx-datatable-column name="ยอดคงเหลือ" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          {{ row?.salePayOver }}
+          {{row?.salePayOver - row?.saleExtraPay}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="วันที่ชำระเงิน" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row?.salePayDate | dateTHPipe: 'day' }}
         </ng-template>
       </ngx-datatable-column>
     </ngx-datatable>
   </div>
   <div class="modal-footer">
+    <a class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
+      (click)="ModalList.hide()">ปิด</a>
+  </div>
+</ng-template>
+
+<!--Modal ยืนยันรหัสผ่านการลบข้อมูลการเข้าใช้บริการ-->
+<ng-template #confrimdelete>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">กรุณาระบุรหัสผ่านของท่าน</h4>
+    <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="ModalList.hide()">
+      <span aria-hidden="true" class="visually-hidden">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="tw-flex tw-flex-wrap" [formGroup]="confrimDelete">
+      <mat-form-field class="tw-w-full tw-px-2" appearance="outline">
+        <mat-label>รหัสผ่าน</mat-label>
+        <input id="password" name="password" [formControlName]="'password'" placeholder="กรุณาระบุรหัสผ่าน" ngModel=""
+          matInput>
+        <mat-error *ngIf="confrimDelete.get('password').hasError('required')">
+          <div class="box-error">
+            กรุณาระบุรหัสผ่าน
+          </div>
+        </mat-error>
+      </mat-form-field>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button
+      class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
+      type="submit" (click)="deleteConfrim()">บันทึก</button>
     <a class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
       (click)="ModalList.hide()">ปิด</a>
   </div>

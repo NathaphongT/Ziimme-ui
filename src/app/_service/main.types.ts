@@ -22,7 +22,7 @@ export interface Sale {
     saleConsultant: number;
     saleProduct: number;
     saleCount: number;
-    salePayBalance: string;
+    saleBalance: string;
     salePay: string;
     saleOverdue: string;
     cusId: number;

@@ -23,6 +23,7 @@ export class ZimViewCustomerComponent implements OnInit {
   saleForm: FormGroup;
   saleEmployeeForm: FormGroup;
   saleProductForm: FormGroup;
+  confrimDelete: FormGroup;
 
   saleCutForm: FormGroup;
   salePayForm: FormGroup;
@@ -32,6 +33,10 @@ export class ZimViewCustomerComponent implements OnInit {
   rowsCutCourse = [];
   rowsSalepay = [];
   groups = [];
+
+  CusTomer: any;
+  password: any;
+  passwordMain: any;
 
   pros: any;
 
@@ -129,9 +134,7 @@ export class ZimViewCustomerComponent implements OnInit {
     this.saleForm = this._formBuilder.group({
       saleId: [this.cus_id],
       saleNumber: [{ value: '', enabled: !!this.cus_id }, Validators.required],
-      salePayBalance: [{ value: '', enabled: !!this.cus_id }, Validators.required],
-      salePay: [{ value: '', enabled: !!this.cus_id }, Validators.required],
-      saleOverdue: [{ value: '', enabled: !!this.cus_id }, Validators.required],
+      saleBalance: [{ value: '', enabled: !!this.cus_id }, Validators.required],
       cusId: [this.cus_id],
     });
 
@@ -141,6 +144,10 @@ export class ZimViewCustomerComponent implements OnInit {
 
     this.saleProductForm = this._formBuilder.group({
       selectedData: [null]
+    })
+
+    this.confrimDelete = this._formBuilder.group({
+      password: ['', Validators.required]
     })
 
     this.saleCutForm = this._formBuilder.group({
@@ -162,12 +169,13 @@ export class ZimViewCustomerComponent implements OnInit {
     this.salePayForm = this._formBuilder.group({
       salePayId: [null],
       saleExtraPay: [''],
+      salePayDate: [''],
       saleId: [''],
       saleProductId: [''],
       courseId: [''],
       cusId: [''],
       salePayCourse: [{ value: '', disabled: true }],
-      salePayBaLance: [{ value: '', disabled: true }],
+      salePayBalance: [{ value: '', disabled: true }],
       salePayOver: [{ value: '', disabled: true }],
     })
 
@@ -304,9 +312,7 @@ export class ZimViewCustomerComponent implements OnInit {
 
     this._serviceSale.saveAll(
       saleViewData.saleNumber,
-      saleViewData.salePayBalance,
-      saleViewData.salePay,
-      saleViewData.saleOverdue,
+      saleViewData.saleBalance,
       saleViewData.cusId,
       saleEmployeeData.empId,
       saleProductData,)
@@ -335,33 +341,7 @@ export class ZimViewCustomerComponent implements OnInit {
       );
   }
 
-  delete(row) {
-    Swal.fire({
-      title: 'คุณแน่ใจหรือว่าต้องการลบ?',
-      text:
-        'คุณจะไม่สามารถกู้ข้อมูลคอร์ส ' + row.courseNameTh + ' ได้!',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'ยืนยัน',
-      cancelButtonText: 'ยกเลิก',
-    }).then((result) => {
-      if (result.isConfirmed) {
 
-        this._serviceSale.deleteSale(row.saleId).pipe(take(1))
-          .subscribe(() => {
-            Swal.fire({
-              icon: 'success',
-              title: 'ลบข้อมูลสำเร็จ',
-              showConfirmButton: false,
-              timer: 2000,
-            });
-            window.location.reload();
-            this._changeDetectorRef.markForCheck();
-          })
-
-      }
-    });
-  }
 
   selectCourse(courseIds: number[]): void {
     this.selectedCourse = courseIds;
@@ -434,8 +414,6 @@ export class ZimViewCustomerComponent implements OnInit {
 
   openModalHistoryCutCourse(historycutcourse: TemplateRef<any>, data = null) {
 
-
-
     this._serviceSale.getSaleBYIDSaleCut(data.saleProductId).subscribe((res) => {
 
       this.rowsCutCourse = res;
@@ -464,16 +442,16 @@ export class ZimViewCustomerComponent implements OnInit {
     this._serviceSale.getSaleBYIDSalePay(data.saleProductId).subscribe((res) => {
       this.salePayOderBy = res
       this.salePayOderByID = Object.assign({}, res);
-      console.log(this.salePayOderBy);
-      this.salePayOderByBalance = this.salePayOderByID[0]?.salePayBaLance
+      console.log('res', this.salePayOderBy);
+      this.salePayOderByBalance = this.salePayOderByID[0]?.salePayBalance
       this.salePayOderByOver = this.salePayOderByID[0]?.salePayOver
       this.salePayOderByEx = this.salePayOderByID[0]?.saleExtraPay
 
       if (this.salePayOderBy.length <= 0) {
-        this.salePayForm.patchValue({ salePayBaLance: data?.salePayBalance })
-        this.salePayForm.patchValue({ salePayOver: data?.saleOverdue })
+        this.salePayForm.patchValue({ salePayBalance: data?.saleBalance })
+        this.salePayForm.patchValue({ salePayOver: data?.saleBalance})
       } else {
-        this.salePayForm.patchValue({ salePayBaLance: this.salePayOderByBalance })
+        this.salePayForm.patchValue({ salePayBalance: this.salePayOderByBalance })
         this.salePayForm.patchValue({ salePayOver: this.salePayOderByOver - this.salePayOderByEx })
       }
     })
@@ -535,6 +513,72 @@ export class ZimViewCustomerComponent implements OnInit {
     this.ModalList = this.modalService.show(
       historypayment,
       Object.assign({}, { class: 'gray modal-lg' })
+    );
+  }
+
+  delete(row) {
+
+  }
+
+  deleteConfrim() {
+
+    if (this.confrimDelete.invalid) {
+      return;
+    }
+
+    this.submitted = true;
+    this.isLoading = true;
+
+
+    this.password = this.confrimDelete.value.password
+    this.passwordMain = localStorage.getItem('Password')
+
+    console.log(this.password);
+    console.log(this.passwordMain);
+
+
+    if (this.password !== this.passwordMain) {
+      Swal.fire({
+        title: 'รหัสผ่านไม่ถูกต้อง',
+        text: "กรุณาระบุรหัสผ่านใหม่อีกครั้ง",
+        icon: 'error',
+        timer: 1500
+      })
+    } else {
+      Swal.fire({
+        title: 'คุณแน่ใจหรือว่าต้องการลบ?',
+        text:
+          'คุณสามารถกู้ข้อมูลคอร์สได้!',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'ยืนยัน',
+        cancelButtonText: 'ยกเลิก',
+      }).then((result) => {
+        if (result.isConfirmed) {
+
+          this._serviceSale.deleteSale(this.CusTomer.saleId).pipe(take(1))
+            .subscribe(() => {
+              Swal.fire({
+                icon: 'success',
+                title: 'ลบข้อมูลสำเร็จ',
+                showConfirmButton: false,
+                timer: 2000,
+              });
+              window.location.reload();
+              this._changeDetectorRef.markForCheck();
+            })
+
+        }
+      });
+    }
+  }
+
+  openModalConfrimDelete(confrimdelete: TemplateRef<any>, data = null) {
+    this.CusTomer = data;
+    this.ModalList = this.modalService.show(
+      confrimdelete,
+      Object.assign({})
+      // Object.assign({}, { class: 'gray modal-lg' })
     );
   }
 
