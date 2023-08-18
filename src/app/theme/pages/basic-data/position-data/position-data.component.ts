@@ -20,13 +20,19 @@ export class PositionDataComponent implements OnInit {
 
 
   positionForm: FormGroup;
+  confrimDelete: FormGroup;
+
   ColumnMode = ColumnMode;
   rows = [];
 
 
   isAddMode: boolean;
 
-  modalRef?: BsModalRef;
+  ModalList?: BsModalRef;
+
+  Items: any;
+  password: any;
+  passwordMain: any;
 
   isLoading: boolean;
   submitted: boolean;
@@ -45,6 +51,10 @@ export class PositionDataComponent implements OnInit {
       positionNameTh: ['', Validators.required],
       positionNameEng: ['', Validators.required],
     });
+
+    this.confrimDelete = this._formBuilder.group({
+      password: ['', Validators.required]
+    })
 
     this._Service.positionsPagination$
       .pipe(takeUntil(this._unsubscribeAll)).subscribe(pagination => {
@@ -75,7 +85,7 @@ export class PositionDataComponent implements OnInit {
       this.positionForm.patchValue(data);
       // this.isAddMode = false
     }
-    this.modalRef = this.modalService.show(template);
+    this.ModalList = this.modalService.show(template);
   }
 
   get f() { return this.positionForm.controls; }
@@ -107,7 +117,7 @@ export class PositionDataComponent implements OnInit {
           })
         )
         .subscribe((res) => {
-          this.modalRef.hide();
+          this.ModalList.hide();
           if (res) {
             Swal.fire({
               icon: 'success',
@@ -140,7 +150,7 @@ export class PositionDataComponent implements OnInit {
           })
         )
         .subscribe((res) => {
-          this.modalRef.hide();
+          this.ModalList.hide();
           if (res) {
             Swal.fire({
               icon: 'success',
@@ -151,32 +161,6 @@ export class PositionDataComponent implements OnInit {
           }
         });
     }
-  }
-
-  delete(row) {
-    Swal.fire({
-      title: 'คุณแน่ใจหรือว่าต้องการลบ?',
-      text:
-        'คุณจะไม่สามารถกู้คืนตำแหน่ง ' + row.positionNameTh + ' ได้!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'ยืนยัน',
-      cancelButtonText: 'ยกเลิก',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this._Service.deletePosition(row.positionId).pipe(take(1))
-          .subscribe(() => {
-            Swal.fire({
-              icon: 'success',
-              title: 'ลบข้อมูลสำเร็จ',
-              showConfirmButton: false,
-              timer: 2000,
-            });
-
-            this._changeDetectorRef.markForCheck();
-          })
-      }
-    });
   }
 
   setPage(pageInfo) {
@@ -194,6 +178,67 @@ export class PositionDataComponent implements OnInit {
       });
     }
   }
+
+  deleteConfrim() {
+
+    if (this.confrimDelete.invalid) {
+      return;
+    }
+
+    this.submitted = true;
+    this.isLoading = true;
+
+
+    this.password = this.confrimDelete.value.password
+    this.passwordMain = localStorage.getItem('Password')
+
+    console.log(this.password);
+    console.log(this.passwordMain);
+
+
+    if (this.password !== this.passwordMain) {
+      Swal.fire({
+        title: 'รหัสผ่านไม่ถูกต้อง',
+        text: "กรุณาระบุรหัสผ่านใหม่อีกครั้ง",
+        icon: 'error',
+        timer: 1500
+      })
+    } else {
+      Swal.fire({
+        title: 'คุณแน่ใจหรือว่าต้องการลบ?',
+        text:
+          'คุณจะไม่สามารถกู้คืนตำแหน่ง ' + this.Items.positionNameTh + ' ได้!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'ยืนยัน',
+        cancelButtonText: 'ยกเลิก',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this._Service.deletePosition(this.Items.positionId).pipe(take(1))
+            .subscribe(() => {
+              Swal.fire({
+                icon: 'success',
+                title: 'ลบข้อมูลสำเร็จ',
+                showConfirmButton: false,
+                timer: 2000,
+              });
+  
+              this._changeDetectorRef.markForCheck();
+            })
+        }
+      });
+    }
+  }
+
+  openModalConfrimDelete(confrimdelete: TemplateRef<any>, data = null) {
+    this.Items = data;
+    this.ModalList = this.modalService.show(
+      confrimdelete,
+      Object.assign({})
+      // Object.assign({}, { class: 'gray modal-lg' })
+    );
+  }
+
 
 
 }

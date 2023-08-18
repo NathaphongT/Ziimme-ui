@@ -16,12 +16,19 @@ import { UserService } from '@app/_service/user.service';
 export class UserDataComponent implements OnInit {
 
   userForm: FormGroup;
+  confrimDelete: FormGroup;
+
   user = [];
   rows = [];
 
   public users: User;
 
-  modalUser?: BsModalRef;
+  ModalList?: BsModalRef;
+
+  Items: any;
+  password: any;
+  passwordMain: any;
+
 
   submitted: boolean;
   loading: boolean;
@@ -50,6 +57,10 @@ export class UserDataComponent implements OnInit {
       branchName: [[], Validators.required],
     });
 
+    this.confrimDelete = this._formBuilder.group({
+      password: ['', Validators.required]
+    })
+
     this._Service.usersPagination$
       .pipe(takeUntil(this._unsubscribeAll)).subscribe(pagination => {
         this.userPagination = pagination;
@@ -72,7 +83,7 @@ export class UserDataComponent implements OnInit {
 
     this.user = data
     // console.log(this.user);
-    // this.modalUser = this.modalService.show(template);
+    // this.ModalList = this.modalService.show(template);
     // this.isAddMode = true
     this.userForm.reset();
     this.userForm.markAsPristine();
@@ -80,7 +91,7 @@ export class UserDataComponent implements OnInit {
       this.userForm.patchValue(data);
       // this.isAddMode = false
     }
-    this.modalUser = this.modalService.show(template);
+    this.ModalList = this.modalService.show(template);
     // this.isAddMode = true
   }
 
@@ -115,7 +126,7 @@ export class UserDataComponent implements OnInit {
           })
         )
         .subscribe((res) => {
-          this.modalUser.hide();
+          this.ModalList.hide();
           if (res) {
             Swal.fire({
               icon: 'success',
@@ -149,7 +160,7 @@ export class UserDataComponent implements OnInit {
           })
         )
         .subscribe((res) => {
-          this.modalUser.hide();
+          this.ModalList.hide();
           if (res) {
             Swal.fire({
               icon: 'success',
@@ -202,6 +213,66 @@ export class UserDataComponent implements OnInit {
         this.isLoading = false;
       });
     }
+  }
+
+  deleteConfrim() {
+
+    if (this.confrimDelete.invalid) {
+      return;
+    }
+
+    this.submitted = true;
+    this.isLoading = true;
+
+
+    this.password = this.confrimDelete.value.password
+    this.passwordMain = localStorage.getItem('Password')
+
+    console.log(this.password);
+    console.log(this.passwordMain);
+
+
+    if (this.password !== this.passwordMain) {
+      Swal.fire({
+        title: 'รหัสผ่านไม่ถูกต้อง',
+        text: "กรุณาระบุรหัสผ่านใหม่อีกครั้ง",
+        icon: 'error',
+        timer: 1500
+      })
+    } else {
+      Swal.fire({
+        title: 'คุณแน่ใจหรือว่าต้องการลบ?',
+        text:
+          'คุณจะไม่สามารถกู้คืนผู้ใช้งาน ' + this.Items.username + ' ได้!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'ยืนยัน',
+        cancelButtonText: 'ยกเลิก',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this._Service.deleteUser(this.Items.userId).pipe(take(1))
+            .subscribe(() => {
+              Swal.fire({
+                icon: 'success',
+                title: 'ลบข้อมูลสำเร็จ',
+                showConfirmButton: false,
+                timer: 2000,
+              });
+  
+              this._changeDetectorRef.markForCheck();
+            })
+        }
+      });
+    }
+  }
+
+  openModalConfrimDelete(confrimdelete: TemplateRef<any>, data = null) {
+    this.Items = data;
+    this.ModalList = this.modalService.show(
+      confrimdelete,
+      Object.assign({})
+      // Object.assign({}, { class: 'gray modal-lg' })
+    );
   }
 
 

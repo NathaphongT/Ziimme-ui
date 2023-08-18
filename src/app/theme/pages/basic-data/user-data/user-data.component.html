@@ -1,28 +1,28 @@
 <div class="tw-w-full tw-bg-white tw-p-4">
   <div class="tw-container">
-      <div class="tw-flex">
-          <span class="tw-text-3xl tw-font-bold tw-text-[#454545] tw-my-5">ข้อมูลผู้ใช้งาน</span>
-      </div>
-      <div class="tw-flex tw-justify-between tw-items-center">
-          <button
-              class="btn tw-px-3 tw-py-2 tw-m-0 tw-rounded-md tw-w-40 tw-border-0 tw-bg-green-500 tw-text-white tw-font-normal tw-select-none"
-              (click)="openModal(template)">
-              <i class="fa-solid fa-user-plus"></i>เพิ่มข้อมูล
-          </button>
-          <!-- <mat-form-field class="example-full-width tw-flex tw-flex-row" appearance="outline">
+    <div class="tw-flex">
+      <span class="tw-text-3xl tw-font-bold tw-text-[#454545] tw-my-5">ข้อมูลผู้ใช้งาน</span>
+    </div>
+    <div class="tw-flex tw-justify-between tw-items-center">
+      <button
+        class="btn tw-px-3 tw-py-2 tw-m-0 tw-rounded-md tw-w-40 tw-border-0 tw-bg-green-500 tw-text-white tw-font-normal tw-select-none"
+        (click)="openModal(template)">
+        <i class="fa-solid fa-user-plus"></i>เพิ่มข้อมูล
+      </button>
+      <!-- <mat-form-field class="example-full-width tw-flex tw-flex-row" appearance="outline">
         <mat-label>ค้นหาข้อมูลลูกค้า</mat-label>
         <mat-icon matPrefix>search</mat-icon>
         <input type="search" (keyup)='serviceListFilter($event)' class="tw-text-xs" placeholder="ค้นหาเลขสมาชิกและชื่อลูกค้า" matInput>
       </mat-form-field> -->
-      </div>
+    </div>
   </div>
 </div>
 <div class="wrap-body">
   <div class="container">
     <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
-    [footerHeight]="50" [rowHeight]="50" [rows]="rows" [loadingIndicator]="isLoading" [externalPaging]="true"
-    [count]="userPagination.length" [offset]="userPagination.page" [limit]="userPagination.size"
-    (page)="setPage($event)" (sort)="sorting($event)">
+      [footerHeight]="50" [rowHeight]="50" [rows]="rows" [loadingIndicator]="isLoading" [externalPaging]="true"
+      [count]="userPagination.length" [offset]="userPagination.page" [limit]="userPagination.size"
+      (page)="setPage($event)" (sort)="sorting($event)">
       <ngx-datatable-column name="" [width]="50" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <img src="./assets/icons/edit.png" (click)="openModal(template, row)" width="25px" height="25px" />
@@ -30,7 +30,8 @@
       </ngx-datatable-column>
       <ngx-datatable-column name="" [width]="50" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          <img src="./assets/icons/del.png" (click)="delete(row)" width="25px" height="25px" />
+          <img src="./assets/icons/del.png" (click)="openModalConfrimDelete(confrimdelete, row)" width="25px"
+            height="25px" />
         </ng-template>
       </ngx-datatable-column>
       <ngx-datatable-column name="#" [canAutoResize]="false" [sortable]="false" [width]="50" [cellClass]="'cellColumn'">
@@ -66,7 +67,7 @@
 <ng-template #template>
   <div class="modal-header">
     <h4 class="modal-title pull-left">เพิ่มข้อมูลผู้ใช้งาน</h4>
-    <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="modalUser?.hide()"></button>
+    <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="ModalList?.hide()"></button>
   </div>
   <div class="modal-body">
     <form role="form" [formGroup]="userForm" (ngSubmit)="onSubmit()" #f="ngForm" novalidate>
@@ -134,10 +135,41 @@
         </mat-form-field>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-cancel" (click)="modalUser?.hide()">ปิด</button>
+        <button type="button" class="btn btn-cancel" (click)="ModalList?.hide()">ปิด</button>
         <button class="btn btn-save" type="submit">บันทึก</button>
       </div>
     </form>
   </div>
 
+</ng-template>
+
+<!--Modal ยืนยันรหัสผ่านการลบข้อมูล-->
+<ng-template #confrimdelete>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">กรุณาระบุรหัสผ่านของท่าน</h4>
+    <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="ModalList.hide()">
+      <span aria-hidden="true" class="visually-hidden">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="tw-flex tw-flex-wrap" [formGroup]="confrimDelete">
+      <mat-form-field class="tw-w-full tw-px-2" appearance="outline">
+        <mat-label>รหัสผ่าน</mat-label>
+        <input id="password" name="password" [formControlName]="'password'" placeholder="กรุณาระบุรหัสผ่าน" ngModel=""
+          matInput>
+        <mat-error *ngIf="confrimDelete.get('password').hasError('required')">
+          <div class="box-error">
+            กรุณาระบุรหัสผ่าน
+          </div>
+        </mat-error>
+      </mat-form-field>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button
+      class="tw-w-auto tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
+      type="submit" (click)="deleteConfrim()">ยืนยันรหัสผ่าน</button>
+    <a class="tw-w-auto tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
+      (click)="ModalList.hide()">ปิด</a>
+  </div>
 </ng-template>

@@ -19,11 +19,17 @@ export class CourseDataComponent implements OnInit {
   courses$: Observable<Course[]>;
 
   courseForm: FormGroup;
+  confrimDelete: FormGroup;
 
   rows = [];
   isAddMode: boolean;
   ColumnMode = ColumnMode;
-  modalRef?: BsModalRef;
+  ModalList?: BsModalRef;
+
+  Items: any;
+  password: any;
+  passwordMain: any;
+
 
   isLoading: boolean;
   submitted: boolean;
@@ -44,6 +50,10 @@ export class CourseDataComponent implements OnInit {
       courseNameEng: ['', Validators.required],
       courseDetail: [''],
     });
+
+    this.confrimDelete = this._formBuilder.group({
+      password: ['', Validators.required]
+    })
 
     this._Service.coursesPagination$
       .pipe(takeUntil(this._unsubscribeAll)).subscribe(pagination => {
@@ -74,7 +84,7 @@ export class CourseDataComponent implements OnInit {
       this.courseForm.patchValue(data);
       // this.isAddMode = false
     }
-    this.modalRef = this.modalService.show(template);
+    this.ModalList = this.modalService.show(template);
   }
 
   get f() { return this.courseForm.controls; }
@@ -107,7 +117,7 @@ export class CourseDataComponent implements OnInit {
         // })
       )
         .subscribe((res) => {
-          this.modalRef.hide();
+          this.ModalList.hide();
           if (res) {
             Swal.fire({
               icon: 'success',
@@ -140,7 +150,7 @@ export class CourseDataComponent implements OnInit {
           })
         )
         .subscribe((res) => {
-          this.modalRef.hide();
+          this.ModalList.hide();
           if (res) {
             Swal.fire({
               icon: 'success',
@@ -154,29 +164,7 @@ export class CourseDataComponent implements OnInit {
   }
 
   delete(row) {
-    Swal.fire({
-      title: 'คุณแน่ใจหรือว่าต้องการลบ?',
-      text:
-        'คุณจะไม่สามารถกู้คืนคอร์ส ' + row.course_name + ' ได้!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'ยืนยัน',
-      cancelButtonText: 'ยกเลิก',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this._Service.deleteCourse(row.courseId).pipe(take(1))
-          .subscribe(() => {
-            Swal.fire({
-              icon: 'success',
-              title: 'ลบข้อมูลสำเร็จ',
-              showConfirmButton: false,
-              timer: 2000,
-            });
-
-            this._changeDetectorRef.markForCheck();
-          })
-      }
-    });
+    
   }
 
   setPage(pageInfo) {
@@ -193,5 +181,65 @@ export class CourseDataComponent implements OnInit {
         this.isLoading = false;
       });
     }
+  }
+
+  deleteConfrim() {
+
+    if (this.confrimDelete.invalid) {
+      return;
+    }
+
+    this.submitted = true;
+    this.isLoading = true;
+
+
+    this.password = this.confrimDelete.value.password
+    this.passwordMain = localStorage.getItem('Password')
+
+    console.log(this.password);
+    console.log(this.passwordMain);
+
+
+    if (this.password !== this.passwordMain) {
+      Swal.fire({
+        title: 'รหัสผ่านไม่ถูกต้อง',
+        text: "กรุณาระบุรหัสผ่านใหม่อีกครั้ง",
+        icon: 'error',
+        timer: 1500
+      })
+    } else {
+      Swal.fire({
+        title: 'คุณแน่ใจหรือว่าต้องการลบ?',
+        text:
+          'คุณจะไม่สามารถกู้คืนคอร์ส ' + this.Items.course_name + ' ได้!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'ยืนยัน',
+        cancelButtonText: 'ยกเลิก',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this._Service.deleteCourse(this.Items.courseId).pipe(take(1))
+            .subscribe(() => {
+              Swal.fire({
+                icon: 'success',
+                title: 'ลบข้อมูลสำเร็จ',
+                showConfirmButton: false,
+                timer: 2000,
+              });
+  
+              this._changeDetectorRef.markForCheck();
+            })
+        }
+      });
+    }
+  }
+
+  openModalConfrimDelete(confrimdelete: TemplateRef<any>, data = null) {
+    this.Items = data;
+    this.ModalList = this.modalService.show(
+      confrimdelete,
+      Object.assign({})
+      // Object.assign({}, { class: 'gray modal-lg' })
+    );
   }
 }

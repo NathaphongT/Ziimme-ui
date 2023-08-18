@@ -11,7 +11,8 @@ import Swal from 'sweetalert2';
 import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import { Province } from '../../basic-data/basic.model';
 import { CustomerPagination } from '@app/_service/pagination.types';
-import { UntypedFormControl } from '@angular/forms';
+import { FormBuilder, FormGroup, UntypedFormControl, Validators } from '@angular/forms';
+import { SaleService } from '@app/_service/sale.service';
 
 @Component({
   selector: 'app-zim-customer',
@@ -20,6 +21,8 @@ import { UntypedFormControl } from '@angular/forms';
 })
 export class ZimCustomerComponent implements OnInit, OnDestroy {
   @ViewChild(DatatableComponent, { static: true }) table: DatatableComponent;
+
+  confrimDelete: FormGroup;
 
   public customers: Customer[];
   province: Province[] = [];
@@ -32,6 +35,13 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
   lastupdate: any = '';
 
   isLoading: boolean;
+  submitted: boolean;
+
+  Items: any;
+  password: any;
+  passwordMain: any;
+  ModalList: BsModalRef;
+
 
   customerPagination: CustomerPagination;
   searchInputControl: UntypedFormControl = new UntypedFormControl();
@@ -40,13 +50,18 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
 
   constructor(private _changeDetectorRef: ChangeDetectorRef,
     private modalService: BsModalService,
+    private _formBuilder: FormBuilder,
     private _serivceCus: CustomerService,
-    private _ServiceBasic: BasicService
   ) {
 
   }
 
   ngOnInit(): void {
+
+    this.confrimDelete = this._formBuilder.group({
+      password: ['', Validators.required]
+    })
+
     this._serivceCus.customersPagination$
       .pipe(takeUntil(this._unsubscribeAll)).subscribe(pagination => {
         this.customerPagination = pagination;
@@ -156,4 +171,67 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
       });
     }
   }
+  
+  deleteConfrim() {
+
+    if (this.confrimDelete.invalid) {
+      return;
+    }
+
+    this.submitted = true;
+    this.isLoading = true;
+
+
+    this.password = this.confrimDelete.value.password
+    this.passwordMain = localStorage.getItem('Password')
+
+    console.log(this.password);
+    console.log(this.passwordMain);
+
+
+    if (this.password !== this.passwordMain) {
+      Swal.fire({
+        title: 'รหัสผ่านไม่ถูกต้อง',
+        text: "กรุณาระบุรหัสผ่านใหม่อีกครั้ง",
+        icon: 'error',
+        timer: 1500
+      })
+    } else {
+      Swal.fire({
+        title: 'คุณแน่ใจหรือว่าต้องการลบ?',
+        text:
+          'คุณสามารถกู้ข้อมูลผู้ใช้งานได้!',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'ยืนยัน',
+        cancelButtonText: 'ยกเลิก',
+      }).then((result) => {
+        if (result.isConfirmed) {
+
+          this._serivceCus.deleteCustomer(this.Items.cusId).pipe(take(1))
+          .subscribe(() => {
+            Swal.fire({
+              icon: 'success',
+              title: 'ลบข้อมูลสำเร็จ',
+              showConfirmButton: false,
+              timer: 2000,
+            });
+            this.ModalList.hide();
+            this._changeDetectorRef.markForCheck();
+          })
+
+        }
+      });
+    }
+  }
+
+  openModalConfrimDelete(confrimdelete: TemplateRef<any>, data = null) {
+    this.Items = data;
+    this.ModalList = this.modalService.show(
+      confrimdelete,
+      Object.assign({})
+      // Object.assign({}, { class: 'gray modal-lg' })
+    );
+  }
 }
+

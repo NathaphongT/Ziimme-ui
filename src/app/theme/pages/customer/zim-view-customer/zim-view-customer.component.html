@@ -8,7 +8,7 @@
         class="btn tw-px-3 tw-py-2 tw-m-0 tw-rounded-md tw-w-40 tw-border-0 tw-bg-green-500 tw-text-white tw-font-normal tw-select-none"
         (click)="openModal(template)">
         <i class="fa-solid fa-user-plus"></i>ข้อมูลการใช้บริการ
-      </button>openModalConfrimDelete
+      </button>
       <!-- <mat-form-field class="example-full-width tw-flex tw-flex-row" appearance="outline">
         <mat-label>ค้นหาข้อมูลลูกค้า</mat-label>
         <mat-icon matPrefix>search</mat-icon>
@@ -147,7 +147,7 @@
     <div class="tw-flex tw-flex-wrap" [formGroup]="saleForm">
       <mat-form-field class="tw-w-1/2 tw-px-2" appearance="outline">
         <mat-label>เลขเอกสาร</mat-label>
-        <input #postalCode maxlength="5" id="saleNumber" name="saleNumber" [formControlName]="'saleNumber'" matInput>
+        <input #postalCode  id="saleNumber" name="saleNumber" [formControlName]="'saleNumber'" matInput>
         <mat-error *ngIf="saleForm.get('saleNumber').hasError('required')">
           <div class="box-error">
             กรุณากรอกเลขเอกสาร
@@ -477,9 +477,9 @@
   </div>
   <div class="modal-footer">
     <button
-      class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
-      type="submit" (click)="deleteConfrim()">บันทึก</button>
-    <a class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
+      class="tw-w-auto tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
+      type="submit" (click)="deleteConfrim()">ยืนยันรหัสผ่าน</button>
+    <a class="tw-w-auto tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
       (click)="ModalList.hide()">ปิด</a>
   </div>
 </ng-template>

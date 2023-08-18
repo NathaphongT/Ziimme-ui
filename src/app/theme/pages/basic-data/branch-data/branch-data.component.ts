@@ -17,22 +17,26 @@ export class BranchDataComponent implements OnInit {
 
   public branchs: Branch;
 
-
   branchForm: FormGroup;
+  confrimDelete: FormGroup;
+
   rows = [];
   ColumnMode = ColumnMode;
 
   isAddMode: boolean;
 
+  ModalList?: BsModalRef;
 
-  modalRef?: BsModalRef;
+  Items: any;
+  password: any;
+  passwordMain: any;
 
   isLoading: boolean;
   submitted: boolean;
 
   branchsPagination: BranchPagination;
   searchInputControl: UntypedFormControl = new UntypedFormControl();
-  
+
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
   constructor(private modalService: BsModalService,
@@ -48,6 +52,10 @@ export class BranchDataComponent implements OnInit {
       branch_name_th: ['', Validators.required],
       branch_name_eng: ['', Validators.required],
     });
+
+    this.confrimDelete = this._formBuilder.group({
+      password: ['', Validators.required]
+    })
 
     this._Service.branchsPagination$
       .pipe(takeUntil(this._unsubscribeAll)).subscribe(pagination => {
@@ -78,7 +86,7 @@ export class BranchDataComponent implements OnInit {
       this.branchForm.patchValue(data);
       // this.isAddMode = false
     }
-    this.modalRef = this.modalService.show(template);
+    this.ModalList = this.modalService.show(template);
   }
 
   get f() { return this.branchForm.controls; }
@@ -110,7 +118,7 @@ export class BranchDataComponent implements OnInit {
           })
         )
         .subscribe((res) => {
-          this.modalRef.hide();
+          this.ModalList.hide();
           if (res) {
             Swal.fire({
               icon: 'success',
@@ -143,7 +151,7 @@ export class BranchDataComponent implements OnInit {
           })
         )
         .subscribe((res) => {
-          this.modalRef.hide();
+          this.ModalList.hide();
           if (res) {
             Swal.fire({
               icon: 'success',
@@ -154,32 +162,6 @@ export class BranchDataComponent implements OnInit {
           }
         });
     }
-  }
-
-  delete(row) {
-    Swal.fire({
-      title: 'คุณแน่ใจหรือว่าต้องการลบ?',
-      text:
-        'คุณจะไม่สามารถกู้คืนตำแหน่ง ' + row.positionNameTh + ' ได้!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'ยืนยัน',
-      cancelButtonText: 'ยกเลิก',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this._Service.deletePosition(row.branchId).pipe(take(1))
-          .subscribe(() => {
-            Swal.fire({
-              icon: 'success',
-              title: 'ลบข้อมูลสำเร็จ',
-              showConfirmButton: false,
-              timer: 2000,
-            });
-
-            this._changeDetectorRef.markForCheck();
-          })
-      }
-    });
   }
 
   setPage(pageInfo) {
@@ -198,4 +180,63 @@ export class BranchDataComponent implements OnInit {
     }
   }
 
+  deleteConfrim() {
+
+    if (this.confrimDelete.invalid) {
+      return;
+    }
+
+    this.submitted = true;
+    this.isLoading = true;
+
+
+    this.password = this.confrimDelete.value.password
+    this.passwordMain = localStorage.getItem('Password')
+
+    console.log(this.password);
+    console.log(this.passwordMain);
+
+
+    if (this.password !== this.passwordMain) {
+      Swal.fire({
+        title: 'รหัสผ่านไม่ถูกต้อง',
+        text: "กรุณาระบุรหัสผ่านใหม่อีกครั้ง",
+        icon: 'error',
+        timer: 1500
+      })
+    } else {
+      Swal.fire({
+        title: 'คุณแน่ใจหรือว่าต้องการลบ?',
+        text:
+          'คุณจะไม่สามารถกู้คืนตำแหน่ง ' + this.Items.positionNameTh + ' ได้!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'ยืนยัน',
+        cancelButtonText: 'ยกเลิก',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this._Service.deletePosition(this.Items.branchId).pipe(take(1))
+            .subscribe(() => {
+              Swal.fire({
+                icon: 'success',
+                title: 'ลบข้อมูลสำเร็จ',
+                showConfirmButton: false,
+                timer: 2000,
+              });
+
+              this._changeDetectorRef.markForCheck();
+            })
+        }
+      });
+    }
+  }
+
+  openModalConfrimDelete(confrimdelete: TemplateRef<any>, data = null) {
+    this.Items = data;
+    this.ModalList = this.modalService.show(
+      confrimdelete,
+      Object.assign({})
+      // Object.assign({}, { class: 'gray modal-lg' })
+    );
+  }
 }

@@ -34,13 +34,13 @@ export class ZimViewCustomerComponent implements OnInit {
   rowsSalepay = [];
   groups = [];
 
-  CusTomer: any;
+  Items: any;
   password: any;
   passwordMain: any;
+  ModalList: BsModalRef;
 
   pros: any;
 
-  ModalList: BsModalRef;
 
   cus_id = null
   pro_id = null
@@ -556,7 +556,7 @@ export class ZimViewCustomerComponent implements OnInit {
       }).then((result) => {
         if (result.isConfirmed) {
 
-          this._serviceSale.deleteSale(this.CusTomer.saleId).pipe(take(1))
+          this._serviceSale.deleteSale(this.Items.saleId).pipe(take(1))
             .subscribe(() => {
               Swal.fire({
                 icon: 'success',
@@ -574,7 +574,7 @@ export class ZimViewCustomerComponent implements OnInit {
   }
 
   openModalConfrimDelete(confrimdelete: TemplateRef<any>, data = null) {
-    this.CusTomer = data;
+    this.Items = data;
     this.ModalList = this.modalService.show(
       confrimdelete,
       Object.assign({})
