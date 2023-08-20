@@ -6,7 +6,7 @@ import { Customer } from '@app/_service/user.types';
 import { CustomerService } from '@app/theme/pages/customer/customer.service';
 import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Districts, PostCode, Province, SubDistricts, Salary } from '../../basic-data/basic.model';
+import { Districts, PostCode, Province, SubDistricts, Salary, Branch } from '../../basic-data/basic.model';
 
 @Component({
   selector: 'app-zim-customers',
@@ -24,6 +24,10 @@ export class ZimCustomersComponent {
   provinces$: Observable<Province[]>
   // districts$: Observable<Districts[]>
   // subdistricts$: Observable<SubDistricts[]>
+
+  branchs$: Observable<Branch[]>
+  Branchs: Branch[] = [];
+
 
   prefix: string[] = ['นาย', 'นาง', 'นางสาว'];
   gender: string[] = ['ชาย', 'หญิง', 'อื่นๆ'];
@@ -71,8 +75,10 @@ export class ZimCustomersComponent {
     private router: Router,
     private _fb: FormBuilder,
     private _Service: BasicService,
-    private _SerivceCus: CustomerService,
     private _activatedRoute: ActivatedRoute,
+    private _serviceCus: CustomerService,
+    private _serviceBase: BasicService
+
   ) {
     this._activatedRoute.paramMap.subscribe(params => {
       this.cusId = params.get('id')
@@ -83,6 +89,7 @@ export class ZimCustomersComponent {
 
     this.customerForm = this._fb.group({
       cusId: [this.cusId],
+      cusBranch: [''],
       cusMember: [''],
       cusPrefix: [''],
       cusFullName: [''],
@@ -107,17 +114,19 @@ export class ZimCustomersComponent {
     });
 
     this.provinces$ = this._Service.provinces$;
+    this.branchs$ = this._serviceBase.branchs$;
 
     if (this.cusId) {
-      this._SerivceCus.customer$.pipe(takeUntil(this._unsubscribeAll)).subscribe(customer => {
+      this._serviceCus.customer$.pipe(takeUntil(this._unsubscribeAll)).subscribe(customer => {
         this.customerForm.patchValue(customer);
       })
     }
+
     this.GetByIdCustomer(this.cusId);
   }
 
   GetByIdCustomer(id) {
-    this._SerivceCus.getByIdCustomer(id).subscribe()
+    this._serviceCus.getByIdCustomer(id).subscribe()
   }
 
   ngOnDestroy(): void {
@@ -139,7 +148,7 @@ export class ZimCustomersComponent {
     let DataCustomer: Customer = this.customerForm.getRawValue();
 
     if (DataCustomer.cusId) {
-      this._SerivceCus.updateCustomer(DataCustomer.cusId, DataCustomer).subscribe((res) => {
+      this._serviceCus.updateCustomer(DataCustomer.cusId, DataCustomer).subscribe((res) => {
         if (res) {
           Swal.fire({
             icon: 'success',
@@ -158,7 +167,7 @@ export class ZimCustomersComponent {
     }
     else {
       this.customerForm.reset();
-      this._SerivceCus.createCustomer(DataCustomer)
+      this._serviceCus.createCustomer(DataCustomer)
         .subscribe((res) => {
           if (res) {
             Swal.fire({

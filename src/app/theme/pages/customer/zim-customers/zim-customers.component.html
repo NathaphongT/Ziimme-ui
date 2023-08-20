@@ -79,6 +79,20 @@
 
           <div class="tw-grid tw-grid-cols-4 tw-gap-4">
             <mat-form-field class="tw-w-full" appearance="outline">
+              <mat-label>สาขาประจำ</mat-label>
+              <mat-select [formControlName]="'cusBranch'">
+                <mat-option value="0">ไม่ระบุ</mat-option>
+                <mat-option *ngFor="let item of (branchs$ | async)" [value]="item.branchId">
+                  {{item.branchCode}}
+                </mat-option>
+              </mat-select>
+              <!-- <mat-error *ngIf="employeeForm.get('empBranch').hasError('required')">
+                <div class="box-error">
+                  กรุณาเลือกสาขา
+                </div>
+              </mat-error> -->
+            </mat-form-field>
+            <mat-form-field class="tw-w-full" appearance="outline">
               <mat-label>เลขสมาชิก</mat-label>
               <input [formControlName]="'cusMember'" matInput>
             </mat-form-field>

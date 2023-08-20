@@ -15,6 +15,7 @@ export interface User {
 
 export interface Customer {
   cusId: number;
+  cusBranch: number;
   cusMember: string;
   cusPrefix: string;
   cusFullName: string;

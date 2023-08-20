@@ -9,7 +9,7 @@ import { SaleService } from '@app/_service/sale.service';
 import { Customer, SaleList } from '@app/_service/user.types';
 import { Observable, forkJoin } from 'rxjs';
 import { BasicService } from '@app/theme/pages/basic-data/basic.service';
-import { Course, Districts, PostCode, Province, SaleCut, SubDistricts } from '../basic-data/basic.model';
+import { Branch, Course, Districts, PostCode, Province, SaleCut, SubDistricts } from '../basic-data/basic.model';
 import { Employee, Sale, SaleEmployee } from '@app/_service/main.types';
 import { CustomerPagination, EmployeePagination, SalePagination } from '@app/_service/pagination.types';
 import { EmployeeService } from '../employee/employee.service';
@@ -48,6 +48,19 @@ export class SubDistrictsResolver implements Resolve<any> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | SubDistricts[]> {
     return this._basicService.getAllSubDistricts();
+  }
+
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class BranchResolver implements Resolve<any> {
+
+  constructor(private _basicService: BasicService) { }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | Branch[]> {
+    return this._basicService.getAllBranch();
   }
 
 }

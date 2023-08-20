@@ -9,7 +9,7 @@ import { Observable, Subject, debounceTime, map, switchMap, take, takeUntil, tap
 import { Customer } from '@app/_service/user.types';
 import Swal from 'sweetalert2';
 import { BasicService } from '@app/theme/pages/basic-data/basic.service';
-import { Province } from '../../basic-data/basic.model';
+import { Branch, Province } from '../../basic-data/basic.model';
 import { CustomerPagination } from '@app/_service/pagination.types';
 import { FormBuilder, FormGroup, UntypedFormControl, Validators } from '@angular/forms';
 import { SaleService } from '@app/_service/sale.service';
@@ -26,6 +26,7 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
 
   public customers: Customer[];
   province: Province[] = [];
+  Branchs: Branch[] = [];
 
   basicRows = [];
   basicSort = [];
@@ -52,6 +53,7 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
     private modalService: BsModalService,
     private _formBuilder: FormBuilder,
     private _serivceCus: CustomerService,
+    private _serviceBase: BasicService
   ) {
 
   }
@@ -78,6 +80,10 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
 
         this.isLoading = false;
       })
+
+    this._serviceBase.branchs$.pipe(takeUntil(this._unsubscribeAll)).subscribe(branchs => {
+      this.Branchs = branchs;
+    })
 
     this.searchInputControl.valueChanges
       .pipe(
@@ -144,6 +150,17 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
     this.table.offset = 0;
   }
 
+  getNameBranch(id: number) {
+    let index = this.Branchs.findIndex(item => item.branchId === id);
+    if (index === -1) {
+      return "-";
+    }
+    else {
+      return this.Branchs[index].branchCode;
+    }
+  }
+
+
   highLight(temp) {
     if (!this.key) {
       return temp;
@@ -171,7 +188,7 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
       });
     }
   }
-  
+
   deleteConfrim() {
 
     if (this.confrimDelete.invalid) {
@@ -209,16 +226,16 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
         if (result.isConfirmed) {
 
           this._serivceCus.deleteCustomer(this.Items.cusId).pipe(take(1))
-          .subscribe(() => {
-            Swal.fire({
-              icon: 'success',
-              title: 'ลบข้อมูลสำเร็จ',
-              showConfirmButton: false,
-              timer: 2000,
-            });
-            this.ModalList.hide();
-            this._changeDetectorRef.markForCheck();
-          })
+            .subscribe(() => {
+              Swal.fire({
+                icon: 'success',
+                title: 'ลบข้อมูลสำเร็จ',
+                showConfirmButton: false,
+                timer: 2000,
+              });
+              this.ModalList.hide();
+              this._changeDetectorRef.markForCheck();
+            })
 
         }
       });

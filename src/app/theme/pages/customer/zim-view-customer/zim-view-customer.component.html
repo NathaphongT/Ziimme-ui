@@ -1,7 +1,12 @@
 <div class="tw-w-full tw-bg-white tw-p-4">
   <div class="tw-container">
     <div class="tw-flex">
-      <span class="tw-text-2xl tw-font-bold tw-text-[#454545] tw-my-5">ข้อมูลการใช้บริการ</span>
+      <span class="tw-text-xl tw-font-bold tw-text-[#454545] tw-my-2">ข้อมูลการใช้บริการ</span>
+
+      <div class="tw-my-2 tw-mx-2 tw-text-xl tw-font-bold tw-text-[#454545]">
+        <span class="tw-mx-2">{{this.cusName}}</span>
+        <span class="tw-mx-2">{{this.cusNumber}}</span>
+      </div>
     </div>
     <div class="tw-flex tw-justify-between tw-items-center">
       <button
@@ -39,43 +44,49 @@
           <div class="tw-basis-1/2">
             <div class="tw-flex tw-flex-col tw-mx-2 tw-p-2">
               <div class="tw-flex  tw-mb-1.5">
-                <span class="tw-text-lg tw-font-semibold tw-rounded-md tw-mr-3">
-                  ราคารวม:
+                <span class="tw-text-base tw-font-semibold tw-rounded-md tw-mr-3">
+                  ยอดชำระ:
                   {{group.value[0].saleBalance}}
                 </span>
 
-                <div *ngIf="group.value[0].saleExtraPay == null">
-                  <button
-                    class="tw-mr-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
-                    (click)="openModalPayment(payment, group.value[0])">ชำระเงิน</button>
+                <div class="tw-mb-2" *ngIf="group.value[0].saleExtraPay == null">
+                  <span class="tw-text-base tw-font-semibold tw-rounded-md tw-mr-3">จ่าย:
+                    -</span>
+                  <span class="tw-text-base tw-font-semibold tw-rounded-md tw-mr-3">คงค้างชำระ:
+                    -</span>
                 </div>
 
-                <div *ngIf="group.value[0].saleExtraPay != group.value[0].salePayOver">
-                  <button
-                    class="tw-mr-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
-                    (click)="openModalPayment(payment, group.value[0])">ชำระเงิน</button>
-                  <button
-                    class="tw-mr-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-blue-500 hover:tw-bg-blue-600"
-                    (click)="openModalHistoryPayment(historypayment, group.value[0])">ประวัติการชำระเงิน</button>
-                </div>
-
-                <div *ngIf="group.value[0].saleExtraPay == group.value[0].salePayOver">
-                  <button
-                    class="tw-mr-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-blue-500 hover:tw-bg-blue-600"
-                    (click)="openModalHistoryPayment(historypayment, group.value[0])">ประวัติการชำระเงิน</button>
+                <div class="tw-mb-2" *ngIf="group.value[0].saleExtraPay !== null">
+                  <span class="tw-text-base tw-font-semibold tw-rounded-md tw-mr-3">จ่าย:
+                    {{group.value[0].saleExtraPay}}</span>
+                  <span class="tw-text-base tw-font-semibold tw-rounded-md tw-mr-3">คงค้างชำระ:
+                    {{group.value[0].salePayOver - group.value[0].saleExtraPay}} </span>
                 </div>
               </div>
-              <div class="tw-flex tw-items-center tw-mb-2" *ngIf="group.value[0].saleExtraPay == null">
-                <span class="tw-text-base tw-font-medium tw-mr-1">ยอดชำระล่าสุด: {{group.value[0].salePay}}</span>
-                <span class="tw-text-base tw-font-medium tw-ml-1">ยอดคงเหลือล่าสุด:
-                  {{group.value[0].salePayOver}}</span>
+
+              <div *ngIf="group.value[0].saleExtraPay == null">
+                <button
+                  class="tw-mr-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
+                  (click)="openModalPayment(payment, group.value[0])">ชำระเงินครั้งแรก</button>
+                <span class="tw-text-red-600 tw-font-semibold">กรุณากดชำระเงินครั้งแรกก่อนทำรายการ</span>
               </div>
 
-              <div class="tw-flex tw-items-center tw-mb-2" *ngIf="group.value[0].saleExtraPay !== null">
-                <span class="tw-text-base tw-font-medium tw-mr-1">ยอดชำระล่าสุด: {{group.value[0].saleExtraPay}}</span>
-                <span class="tw-text-base tw-font-medium tw-ml-1">ยอดคงเหลือล่าสุด:
-                  {{group.value[0].salePayOver - group.value[0].saleExtraPay}} </span>
+              <div *ngIf="group.value[0].saleExtraPay != group.value[0].salePayOver">
+                <button
+                  class="tw-mr-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
+                  (click)="openModalPayment(payment, group.value[0])">ชำระเงิน</button>
+                <button
+                  class="tw-mr-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-blue-500 hover:tw-bg-blue-600"
+                  (click)="openModalHistoryPayment(historypayment, group.value[0])">ประวัติการชำระเงิน</button>
               </div>
+
+              <div
+                *ngIf="group.value[0].saleExtraPay == group.value[0].salePayOver && group.value[0].saleExtraPay != null">
+                <button
+                  class="tw-mr-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-blue-500 hover:tw-bg-blue-600"
+                  (click)="openModalHistoryPayment(historypayment, group.value[0])">ประวัติการชำระเงิน</button>
+              </div>
+
             </div>
           </div>
         </div>
@@ -100,15 +111,20 @@
     <ngx-datatable-column name="ใช้ไปทั้งหมด" editable="true" [flexGrow]="1">
       <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row"
         let-group="group">
-        <b *ngIf="row?.saleCutCount == null" class="tw-text-lg tw-font-bold">ยังไม่เริ่มใช้บริการ</b>
+        <div class="tw-flex tw-items-center" *ngIf="row?.saleCutCount == null">
+          <div class="tw-rounded-lg tw-p-1  tw-border-slate-100 tw-bg-slate-200 tw-text-red-500 ">
+            <b class="tw-text-base tw-font-bold">ยังไม่เริ่มใช้บริการ</b>
+          </div>
+        </div>
         <div class="tw-flex tw-items-center" *ngIf="row?.saleCutCount !== null">
-          <div>
+          <div *ngIf="row.saleCount != row.saleCutCount">
             ใช้ไป
             <b class="tw-text-lg tw-font-bold">{{ row?.saleCutCount }}</b>
             ครั้ง
           </div>
-          <div class="tw-rounded-l tw-p-1" *ngIf="row.saleCount == row.saleCutCount">
-            <b class="tw-text-lg tw-font-bold tw-text-red-600">ใช้บริการครบแล้ว</b>
+          <div class="tw-rounded-lg tw-p-1  tw-border-slate-100 tw-bg-slate-200 tw-text-green-500"
+            *ngIf="row.saleCount == row.saleCutCount">
+            <b class="tw-text-base tw-font-bold ">ใช้บริการครบแล้ว</b>
           </div>
         </div>
       </ng-template>
@@ -147,7 +163,7 @@
     <div class="tw-flex tw-flex-wrap" [formGroup]="saleForm">
       <mat-form-field class="tw-w-1/2 tw-px-2" appearance="outline">
         <mat-label>เลขเอกสาร</mat-label>
-        <input #postalCode  id="saleNumber" name="saleNumber" [formControlName]="'saleNumber'" matInput>
+        <input #postalCode id="saleNumber" name="saleNumber" [formControlName]="'saleNumber'" matInput>
         <mat-error *ngIf="saleForm.get('saleNumber').hasError('required')">
           <div class="box-error">
             กรุณากรอกเลขเอกสาร
@@ -178,10 +194,7 @@
       </mat-error>
     </mat-form-field>
 
-    <div class="tw-w-full tw-px-1 tw-my-3">
-      <button matSuffix mat-raised-button color="primary" class="tw-p-3 tw-m-1 tw-h-12 "
-        (click)="addURL(newUrl.value,newUrl2.value);">เพิ่มคอร์ส</button>
-    </div>
+
     <mat-form-field class="tw-w-1/2 tw-px-2" appearance="outline">
       <mat-label>รายการสินค้า/บริการ</mat-label>
       <mat-select [ngModel]="Products" #newUrl>
@@ -204,6 +217,10 @@
         </div>
       </mat-error> -->
     </mat-form-field>
+    <div class="tw-w-full tw-px-1 tw-flex tw-flex-row tw-items-end">
+      <button matSuffix mat-raised-button color="primary" class="tw-p-3 tw-m-1 tw-h-12 "
+        (click)="addURL(newUrl.value,newUrl2.value);">เพิ่มคอร์ส</button>
+    </div>
     <div *ngFor="let item of this.pros; let i = index" class="flex tw-flex-row">
       <mat-form-field class="tw-w-[45%] tw-p-3" appearance="outline">
         <mat-label>สินค้าและบริการ</mat-label>
@@ -224,8 +241,8 @@
       <mat-form-field class="tw-w-[45%] tw-p-3" appearance="outline">
         <mat-label>สินค้าและบริการ</mat-label>
         <!-- <mat-label>สินค้าและบริการ : {{i+1}}</mat-label> -->
-        <input type="text" value="{{item.courseId}}" [disabled]="isDisabled[i]" [textContent]="textValues[i]"
-          matInput />
+        <input type="text" value="{{getNameCourse(item?.courseId)}}" [disabled]="isDisabled[i]"
+          [textContent]="textValues[i]" matInput />
 
       </mat-form-field>
       <mat-form-field class="tw-w-[45%] tw-p-3" appearance="outline">
@@ -236,13 +253,13 @@
       </mat-form-field>
 
       <button (click)="removeURL(i)"
-        class="tw-w-[10%] tw-bg-red-500 tw-text-white tw-p-3 tw-border-0 tw-font-semibold tw-rounded-lg">Delete</button>
+        class="tw-w-[10%] tw-bg-red-500 tw-text-white tw-p-3 tw-border-0 tw-font-semibold tw-rounded-lg">ลบ</button>
     </div>
 
     <div class="modal-footer">
       <button
-        class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
-        type="submit" (click)="saveSale()">บันทึก</button>
+        class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 "
+        type="submit" (click)="saveSale()" [disabled]="saleForm.invalid">บันทึก</button>
       <a class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
         (click)="ModalList.hide()">ปิด</a>
     </div>
@@ -293,10 +310,12 @@
       </mat-form-field>
       <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>หมอ</mat-label>
-        <mat-select [formControlName]="'saleCutDoctor'">
-          <mat-option *ngFor="let item of Docter" [value]="item.name">
-            {{item.name}}
-          </mat-option>
+        <mat-select [formControlName]="'saleCutDetail'">
+          <ng-container *ngFor="let item of (employees$ | async)">
+            <mat-option *ngIf="item.empPosition == 7" [value]="item.empId">
+              {{item.empFullname}}
+            </mat-option>
+          </ng-container>
         </mat-select>
       </mat-form-field>
       <mat-form-field class="tw-px-2 tw-mb-3 example-full-width tw-w-full" appearance="outline">
@@ -382,22 +401,22 @@
   <div class="modal-body">
     <div class="tw-flex tw-flex-wrap" [formGroup]="salePayForm">
       <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
-        <mat-label>ชื่อคอร์ส</mat-label>
+        <mat-label>เลขที่เอกสาร</mat-label>
         <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'salePayCourse'" matInput>
       </mat-form-field>
       <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
-        <mat-label>ยอดทั้งหมด</mat-label>
+        <mat-label>ยอดรวมทั้งหมด</mat-label>
         <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'salePayBalance'" matInput>
       </mat-form-field>
       <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
+        <mat-label>ยอดค้างชำระ</mat-label>
+        <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'salePayOver'" matInput>
+      </mat-form-field>
+      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>วันที่รับชำระเงิน</mat-label>
         <input [formControlName]="'salePayDate'" matInput [matDatepicker]="picker">
         <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker touchUi #picker></mat-datepicker>
-      </mat-form-field>
-      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
-        <mat-label>ยอดคงเหลือ</mat-label>
-        <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'salePayOver'" matInput>
       </mat-form-field>
       <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>ชำระเพิ่ม</mat-label>

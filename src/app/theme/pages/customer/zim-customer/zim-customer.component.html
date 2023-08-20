@@ -29,9 +29,13 @@
       </ngx-datatable-column>
       <ngx-datatable-column name="รหัสบัตรสมาชิก" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          <!-- {{ row.cusMember }} -->
-          <div [innerHTML]="highLight(row.cusMember)">{{
-            row.cusMember }}</div>
+          <div class="tw-flex tw-flex-row">
+            <div>
+              {{getNameBranch(row.cusBranch)}}
+            </div>
+            <div [innerHTML]="highLight(row.cusMember)">{{
+              row.cusMember }}</div>
+          </div>
         </ng-template>
       </ngx-datatable-column>
 
