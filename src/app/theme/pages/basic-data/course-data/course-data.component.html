@@ -1,7 +1,7 @@
 <div class="tw-w-full tw-bg-white tw-p-4">
   <div class="tw-container">
     <div class="tw-flex">
-      <span class="tw-text-3xl tw-font-bold tw-text-[#454545] tw-my-5">ข้อมูลคอร์ส</span>
+      <span class="tw-text-3xl tw-font-bold tw-text-[#454545] tw-my-5">ข้อมูลคอร์ส ({{this.count}})</span>
     </div>
     <div class="tw-flex tw-justify-between tw-items-center" *ngIf="this.positionMain != 'user'">
       <button
@@ -72,8 +72,7 @@
 <!--Modal-->
 <ng-template #template>
   <div class="modal-header">
-    <h4 *ngIf="!isAddMode" class="modal-title pull-left">เพิ่มข้อมูลคอร์ส</h4>
-    <h4 *ngIf="isAddMode" class="modal-title pull-left">แก้ไขข้อมูลคอร์ส</h4>
+    <h4 class="modal-title pull-left">เพิ่มข้อมูลคอร์ส</h4>
     <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="ModalList.hide()">
       <span aria-hidden="true" class="visually-hidden">&times;</span>
     </button>

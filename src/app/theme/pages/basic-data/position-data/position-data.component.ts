@@ -22,10 +22,10 @@ export class PositionDataComponent implements OnInit {
   positionForm: FormGroup;
   confrimDelete: FormGroup;
 
-  ColumnMode = ColumnMode;
   rows = [];
-
-
+  count: any;
+  ColumnMode = ColumnMode;
+  
   isAddMode: boolean;
 
   ModalList?: BsModalRef;
@@ -70,6 +70,8 @@ export class PositionDataComponent implements OnInit {
     this._Service.positions$
       .pipe(takeUntil(this._unsubscribeAll)).subscribe(positions => {
         this.rows = positions;
+
+        this.count = this.rows.length;
 
         this.rows = [...this.rows];
 

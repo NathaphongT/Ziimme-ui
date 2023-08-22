@@ -21,6 +21,7 @@ export class BranchDataComponent implements OnInit {
   confrimDelete: FormGroup;
 
   rows = [];
+  count: any;
   ColumnMode = ColumnMode;
 
   isAddMode: boolean;
@@ -31,7 +32,7 @@ export class BranchDataComponent implements OnInit {
   password: any;
   passwordMain: any;
   positionMain: any;
-  
+
 
   isLoading: boolean;
   submitted: boolean;
@@ -73,6 +74,8 @@ export class BranchDataComponent implements OnInit {
     this._Service.branchs$
       .pipe(takeUntil(this._unsubscribeAll)).subscribe(branchs => {
         this.rows = branchs;
+
+        this.count = this.rows.length;
 
         this.rows = [...this.rows];
 

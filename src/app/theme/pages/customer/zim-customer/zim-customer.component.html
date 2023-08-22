@@ -19,7 +19,7 @@
 <div class="wrap-body">
   <div class="container">
     <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
-      [footerHeight]="50" [rowHeight]="50" [rows]="basicRows" [loadingIndicator]="isLoading" [externalPaging]="true"
+      [footerHeight]="50" [rowHeight]="50" [rows]="rows" [loadingIndicator]="isLoading" [externalPaging]="true"
       [count]="customerPagination.length" [offset]="customerPagination.page" [limit]="customerPagination.size"
       (page)="setPage($event)" (sort)="sorting($event)">
       <ngx-datatable-column name="#" [canAutoResize]="false" [sortable]="false" [width]="50" [cellClass]="'cellColumn'">
@@ -33,8 +33,7 @@
             <div>
               {{getNameBranch(row.cusBranch)}}
             </div>
-            <div [innerHTML]="highLight(row.cusMember)">{{
-              row.cusMember }}</div>
+            {{row.cusMember}}
           </div>
         </ng-template>
       </ngx-datatable-column>
@@ -70,14 +69,15 @@
         </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column *ngIf="this.positionMain != 'user'" [width]="80" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
+      <ngx-datatable-column *ngIf="this.positionMain != 'user'" [width]="80" [canAutoResize]="false" [sortable]="false"
+        [cellClass]="'cellColumn'">
         <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
           <button class="btn btn-edit" routerLink="./{{ row.cusId }}">แก้ไข</button>
         </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column *ngIf="this.positionMain != 'user'" [width]="80" [canAutoResize]="false"
-        [sortable]="false" [cellClass]="'cellColumn'">
+      <ngx-datatable-column *ngIf="this.positionMain != 'user'" [width]="80" [canAutoResize]="false" [sortable]="false"
+        [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <button class="btn btn-delete" (click)="openModalConfrimDelete(confrimdelete, row)">ลบ</button>
         </ng-template>

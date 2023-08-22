@@ -22,8 +22,9 @@ export class CourseDataComponent implements OnInit {
   confrimDelete: FormGroup;
 
   rows = [];
-  isAddMode: boolean;
+  count: any;
   ColumnMode = ColumnMode;
+  
   ModalList?: BsModalRef;
 
   Items: any;
@@ -68,6 +69,8 @@ export class CourseDataComponent implements OnInit {
     this._Service.courses$
       .pipe(takeUntil(this._unsubscribeAll)).subscribe(courses => {
         this.rows = courses;
+
+        this.count = this.rows.length;
 
         this.rows = [...this.rows];
 

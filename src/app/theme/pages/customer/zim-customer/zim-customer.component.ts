@@ -28,12 +28,9 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
   province: Province[] = [];
   Branchs: Branch[] = [];
 
-  basicRows = [];
-  basicSort = [];
-  ColumnMode = ColumnMode;
-  key: any;
+  rows = [];
   count: any;
-  lastupdate: any = '';
+  ColumnMode = ColumnMode;
 
   isLoading: boolean;
   submitted: boolean;
@@ -42,9 +39,8 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
   password: any;
   passwordMain: any;
   positionMain: any;
-  
-  ModalList: BsModalRef;
 
+  ModalList: BsModalRef;
 
   customerPagination: CustomerPagination;
   searchInputControl: UntypedFormControl = new UntypedFormControl();
@@ -56,21 +52,13 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
     private _formBuilder: FormBuilder,
     private _serivceCus: CustomerService,
     private _serviceBase: BasicService
-  ) {
-
-  }
-
-
+  ) { }
 
   ngOnInit(): void {
 
     this.confrimDelete = this._formBuilder.group({
       password: ['', Validators.required]
     })
-
-    this.positionMain = localStorage.getItem('Position')
-
-    console.log('ข้อมูล',this.positionMain);
 
     this._serivceCus.customersPagination$
       .pipe(takeUntil(this._unsubscribeAll)).subscribe(pagination => {
@@ -82,16 +70,23 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
 
     this._serivceCus.customers$
       .pipe(takeUntil(this._unsubscribeAll)).subscribe(users => {
-        this.basicRows = users;
 
-        this.basicRows = [...this.basicRows];
+        this.rows = users;
+
+        this.count = this.rows.length;
+
+        this.rows = [...this.rows];
 
         this.isLoading = false;
       })
 
-    this._serviceBase.branchs$.pipe(takeUntil(this._unsubscribeAll)).subscribe(branchs => {
-      this.Branchs = branchs;
-    })
+    this._serviceBase.branchs$
+      .pipe(takeUntil(this._unsubscribeAll)).subscribe(branchs => {
+        this.Branchs = branchs;
+      })
+
+    this.positionMain = localStorage.getItem('Position')
+
 
     this.searchInputControl.valueChanges
       .pipe(
@@ -144,22 +139,6 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
     });
   }
 
-  serviceListFilter(event) {
-    const val = event.target.value.toLowerCase();
-    this.key = event.target.value.toLowerCase();
-    const temp = this.basicSort.filter(function (d) {
-      return (
-        d.cusMember.toLowerCase().indexOf(val) !== -1 ||
-        d.cusMember.toLowerCase().indexOf(val) !== -1 ||
-        d.cusFullName.toLowerCase().indexOf(val) !== -1 ||
-        d.cusFullName.toLowerCase().indexOf(val) !== -1 ||
-        !val
-      );
-    });
-    this.basicRows = temp;
-    this.table.offset = 0;
-  }
-
   getNameBranch(id: number) {
     let index = this.Branchs.findIndex(item => item.branchId === id);
     if (index === -1) {
@@ -169,19 +148,6 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
       return this.Branchs[index].branchCode;
     }
   }
-
-
-  highLight(temp) {
-    if (!this.key) {
-      return temp;
-    }
-    if (temp != null) {
-      return temp.replace(new RegExp(this.key, 'gi'), (match) => {
-        return '<span class="highlightText">' + match + '</span>';
-      });
-    }
-  }
-
 
   setPage(pageInfo) {
     this.customerPagination.page = pageInfo.offset + 1;

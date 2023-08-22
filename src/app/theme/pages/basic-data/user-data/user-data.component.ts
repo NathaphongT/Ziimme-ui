@@ -20,7 +20,7 @@ export class UserDataComponent implements OnInit {
 
   user = [];
   rows = [];
-
+  count: any;
   public users: User;
 
   ModalList?: BsModalRef;
@@ -75,6 +75,8 @@ export class UserDataComponent implements OnInit {
     this._Service.users$
       .pipe(takeUntil(this._unsubscribeAll)).subscribe(users => {
         this.rows = users;
+
+        this.count = this.rows.length;
 
         this.rows = [...this.rows];
 
