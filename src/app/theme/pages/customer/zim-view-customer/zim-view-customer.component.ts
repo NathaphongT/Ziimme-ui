@@ -37,6 +37,8 @@ export class ZimViewCustomerComponent implements OnInit {
   Items: any;
   password: any;
   passwordMain: any;
+  positionMain: any;
+
   ModalList: BsModalRef;
 
   pros: any;
@@ -166,6 +168,8 @@ export class ZimViewCustomerComponent implements OnInit {
       salePayBalance: [{ value: '', disabled: true }],
       salePayOver: [{ value: '', disabled: true }],
     })
+
+    this.positionMain = localStorage.getItem('Position')
 
     this.sale$ = this._serviceSale.sale$;
 

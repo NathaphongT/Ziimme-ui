@@ -3,7 +3,7 @@
     <div class="tw-flex">
       <span class="tw-text-3xl tw-font-bold tw-text-[#454545] tw-my-5">รายชื่อพนักงาน ({{this.count}})</span>
     </div>
-    <div class="tw-flex tw-justify-between tw-items-center">
+    <div class="tw-flex tw-justify-between tw-items-center" *ngIf="this.positionMain != 'user'">
       <button
         class="btn tw-px-3 tw-py-2 tw-m-0 tw-rounded-md tw-w-40 tw-border-0 tw-bg-green-500 tw-text-white tw-font-normal tw-select-none"
         (click)="openModal(template)">
@@ -29,12 +29,12 @@
           <button class="btn btn-views" routerLink="./{{ row.empId }}">ข้อมูล</button>
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column name="" [width]="70" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
+      <ngx-datatable-column *ngIf="this.positionMain != 'user'" [width]="70" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <button class="btn btn-edit" (click)="openModal(template, row)">แก้ไข</button>
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column name="" [width]="70" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
+      <ngx-datatable-column *ngIf="this.positionMain != 'user'" [width]="70" [canAutoResize]="false" [sortable]="false"  [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <button class="btn btn-delete" (click)="delete(row)">ลบ</button>
         </ng-template>

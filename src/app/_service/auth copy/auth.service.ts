@@ -42,6 +42,7 @@ export class AuthService {
       map((response: any) => response.data),
       switchMap((response: any) => {
 
+        localStorage.setItem('Position', response.userRole);
 
         this.accessToken = response.token.split(" ")[1];
 
@@ -60,6 +61,7 @@ export class AuthService {
   signOut(): Observable<any> {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('Password');
+    localStorage.removeItem('Position');
     this._authenticated = false;
     return this._httpClient.get(`${environment.APIURL_LOCAL}/api/v1.0/logout`).pipe(
       tap((response) => {

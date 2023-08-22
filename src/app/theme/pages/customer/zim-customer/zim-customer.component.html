@@ -70,13 +70,14 @@
         </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column name="" [width]="80" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
+      <ngx-datatable-column *ngIf="this.positionMain != 'user'" [width]="80" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
         <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
           <button class="btn btn-edit" routerLink="./{{ row.cusId }}">แก้ไข</button>
         </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column name="" [width]="80" [canAutoResize]="false" [sortable]="false" [cellClass]="'cellColumn'">
+      <ngx-datatable-column *ngIf="this.positionMain != 'user'" [width]="80" [canAutoResize]="false"
+        [sortable]="false" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
           <button class="btn btn-delete" (click)="openModalConfrimDelete(confrimdelete, row)">ลบ</button>
         </ng-template>
@@ -98,8 +99,8 @@
     <div class="tw-flex tw-flex-wrap" [formGroup]="confrimDelete">
       <mat-form-field class="tw-w-full tw-px-2" appearance="outline">
         <mat-label>รหัสผ่าน</mat-label>
-        <input id="password" name="password" type="password" [formControlName]="'password'" placeholder="กรุณาระบุรหัสผ่าน" ngModel=""
-          matInput>
+        <input id="password" name="password" type="password" [formControlName]="'password'"
+          placeholder="กรุณาระบุรหัสผ่าน" ngModel="" matInput>
         <mat-error *ngIf="confrimDelete.get('password').hasError('required')">
           <div class="box-error">
             กรุณาระบุรหัสผ่าน

@@ -33,6 +33,7 @@ export class PositionDataComponent implements OnInit {
   Items: any;
   password: any;
   passwordMain: any;
+  positionMain: any;
 
   isLoading: boolean;
   submitted: boolean;
@@ -55,6 +56,8 @@ export class PositionDataComponent implements OnInit {
     this.confrimDelete = this._formBuilder.group({
       password: ['', Validators.required]
     })
+
+    this.positionMain = localStorage.getItem('Position')
 
     this._Service.positionsPagination$
       .pipe(takeUntil(this._unsubscribeAll)).subscribe(pagination => {

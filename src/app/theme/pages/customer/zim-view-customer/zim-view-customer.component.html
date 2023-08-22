@@ -33,7 +33,7 @@
             <div class="tw-flex tw-items-center  tw-mb-1.5">
               <span class="tw-text-lg tw-font-semibold tw-rounded-md tw-mr-3">
                 เลขที่เอกสาร : {{group.value[0].saleNumber}}</span>
-              <button
+              <button *ngIf="this.positionMain != 'user'"
                 class="tw-p-1.5 tw-mx-2 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
                 (click)="openModalConfrimDelete(confrimdelete, group.value[0])">ลบคอร์ส</button>
             </div>

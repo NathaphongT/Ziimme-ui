@@ -28,6 +28,7 @@ export class UserDataComponent implements OnInit {
   Items: any;
   password: any;
   passwordMain: any;
+  positionMain: any;
 
 
   submitted: boolean;
@@ -60,6 +61,8 @@ export class UserDataComponent implements OnInit {
     this.confrimDelete = this._formBuilder.group({
       password: ['', Validators.required]
     })
+
+    this.positionMain = localStorage.getItem('Position')
 
     this._Service.usersPagination$
       .pipe(takeUntil(this._unsubscribeAll)).subscribe(pagination => {

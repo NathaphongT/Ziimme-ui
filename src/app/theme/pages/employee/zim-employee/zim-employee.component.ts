@@ -43,6 +43,8 @@ export class ZimEmployeeComponent implements OnInit {
 
   status: string[] = ['โสด', 'สมรส', 'อื่นๆ'];
 
+  positionMain: any;
+
   isLoading: boolean;
   submitted: boolean;
 
@@ -74,6 +76,8 @@ export class ZimEmployeeComponent implements OnInit {
       empPosition: ['', Validators.required],
       empBranch: ['', Validators.required],
     });
+
+    this.positionMain = localStorage.getItem('Position')
 
     this.positions$ = this._SerivceBasic.positions$;
     this._SerivceBasic.positions$.pipe(takeUntil(this._unsubscribeAll)).subscribe(positions => {

@@ -41,6 +41,8 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
   Items: any;
   password: any;
   passwordMain: any;
+  positionMain: any;
+  
   ModalList: BsModalRef;
 
 
@@ -58,11 +60,17 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
 
   }
 
+
+
   ngOnInit(): void {
 
     this.confrimDelete = this._formBuilder.group({
       password: ['', Validators.required]
     })
+
+    this.positionMain = localStorage.getItem('Position')
+
+    console.log('ข้อมูล',this.positionMain);
 
     this._serivceCus.customersPagination$
       .pipe(takeUntil(this._unsubscribeAll)).subscribe(pagination => {
@@ -102,6 +110,8 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
       .subscribe();
 
   }
+
+
 
   ngOnDestroy(): void {
     this._unsubscribeAll.next(null);
@@ -198,13 +208,8 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
     this.submitted = true;
     this.isLoading = true;
 
-
     this.password = this.confrimDelete.value.password
     this.passwordMain = localStorage.getItem('Password')
-
-    console.log(this.password);
-    console.log(this.passwordMain);
-
 
     if (this.password !== this.passwordMain) {
       Swal.fire({

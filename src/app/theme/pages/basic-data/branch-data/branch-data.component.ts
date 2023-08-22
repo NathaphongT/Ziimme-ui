@@ -30,6 +30,8 @@ export class BranchDataComponent implements OnInit {
   Items: any;
   password: any;
   passwordMain: any;
+  positionMain: any;
+  
 
   isLoading: boolean;
   submitted: boolean;
@@ -56,6 +58,9 @@ export class BranchDataComponent implements OnInit {
     this.confrimDelete = this._formBuilder.group({
       password: ['', Validators.required]
     })
+
+    this.positionMain = localStorage.getItem('Position')
+
 
     this._Service.branchsPagination$
       .pipe(takeUntil(this._unsubscribeAll)).subscribe(pagination => {
