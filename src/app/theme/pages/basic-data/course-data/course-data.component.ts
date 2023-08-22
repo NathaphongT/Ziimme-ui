@@ -226,7 +226,7 @@ export class CourseDataComponent implements OnInit {
                 showConfirmButton: false,
                 timer: 2000,
               });
-  
+              this.ModalList.hide();
               this._changeDetectorRef.markForCheck();
             })
         }

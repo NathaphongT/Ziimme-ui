@@ -484,7 +484,7 @@
     <div class="tw-flex tw-flex-wrap" [formGroup]="confrimDelete">
       <mat-form-field class="tw-w-full tw-px-2" appearance="outline">
         <mat-label>รหัสผ่าน</mat-label>
-        <input id="password" name="password" [formControlName]="'password'" placeholder="กรุณาระบุรหัสผ่าน" ngModel=""
+        <input id="password" name="password" type="password" [formControlName]="'password'" placeholder="กรุณาระบุรหัสผ่าน" ngModel=""
           matInput>
         <mat-error *ngIf="confrimDelete.get('password').hasError('required')">
           <div class="box-error">

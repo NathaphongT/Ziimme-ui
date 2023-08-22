@@ -83,7 +83,7 @@
       </mat-form-field>
       <mat-form-field class="tw-w-full tw-mb-3" appearance="outline">
         <mat-label>รหัสผ่าน</mat-label>
-        <input [formControlName]="'password'" matInput [type]="hide ? 'password' : 'text'">
+        <input [formControlName]="'password'" type="password"  matInput [type]="hide ? 'password' : 'text'">
         <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'"
           [attr.aria-pressed]="hide">
           <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
@@ -155,7 +155,7 @@
     <div class="tw-flex tw-flex-wrap" [formGroup]="confrimDelete">
       <mat-form-field class="tw-w-full tw-px-2" appearance="outline">
         <mat-label>รหัสผ่าน</mat-label>
-        <input id="password" name="password" [formControlName]="'password'" placeholder="กรุณาระบุรหัสผ่าน" ngModel=""
+        <input id="password" name="password" type="password" [formControlName]="'password'" placeholder="กรุณาระบุรหัสผ่าน" ngModel=""
           matInput>
         <mat-error *ngIf="confrimDelete.get('password').hasError('required')">
           <div class="box-error">
