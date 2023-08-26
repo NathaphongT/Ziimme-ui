@@ -356,7 +356,7 @@ export class ZimViewCustomerComponent implements OnInit {
           showConfirmButton: false,
           timer: 2000,
         }).then((result) => {
-
+          location.reload();
         });
       }
       );
