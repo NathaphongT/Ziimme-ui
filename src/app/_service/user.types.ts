@@ -73,5 +73,6 @@ export interface SaleListEmp {
   saleId: number;
   saleDate: Date;
   courseNameEng: string;
+  courseCode: string;
   courseNameTh: string;
 }
