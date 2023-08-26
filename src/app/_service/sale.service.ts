@@ -248,12 +248,13 @@ export class SaleService {
     )
   }
 
-  saveSale(saleNumber, saleBalance, salePayment, saleOverdue, cusId): Observable<any> {
+  saveSale(saleNumber, saleBalance, salePayment, saleOverdue, saleDate, cusId): Observable<any> {
     return this._httpClient.post(`${environment.APIURL_LOCAL}/api/v1.0/sales`, {
       saleNumber,
       saleBalance,
       salePayment,
       saleOverdue,
+      saleDate,
       cusId,
     }).pipe(
       tap((v) => console.log("saveAll", v))
@@ -293,12 +294,13 @@ export class SaleService {
     );
   }
 
-  saveAll(saleNumber, saleBalance,salePayment, saleOverdue, cusId, consultantList, courseId = []): Observable<any> {
+  saveAll(saleNumber, saleBalance, salePayment, saleOverdue, saleDate, cusId, consultantList, courseId = []): Observable<any> {
     return this.saveSale(
       saleNumber,
       saleBalance,
       salePayment,
       saleOverdue,
+      saleDate,
       cusId,
     ).pipe(
       concatMap(wh => this.saveSaleEmployee(wh.saleId, wh.cusId, consultantList).pipe(

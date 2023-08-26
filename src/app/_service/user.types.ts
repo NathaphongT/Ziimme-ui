@@ -66,7 +66,10 @@ export interface SaleListEmp {
   saleNumber: number;
   saleBalance: number;
   cusFullName: string;
+  cusMember: string;
+  cusBranch: string;
   courseId: string;
   empId: number;
-  empFullname: string;
+  saleId: number;
+  saleDate: Date;
 }

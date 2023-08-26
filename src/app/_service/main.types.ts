@@ -25,6 +25,7 @@ export interface Sale {
     saleBalance: string;
     salePayment: string;
     saleOverdue: string;
+    saleDate: Date;
     cusId: number;
     recordStatus: string;
     createdTime: Date;

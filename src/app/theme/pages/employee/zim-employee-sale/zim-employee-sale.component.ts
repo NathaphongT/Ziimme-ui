@@ -3,7 +3,7 @@ import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import { SaleService } from '@app/_service/sale.service';
 import { ColumnMode } from '@swimlane/ngx-datatable';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { Course } from '../../basic-data/basic.model';
+import { Branch, Course } from '../../basic-data/basic.model';
 import { Employee, Sale } from '@app/_service/main.types';
 import { EmployeeService } from '../employee.service';
 
@@ -28,6 +28,8 @@ export class ZimEmployeeSaleComponent implements OnInit {
   sale$: Observable<Sale[]>
   Sales: Sale[] = [];
 
+  branchs: Branch[] = [];
+
   isLoading: boolean;
   submitted: boolean;
 
@@ -48,16 +50,11 @@ export class ZimEmployeeSaleComponent implements OnInit {
 
       this.isLoading = false;
     })
-  }
 
-  getNameEmployee(id: number) {
-    let index = this.Employees.findIndex(type => type.empId === id);
-    if (index === -1) {
-      return "-";
-    }
-    else {
-      return this.Employees[index].empFullname;
-    }
+    this._SerivceBasic.branchs$
+      .pipe(takeUntil(this._unsubscribeAll)).subscribe(branchs => {
+        this.branchs = branchs;
+      })
   }
 
   getNameProduct(id: number) {
