@@ -26,7 +26,7 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
 
   public customers: Customer[];
   province: Province[] = [];
-  Branchs: Branch[] = [];
+  branchs: Branch[] = [];
 
   rows = [];
   count: any;
@@ -82,7 +82,7 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
 
     this._serviceBase.branchs$
       .pipe(takeUntil(this._unsubscribeAll)).subscribe(branchs => {
-        this.Branchs = branchs;
+        this.branchs = branchs;
       })
 
     this.positionMain = localStorage.getItem('Position')
@@ -140,12 +140,12 @@ export class ZimCustomerComponent implements OnInit, OnDestroy {
   }
 
   getNameBranch(id: number) {
-    let index = this.Branchs.findIndex(item => item.branchId === id);
+    let index = this.branchs.findIndex(item => item.branchId === id);
     if (index === -1) {
       return "-";
     }
     else {
-      return this.Branchs[index].branchCode;
+      return this.branchs[index].branchCode;
     }
   }
 

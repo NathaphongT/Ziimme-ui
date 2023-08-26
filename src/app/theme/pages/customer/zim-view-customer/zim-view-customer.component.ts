@@ -8,7 +8,7 @@ import { BasicService } from '@app/theme/pages/basic-data/basic.service';
 import { SaleService } from '@app/_service/sale.service';
 import Swal from 'sweetalert2';
 import { CustomerService } from '@app/theme/pages/customer/customer.service';
-import { Course, SaleCut, SalePay } from '../../basic-data/basic.model';
+import { Branch, Course, SaleCut, SalePay } from '../../basic-data/basic.model';
 import { Employee, Sale } from '@app/_service/main.types';
 import { EmployeeService } from '../../employee/employee.service';
 import { SalePagination } from '@app/_service/pagination.types';
@@ -27,6 +27,8 @@ export class ZimViewCustomerComponent implements OnInit {
 
   saleCutForm: FormGroup;
   salePayForm: FormGroup;
+
+  dataPayForm: any;
 
   ColumnMode = ColumnMode;
   rows = [];
@@ -59,6 +61,7 @@ export class ZimViewCustomerComponent implements OnInit {
 
   Employee: Employee[] = [];
   courses: Course[] = [];
+  branchs: Branch[] = [];
 
   employ: any;
 
@@ -89,7 +92,9 @@ export class ZimViewCustomerComponent implements OnInit {
 
   salePayOderBy = [];
   salePayOderByID: any
-  salePayOderByBalance: any = "";
+  salePayment: any;
+  salePayOverdue: any;
+  salePayBalacne: any = "";
   salePayOderByOver: any = "";
   salePayOderByEx: any = "";
 
@@ -98,6 +103,7 @@ export class ZimViewCustomerComponent implements OnInit {
   salePayShowDataEx: any = "";
 
   cusData: any = "";
+  cusDataArray: any = "";
   cusName: any = "";
   cusNumber: any = "";
 
@@ -125,6 +131,8 @@ export class ZimViewCustomerComponent implements OnInit {
       saleId: [this.cus_id],
       saleNumber: [{ value: '', enabled: !!this.cus_id }, Validators.required],
       saleBalance: [{ value: '', enabled: !!this.cus_id }, Validators.required],
+      salePayment: [{ value: '', enabled: !!this.cus_id }, Validators.required],
+      saleOverdue: [{ value: '', enabled: !!this.cus_id }, Validators.required],
       cusId: [this.cus_id],
     });
 
@@ -143,16 +151,16 @@ export class ZimViewCustomerComponent implements OnInit {
     this.saleCutForm = this._formBuilder.group({
       saleCutId: [null],
       saleCutCourse: [{ value: '', disabled: true }],
-      saleCutCount: [{ value: '' }, Validators.required],
-      saleCount: ['', Validators.required],
+      saleCutCount: [{ value: '' }],
+      saleCount: [''],
       saleCutVitamin: ['', Validators.required],
       saleCutMark: ['', Validators.required],
       saleCutTherapist: ['', Validators.required],
       saleCutDoctor: ['', Validators.required],
-      saleCutDetail: ['', Validators.required],
+      saleCutDetail: [''],
       saleCutDate: ['', Validators.required],
-      saleId: ['', Validators.required],
-      saleProductId: ['', Validators.required],
+      saleId: [''],
+      saleProductId: [''],
       courseId: ['', Validators.required],
     })
 
@@ -166,6 +174,7 @@ export class ZimViewCustomerComponent implements OnInit {
       cusId: ['', Validators.required],
       salePayCourse: [{ value: '', disabled: true }],
       salePayBalance: [{ value: '', disabled: true }],
+      saleLastPaymet: [{ value: '', disabled: true }],
       salePayOver: [{ value: '', disabled: true }],
     })
 
@@ -183,9 +192,16 @@ export class ZimViewCustomerComponent implements OnInit {
       this.courses = courses;
     })
 
+    this._SerivceBasic.branchs$
+      .pipe(takeUntil(this._unsubscribeAll)).subscribe(branchs => {
+        this.branchs = branchs;
+      })
+
     this._serivceCustomer.salelists$.pipe(takeUntil(this._unsubscribeAll)).subscribe(sales => {
 
       this.rows = sales;
+
+      console.log(this.rows);
 
       this.rows = [...this.rows];
 
@@ -194,10 +210,10 @@ export class ZimViewCustomerComponent implements OnInit {
 
     this._serivceCustomer.getByIdCustomer(this.cus_id).subscribe((res) => {
       this.cusData = res;
-      this.cusName = this.cusData.cusFullName
-      this.cusNumber = this.cusData.cusMember
-      console.log(this.cusNumber);
-      
+      this.cusDataArray = [this.cusData]
+
+      console.log([this.cusDataArray]);
+
     })
   }
 
@@ -303,6 +319,9 @@ export class ZimViewCustomerComponent implements OnInit {
       return;
     }
 
+    console.log("ข้อมูลขาย", this.saleForm.value);
+
+
     this.submitted = true;
     this.isLoading = true;
 
@@ -313,6 +332,8 @@ export class ZimViewCustomerComponent implements OnInit {
     this._serviceSale.saveAll(
       saleViewData.saleNumber,
       saleViewData.saleBalance,
+      saleViewData.salePayment,
+      saleViewData.saleOverdue,
       saleViewData.cusId,
       saleEmployeeData.empId,
       saleProductData,)
@@ -335,10 +356,11 @@ export class ZimViewCustomerComponent implements OnInit {
           showConfirmButton: false,
           timer: 2000,
         }).then((result) => {
-          window.location.reload();
+
         });
       }
       );
+
   }
 
 
@@ -348,6 +370,9 @@ export class ZimViewCustomerComponent implements OnInit {
   }
 
   openModalCutCourse(cutcourse: TemplateRef<any>, data = null) {
+
+    this.saleCutForm.reset();
+
     this.saleCutForm.patchValue({ saleId: data.saleId })
     this.saleCutForm.patchValue({ saleProductId: data.saleProductId })
     this.saleCutForm.patchValue({ courseId: data.courseId })
@@ -431,27 +456,34 @@ export class ZimViewCustomerComponent implements OnInit {
 
   openModalPayment(payment: TemplateRef<any>, data = null) {
 
-    console.log(data);
+    this.dataPayForm = [data];
+
+    this.salePayForm.reset();
 
     this.salePayForm.patchValue({ saleId: data.saleId })
-    this.salePayForm.patchValue({ saleProductId: data.saleProductId })
-    this.salePayForm.patchValue({ courseId: data.courseId })
     this.salePayForm.patchValue({ salePayCourse: data.saleNumber })
     this.salePayForm.patchValue({ cusId: data.cusId })
+    this.salePayForm.patchValue({ saleProductId: data.saleProductId })
+    this.salePayForm.patchValue({ courseId: data.courseId })
+
 
     this._serviceSale.getSaleBYIDSalePay(data.saleProductId).subscribe((res) => {
       this.salePayOderBy = res
       this.salePayOderByID = Object.assign({}, res);
       console.log('res', this.salePayOderBy);
-      this.salePayOderByBalance = this.salePayOderByID[0]?.salePayBalance
+      this.salePayBalacne = this.salePayOderByID[0]?.salePayBalance
       this.salePayOderByOver = this.salePayOderByID[0]?.salePayOver
       this.salePayOderByEx = this.salePayOderByID[0]?.saleExtraPay
+      this.salePayment = this.salePayOderByID[0]?.salePayment
+      this.salePayOverdue = this.salePayOderByID[0]?.saleOverdue
 
       if (this.salePayOderBy.length <= 0) {
         this.salePayForm.patchValue({ salePayBalance: data?.saleBalance })
-        this.salePayForm.patchValue({ salePayOver: data?.saleBalance })
+        this.salePayForm.patchValue({ saleLastPaymet: data?.salePayment })
+        this.salePayForm.patchValue({ salePayOver: data?.saleOverdue })
       } else {
-        this.salePayForm.patchValue({ salePayBalance: this.salePayOderByBalance })
+        this.salePayForm.patchValue({ salePayBalance: this.salePayBalacne })
+        this.salePayForm.patchValue({ saleLastPaymet: this.salePayOderByEx })
         this.salePayForm.patchValue({ salePayOver: this.salePayOderByOver - this.salePayOderByEx })
       }
     })
@@ -516,10 +548,6 @@ export class ZimViewCustomerComponent implements OnInit {
     );
   }
 
-  delete(row) {
-
-  }
-
   deleteConfrim() {
 
     if (this.confrimDelete.invalid) {
@@ -574,6 +602,9 @@ export class ZimViewCustomerComponent implements OnInit {
   }
 
   openModalConfrimDelete(confrimdelete: TemplateRef<any>, data = null) {
+
+    this.confrimDelete.reset();
+
     this.Items = data;
     this.ModalList = this.modalService.show(
       confrimdelete,
@@ -601,6 +632,5 @@ export class ZimViewCustomerComponent implements OnInit {
       return this.courses[index].courseNameTh;
     }
   }
-
 
 }

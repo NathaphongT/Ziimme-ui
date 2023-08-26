@@ -1,18 +1,25 @@
 <div class="tw-w-full tw-bg-white tw-p-4">
   <div class="tw-container">
-    <div class="tw-flex">
-      <span class="tw-text-xl tw-font-bold tw-text-[#454545] tw-my-2">ข้อมูลการใช้บริการ</span>
-
-      <div class="tw-my-2 tw-mx-2 tw-text-xl tw-font-bold tw-text-[#454545]">
-        <span class="tw-mx-2">{{this.cusName}}</span>
-        <span class="tw-mx-2">{{this.cusNumber}}</span>
+    <div class="tw-flex tw-flex-row tw-items-center">
+      <div class="">
+        <span class="tw-text-xl tw-font-bold tw-text-[#454545] tw-my-2">ข้อมูลการใช้บริการ</span>
+      </div>
+      <div class="tw-my-2 tw-mx-2 " *ngFor="let item of cusDataArray">
+        <span class="tw-mx-2 tw-text-lg tw-font-bold tw-text-[#454545]">ชื่อ: {{item.cusFullName}}</span>
+        <ng-container [ngSwitch]="item.cusBranch">
+          <span *ngSwitchCase="1" class="tw-text-lg tw-font-bold tw-text-[#454545]">รหัสบัตรสมาชิก:
+            zeer{{item.cusMember}}</span>
+          <span *ngSwitchCase="2" class="tw-text-lg tw-font-bold tw-text-[#454545]">รหัสบัตรสมาชิก:
+            NKS{{item.cusMember}}</span>
+          <span *ngSwitchCase="3" class="tw-text-lg tw-font-bold tw-text-[#454545]">รหัสบัตรสมาชิก:
+            PCB{{item.cusMember}}</span>
+        </ng-container>
       </div>
     </div>
+
     <div class="tw-flex tw-justify-between tw-items-center">
-      <button
-        class="btn tw-px-3 tw-py-2 tw-m-0 tw-rounded-md tw-w-40 tw-border-0 tw-bg-green-500 tw-text-white tw-font-normal tw-select-none"
-        (click)="openModal(template)">
-        <i class="fa-solid fa-user-plus"></i>ข้อมูลการใช้บริการ
+      <button mat-flat-button class=" tw-bg-green-500 tw-text-white" (click)="openModal(template)">
+        <i class="fa-solid fa-user-plus tw-mr-2"></i>เพิ่มข้อมูลคอร์ส
       </button>
       <!-- <mat-form-field class="example-full-width tw-flex tw-flex-row" appearance="outline">
         <mat-label>ค้นหาข้อมูลลูกค้า</mat-label>
@@ -33,8 +40,7 @@
             <div class="tw-flex tw-items-center  tw-mb-1.5">
               <span class="tw-text-lg tw-font-semibold tw-rounded-md tw-mr-3">
                 เลขที่เอกสาร : {{group.value[0].saleNumber}}</span>
-              <button *ngIf="this.positionMain != 'user'"
-                class="tw-p-1.5 tw-mx-2 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
+              <button mat-flat-button color="warn" *ngIf="this.positionMain != 'user'"
                 (click)="openModalConfrimDelete(confrimdelete, group.value[0])">ลบคอร์ส</button>
             </div>
             <div class="tw-flex tw-items-center tw-mb-2">
@@ -51,9 +57,9 @@
 
                 <div class="tw-mb-2" *ngIf="group.value[0].saleExtraPay == null">
                   <span class="tw-text-base tw-font-semibold tw-rounded-md tw-mr-3">จ่าย:
-                    -</span>
+                    {{group.value[0].salePayment}}</span>
                   <span class="tw-text-base tw-font-semibold tw-rounded-md tw-mr-3">คงค้างชำระ:
-                    -</span>
+                    {{group.value[0].saleOverdue}}</span>
                 </div>
 
                 <div class="tw-mb-2" *ngIf="group.value[0].saleExtraPay !== null">
@@ -65,25 +71,21 @@
               </div>
 
               <div *ngIf="group.value[0].saleExtraPay == null">
-                <button
-                  class="tw-mr-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
-                  (click)="openModalPayment(payment, group.value[0])">ชำระเงินครั้งแรก</button>
-                <span class="tw-text-red-600 tw-font-semibold">กรุณากดชำระเงินครั้งแรกก่อนทำรายการ</span>
+
+                <button mat-flat-button class="tw-bg-green-500 tw-text-white tw-mr-1"
+                  (click)="openModalPayment(payment, group.value[0])">ชำระเพิ่ม</button>
               </div>
 
               <div *ngIf="group.value[0].saleExtraPay != group.value[0].salePayOver">
-                <button
-                  class="tw-mr-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
-                  (click)="openModalPayment(payment, group.value[0])">ชำระเงิน</button>
-                <button
-                  class="tw-mr-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-blue-500 hover:tw-bg-blue-600"
+                <button mat-flat-button class="tw-bg-green-500 tw-text-white tw-mr-1"
+                  (click)="openModalPayment(payment, group.value[0])">ชำระเพิ่ม</button>
+                <button mat-flat-button color="primary"
                   (click)="openModalHistoryPayment(historypayment, group.value[0])">ประวัติการชำระเงิน</button>
               </div>
 
               <div
                 *ngIf="group.value[0].saleExtraPay == group.value[0].salePayOver && group.value[0].saleExtraPay != null">
-                <button
-                  class="tw-mr-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-blue-500 hover:tw-bg-blue-600"
+                <button mat-flat-button color="primary"
                   (click)="openModalHistoryPayment(historypayment, group.value[0])">ประวัติการชำระเงิน</button>
               </div>
 
@@ -112,9 +114,7 @@
       <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row"
         let-group="group">
         <div class="tw-flex tw-items-center" *ngIf="row?.saleCutCount == null">
-          <div class="tw-rounded-lg tw-p-1  tw-border-slate-100 tw-bg-slate-200 tw-text-red-500 ">
-            <b class="tw-text-base tw-font-bold">ยังไม่เริ่มใช้บริการ</b>
-          </div>
+          <b class="tw-text-base tw-font-bold tw-text-red-600">ยังไม่เริ่มใช้บริการ</b>
         </div>
         <div class="tw-flex tw-items-center" *ngIf="row?.saleCutCount !== null">
           <div *ngIf="row.saleCount != row.saleCutCount">
@@ -122,8 +122,7 @@
             <b class="tw-text-lg tw-font-bold">{{ row?.saleCutCount }}</b>
             ครั้ง
           </div>
-          <div class="tw-rounded-lg tw-p-1  tw-border-slate-100 tw-bg-slate-200 tw-text-green-500"
-            *ngIf="row.saleCount == row.saleCutCount">
+          <div class="  tw-text-green-500" *ngIf="row.saleCount == row.saleCutCount">
             <b class="tw-text-base tw-font-bold ">ใช้บริการครบแล้ว</b>
           </div>
         </div>
@@ -133,16 +132,13 @@
       <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
         <div class="tw-flex">
           <div *ngIf="row.saleCount != row.saleCutCount">
-            <button
-              class="tw-ml-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-blue-500 hover:tw-bg-blue-600"
+            <button mat-flat-button class=" tw-text-white tw-ml-1 tw-bg-blue-500"
               (click)="openModalCutCourse(cutcourse,row)">ตัดคอร์ส</button>
-            <button
-              class="tw-ml-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-yellow-500 hover:tw-bg-yellow-600"
+            <button mat-flat-button class=" tw-text-white tw-ml-1 tw-bg-yellow-500 "
               (click)="openModalHistoryCutCourse(historycutcourse,row)">ประวัติการเข้าใช้งาน</button>
           </div>
           <div *ngIf="row.saleCount == row.saleCutCount">
-            <button
-              class="tw-ml-2 tw-p-1.5 tw-rounded-md tw-text-white tw-border-none tw-bg-yellow-500 hover:tw-bg-yellow-600"
+            <button mat-flat-button class=" tw-text-white tw-ml-1 tw-bg-yellow-500 "
               (click)="openModalHistoryCutCourse(historycutcourse,row)">ประวัติการเข้าใช้งาน</button>
           </div>
         </div>
@@ -161,27 +157,47 @@
   </div>
   <div class="modal-body">
     <div class="tw-flex tw-flex-wrap" [formGroup]="saleForm">
-      <mat-form-field class="tw-w-1/2 tw-px-2" appearance="outline">
+      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>เลขเอกสาร</mat-label>
         <input #postalCode id="saleNumber" name="saleNumber" [formControlName]="'saleNumber'" matInput>
         <mat-error *ngIf="saleForm.get('saleNumber').hasError('required')">
           <div class="box-error">
-            กรุณากรอกเลขเอกสาร
+            กรุณาระบุเลขเอกสาร
           </div>
         </mat-error>
       </mat-form-field>
 
-      <mat-form-field class="tw-w-1/2 tw-px-2" appearance="outline">
+      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>ราคารวม</mat-label>
         <input type="number" matInput id="saleBalance" name="saleBalance" [formControlName]="'saleBalance'">
         <mat-error *ngIf="saleForm.get('saleBalance').hasError('required')">
           <div class="box-error">
-            กรุณากรอกยอดราคารวม
+            กรุณาระบุยอดราคารวม
+          </div>
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
+        <mat-label>ยอดรับชำระ</mat-label>
+        <input type="number" matInput id="salePayment" name="salePayment" [formControlName]="'salePayment'">
+        <mat-error *ngIf="saleForm.get('salePayment').hasError('required')">
+          <div class="box-error">
+            กรุณาระบุยอดรับชำระ
+          </div>
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
+        <mat-label>ยอดค้างชำระ</mat-label>
+        <input type="number" matInput id="saleOverdue" name="saleOverdue" [formControlName]="'saleOverdue'">
+        <mat-error *ngIf="saleForm.get('saleOverdue').hasError('required')">
+          <div class="box-error">
+            กรุณาระบุยอดค้างชำระ
           </div>
         </mat-error>
       </mat-form-field>
     </div>
-    <mat-form-field class="tw-w-full tw-px-2" [formGroup]="saleEmployeeForm" appearance="outline">
+    <mat-form-field class="tw-w-full tw-px-2 tw-mb-3" [formGroup]="saleEmployeeForm" appearance="outline">
       <mat-label>ผู้ปรึกษา</mat-label>
       <mat-select [formControlName]="'empId'" [ngModel]="sales" multiple>
         <mat-option *ngFor="let employee of (employees$ | async)"
@@ -195,7 +211,7 @@
     </mat-form-field>
 
 
-    <mat-form-field class="tw-w-1/2 tw-px-2" appearance="outline">
+    <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
       <mat-label>รายการสินค้า/บริการ</mat-label>
       <mat-select [ngModel]="Products" #newUrl>
         <mat-option *ngFor="let item of (coures$ | async)" [value]="item.courseId">
@@ -204,16 +220,16 @@
       </mat-select>
       <!-- <mat-error *ngIf="saleProductForm.get('courseId').hasError('required')">
         <div class="box-error">
-          กรุณากรอกสินค้า/บริการ
+          กรุณาระบุสินค้า/บริการ
         </div>
       </mat-error> -->
     </mat-form-field>
-    <mat-form-field class="tw-w-1/2 tw-px-2" appearance="outline">
+    <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
       <mat-label>จำนวนครั้ง</mat-label>
       <input type="number" [ngModel]="Counts" matInput #newUrl2>
       <!-- <mat-error *ngIf="saleForm.get('saleCount').hasError('required')">
         <div class="box-error">
-          กรุณากรอกจำนวนครั้ง
+          กรุณาระบุจำนวนครั้ง
         </div>
       </mat-error> -->
     </mat-form-field>
@@ -222,13 +238,13 @@
         (click)="addURL(newUrl.value,newUrl2.value);">เพิ่มคอร์ส</button>
     </div>
     <div *ngFor="let item of this.pros; let i = index" class="flex tw-flex-row">
-      <mat-form-field class="tw-w-[45%] tw-p-3" appearance="outline">
+      <mat-form-field class="tw-w-[45%] tw-p-3 tw-mb-3" appearance="outline">
         <mat-label>สินค้าและบริการ</mat-label>
         <!-- <mat-label>สินค้าและบริการ : {{i+1}}</mat-label> -->
         <input type="text" value="{{item.courseNameTh}}" matInput />
 
       </mat-form-field>
-      <mat-form-field class="tw-w-[45%] tw-p-3" appearance="outline">
+      <mat-form-field class="tw-w-[45%] tw-p-3 tw-mb-3" appearance="outline">
         <mat-label>จำนวนครั้ง</mat-label>
         <!-- <mat-label>จำนวนครั้ง : {{i+1}}</mat-label> -->
         <input type="text" value="{{item?.saleCount}}" matInput />
@@ -238,14 +254,14 @@
         class="tw-w-[10%] tw-bg-red-500 tw-text-white tw-p-3 tw-border-0 tw-font-semibold tw-rounded-lg">Delete</button>
     </div>
     <div *ngFor="let item of urlData; let i = index" class="flex tw-flex-row">
-      <mat-form-field class="tw-w-[45%] tw-p-3" appearance="outline">
+      <mat-form-field class="tw-w-[45%] tw-p-3 tw-mb-3" appearance="outline">
         <mat-label>สินค้าและบริการ</mat-label>
         <!-- <mat-label>สินค้าและบริการ : {{i+1}}</mat-label> -->
         <input type="text" value="{{getNameCourse(item?.courseId)}}" [disabled]="isDisabled[i]"
           [textContent]="textValues[i]" matInput />
 
       </mat-form-field>
-      <mat-form-field class="tw-w-[45%] tw-p-3" appearance="outline">
+      <mat-form-field class="tw-w-[45%] tw-p-3 tw-mb-3" appearance="outline">
         <mat-label>จำนวนครั้ง</mat-label>
         <!-- <mat-label>จำนวนครั้ง : {{i+1}}</mat-label> -->
         <input type="text" value="{{item?.saleCount}}" [disabled]="isDisabled[i]" [textContent]="textValues2[i]"
@@ -257,11 +273,8 @@
     </div>
 
     <div class="modal-footer">
-      <button
-        class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 "
-        type="submit" (click)="saveSale()" [disabled]="saleForm.invalid">บันทึก</button>
-      <a class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
-        (click)="ModalList.hide()">ปิด</a>
+      <button mat-raised-button color="primary" (click)="saveSale()" [disabled]="!saleForm.valid">บันทึก</button>
+      <button mat-raised-button color="warn" (click)="ModalList.hide()">ยกเลิก</button>
     </div>
   </div>
 </ng-template>
@@ -274,66 +287,91 @@
       <span aria-hidden="true" class="visually-hidden">&times;</span>
     </button>
   </div>
-  <div class="modal-body">
-    <div class="tw-flex tw-flex-wrap" [formGroup]="saleCutForm">
-      <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
-        <mat-label>ชื่อคอร์ส</mat-label>
-        <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'saleCutCourse'" matInput>
-      </mat-form-field>
-      <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
-        <mat-label>จำนวนครั้ง</mat-label>
-        <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'saleCutCount'" matInput>
-      </mat-form-field>
-      <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
-        <mat-label>วันที่เข้าใช้บริการ</mat-label>
-        <input [formControlName]="'saleCutDate'" matInput [matDatepicker]="picker">
-        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker touchUi #picker></mat-datepicker>
-      </mat-form-field>
-      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
-        <mat-label>วิตามิน</mat-label>
-        <input type="text" matInput [formControlName]="'saleCutVitamin'">
-      </mat-form-field>
-      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
-        <mat-label>มาร์ค</mat-label>
-        <input type="text" matInput [formControlName]="'saleCutMark'">
-      </mat-form-field>
-      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
-        <mat-label>พนักงานนวดหน้า</mat-label>
-        <mat-select [formControlName]="'saleCutTherapist'">
-          <ng-container *ngFor="let item of (employees$ | async)">
-            <mat-option *ngIf="item.empPosition == 3" [value]="item.empId">
-              {{item.empFullname}}
-            </mat-option>
-          </ng-container>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
-        <mat-label>หมอ</mat-label>
-        <mat-select [formControlName]="'saleCutDetail'">
-          <ng-container *ngFor="let item of (employees$ | async)">
-            <mat-option *ngIf="item.empPosition == 7" [value]="item.empId">
-              {{item.empFullname}}
-            </mat-option>
-          </ng-container>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field class="tw-px-2 tw-mb-3 example-full-width tw-w-full" appearance="outline">
-        <mat-label>รายละเอียด</mat-label>
-        <textarea matInput placeholder="กรอกรายละเอียดการตัดคอร์ส"
-          [formControlName]="'saleCutDetail'">1600 Amphitheatre Pkwy</textarea>
-      </mat-form-field>
+  <form [formGroup]="saleCutForm" novalidate>
+    <div class="modal-body">
+      <div class="tw-flex tw-flex-wrap">
+        <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
+          <mat-label>ชื่อคอร์ส</mat-label>
+          <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'saleCutCourse'" matInput>
+        </mat-form-field>
+        <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
+          <mat-label>จำนวนครั้ง</mat-label>
+          <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'saleCutCount'" matInput>
+        </mat-form-field>
+        <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
+          <mat-label>วันที่เข้าใช้บริการ</mat-label>
+          <input [formControlName]="'saleCutDate'" matInput [matDatepicker]="picker">
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker touchUi #picker></mat-datepicker>
+          <mat-error *ngIf="saleCutForm.get('saleCutDate').hasError('required')">
+            <div class="box-error">
+              กรุณาระบุวันที่เข้าใช้บริการ
+            </div>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
+          <mat-label>วิตามิน</mat-label>
+          <input type="text" matInput [formControlName]="'saleCutVitamin'">
+          <mat-error *ngIf="saleCutForm.get('saleCutVitamin').hasError('required')">
+            <div class="box-error">
+              กรุณาระบุวิตามิน
+            </div>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
+          <mat-label>มาร์ค</mat-label>
+          <input type="text" matInput [formControlName]="'saleCutMark'">
+          <mat-error *ngIf="saleCutForm.get('saleCutMark').hasError('required')">
+            <div class="box-error">
+              กรุณาระบุมาร์ค
+            </div>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
+          <mat-label>พนักงานนวดหน้า</mat-label>
+          <mat-select [formControlName]="'saleCutTherapist'">
+            <ng-container *ngFor="let item of (employees$ | async)">
+              <mat-option *ngIf="item.empPosition == 3" [value]="item.empId">
+                {{item.empFullname}}
+              </mat-option>
+            </ng-container>
+          </mat-select>
+          <mat-error *ngIf="saleCutForm.get('saleCutTherapist').hasError('required')">
+            <div class="box-error">
+              กรุณาระบุพนักงานนวดหน้า
+            </div>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
+          <mat-label>หมอ</mat-label>
+          <mat-select [formControlName]="'saleCutDoctor'">
+            <ng-container>
+              <mat-option value="0">-</mat-option>
+              <div *ngFor="let item of (employees$ | async)">
+                <mat-option *ngIf="item.empPosition == 7" [value]="item.empId">
+                  {{item.empFullname}}
+                </mat-option>
+              </div>
+            </ng-container>
+          </mat-select>
+          <mat-error *ngIf="saleCutForm.get('saleCutDoctor').hasError('required')">
+            <div class="box-error">
+              กรุณาระบุหมอ
+            </div>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="tw-px-2 tw-mb-3 example-full-width tw-w-full" appearance="outline">
+          <mat-label>รายละเอียด</mat-label>
+          <textarea matInput placeholder="กรอกรายละเอียดการตัดคอร์ส"
+            [formControlName]="'saleCutDetail'">1600 Amphitheatre Pkwy</textarea>
+        </mat-form-field>
+      </div>
     </div>
-  </div>
-
-  <div class="modal-footer">
-    <button
-      class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
-      type="submit" (click)="saveSaleCut()">บันทึก</button>
-    <a class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
-      (click)="ModalList.hide()">ปิด</a>
-  </div>
-
+    <div class="modal-footer">
+      <button mat-raised-button color="primary" (click)="saveSaleCut()" [disabled]="!saleCutForm.valid">บันทึก</button>
+      <button mat-raised-button color="warn" (click)="ModalList.hide()">ยกเลิก</button>
+    </div>
+  </form>
 </ng-template>
 
 <!--Modal ประวัติการตัดคอร์ส-->
@@ -350,6 +388,16 @@
       <ngx-datatable-column name="ครั้งที่" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
           {{ row?.saleCutCount }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="วันที่เข้าใช้บริการ" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row?.saleCutDate | dateTHPipe: 'day' }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="รายละเอียด" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row?.saleCutDetail}}
         </ng-template>
       </ngx-datatable-column>
       <ngx-datatable-column name="วิตามิน" [cellClass]="'cellColumn'">
@@ -372,21 +420,10 @@
           {{row?.saleCutDoctor}}
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column name="รายละเอียด" [cellClass]="'cellColumn'">
-        <ng-template let-row="row" ngx-datatable-cell-template>
-          {{row?.saleCutDetail}}
-        </ng-template>
-      </ngx-datatable-column>
-      <ngx-datatable-column name="วันที่เข้าใช้บริการ" [cellClass]="'cellColumn'">
-        <ng-template let-row="row" ngx-datatable-cell-template>
-          {{ row?.saleCutDate | dateTHPipe: 'day' }}
-        </ng-template>
-      </ngx-datatable-column>
     </ngx-datatable>
   </div>
   <div class="modal-footer">
-    <a class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
-      (click)="ModalList.hide()">ปิด</a>
+    <button mat-raised-button color="warn" (click)="ModalList.hide()">ปิด</button>
   </div>
 </ng-template>
 
@@ -398,17 +435,21 @@
       <span aria-hidden="true" class="visually-hidden">&times;</span>
     </button>
   </div>
-  <div class="modal-body">
-    <div class="tw-flex tw-flex-wrap" [formGroup]="salePayForm">
-      <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
+  <form [formGroup]="salePayForm" novalidate>
+    <div class="modal-body">
+      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>เลขที่เอกสาร</mat-label>
         <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'salePayCourse'" matInput>
       </mat-form-field>
-      <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
+      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>ยอดรวมทั้งหมด</mat-label>
         <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'salePayBalance'" matInput>
       </mat-form-field>
-      <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
+      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
+        <mat-label>ยอดชำระล่าสุด</mat-label>
+        <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'saleLastPaymet'" matInput>
+      </mat-form-field>
+      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>ยอดค้างชำระ</mat-label>
         <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'salePayOver'" matInput>
       </mat-form-field>
@@ -417,20 +458,27 @@
         <input [formControlName]="'salePayDate'" matInput [matDatepicker]="picker">
         <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker touchUi #picker></mat-datepicker>
+        <mat-error *ngIf="salePayForm.get('salePayDate').hasError('required')">
+          <div class="box-error">
+            กรุณาระบุวันที่รับชำระเงิน
+          </div>
+        </mat-error>
       </mat-form-field>
       <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>ชำระเพิ่ม</mat-label>
         <input class="tw-text-black" [formControlName]="'saleExtraPay'" matInput>
+        <mat-error *ngIf="salePayForm.get('saleExtraPay').hasError('required')">
+          <div class="box-error">
+            กรุณาระบุจำนวนชำระเพิ่ม
+          </div>
+        </mat-error>
       </mat-form-field>
     </div>
-  </div>
-  <div class="modal-footer">
-    <button
-      class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
-      type="submit" (click)="saveSalePay()">บันทึก</button>
-    <a class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
-      (click)="ModalList.hide()">ปิด</a>
-  </div>
+    <div class="modal-footer">
+      <button mat-raised-button color="primary" (click)="saveSalePay()" [disabled]="!salePayForm.valid">บันทึก</button>
+      <button mat-raised-button color="warn" (click)="ModalList.hide()">ยกเลิก</button>
+    </div>
+  </form>
 </ng-template>
 
 <!--Modal ประวัติการชำระเงิน-->
@@ -467,8 +515,7 @@
     </ngx-datatable>
   </div>
   <div class="modal-footer">
-    <a class="tw-w-[12%] tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
-      (click)="ModalList.hide()">ปิด</a>
+    <button mat-raised-button color="warn" (click)="ModalList.hide()">ปิด</button>
   </div>
 </ng-template>
 
@@ -480,12 +527,12 @@
       <span aria-hidden="true" class="visually-hidden">&times;</span>
     </button>
   </div>
-  <div class="modal-body">
-    <div class="tw-flex tw-flex-wrap" [formGroup]="confrimDelete">
+  <form [formGroup]="confrimDelete">
+    <div class="modal-body">
       <mat-form-field class="tw-w-full tw-px-2" appearance="outline">
         <mat-label>รหัสผ่าน</mat-label>
-        <input id="password" name="password" type="password" [formControlName]="'password'" placeholder="กรุณาระบุรหัสผ่าน" ngModel=""
-          matInput>
+        <input id="password" name="password" type="password" [formControlName]="'password'"
+          placeholder="กรุณาระบุรหัสผ่าน" ngModel="" matInput>
         <mat-error *ngIf="confrimDelete.get('password').hasError('required')">
           <div class="box-error">
             กรุณาระบุรหัสผ่าน
@@ -493,12 +540,11 @@
         </mat-error>
       </mat-form-field>
     </div>
-  </div>
-  <div class="modal-footer">
-    <button
-      class="tw-w-auto tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-green-500 hover:tw-bg-green-600"
-      type="submit" (click)="deleteConfrim()">ยืนยันรหัสผ่าน</button>
-    <a class="tw-w-auto tw-p-3 tw-flex tw-items-center tw-justify-center tw-rounded-md tw-text-white tw-border-none tw-bg-red-500 hover:tw-bg-red-600"
-      (click)="ModalList.hide()">ปิด</a>
-  </div>
+
+    <div class="modal-footer">
+      <button mat-raised-button color="primary" (click)="deleteConfrim()"
+        [disabled]="!confrimDelete.valid">ยืนยันรหัสผ่าน</button>
+      <button mat-raised-button color="warn" (click)="ModalList.hide()">ยกเลิก</button>
+    </div>
+  </form>
 </ng-template>
