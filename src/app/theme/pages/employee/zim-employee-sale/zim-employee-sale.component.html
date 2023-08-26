@@ -24,6 +24,18 @@
                     {{row.saleNumber}}
                 </ng-template>
             </ngx-datatable-column>
+            <ngx-datatable-column name="เลขบัตรสมาชิก" [cellClass]="'cellColumn'">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    <ng-container [ngSwitch]="row.cusBranch">
+                        <b *ngSwitchCase="1">
+                            ZEER{{row.cusMember}}</b>
+                        <b *ngSwitchCase="2">
+                            NKS{{row.cusMember}}</b>
+                        <b *ngSwitchCase="3">
+                            PCB{{row.cusMember}}</b>
+                    </ng-container>
+                </ng-template>
+            </ngx-datatable-column>
             <ngx-datatable-column name="ชื่อลูกค้า" [cellClass]="'cellColumn'">
                 <ng-template let-row="row" ngx-datatable-cell-template>
                     {{row.cusFullName}}
@@ -31,7 +43,7 @@
             </ngx-datatable-column>
             <ngx-datatable-column name="ชื่อสินค้าและบริการ" [cellClass]="'cellColumn'">
                 <ng-template let-row="row" ngx-datatable-cell-template>
-                    {{row.courseId}}
+                    {{getNameProduct(row.courseId)}}
                 </ng-template>
             </ngx-datatable-column>
             <ngx-datatable-column name="ยอดรวม" [cellClass]="'cellColumn'" [canAutoResize]="false" [width]="120">

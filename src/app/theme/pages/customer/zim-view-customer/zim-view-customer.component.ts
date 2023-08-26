@@ -133,6 +133,7 @@ export class ZimViewCustomerComponent implements OnInit {
       saleBalance: [{ value: '', enabled: !!this.cus_id }, Validators.required],
       salePayment: [{ value: '', enabled: !!this.cus_id }, Validators.required],
       saleOverdue: [{ value: '', enabled: !!this.cus_id }, Validators.required],
+      saleDate: [{ value: '', enabled: !!this.cus_id }, Validators.required],
       cusId: [this.cus_id],
     });
 
@@ -334,6 +335,7 @@ export class ZimViewCustomerComponent implements OnInit {
       saleViewData.saleBalance,
       saleViewData.salePayment,
       saleViewData.saleOverdue,
+      saleViewData.saleDate,
       saleViewData.cusId,
       saleEmployeeData.empId,
       saleProductData,)

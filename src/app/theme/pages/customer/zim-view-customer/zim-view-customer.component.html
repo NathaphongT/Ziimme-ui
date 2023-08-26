@@ -135,11 +135,11 @@
             <button mat-flat-button class=" tw-text-white tw-ml-1 tw-bg-blue-500"
               (click)="openModalCutCourse(cutcourse,row)">ตัดคอร์ส</button>
             <button mat-flat-button class=" tw-text-white tw-ml-1 tw-bg-yellow-500 "
-              (click)="openModalHistoryCutCourse(historycutcourse,row)">ประวัติการเข้าใช้งาน</button>
+              (click)="openModalHistoryCutCourse(historycutcourse,row)">ประวัติการตัดคอร์ส</button>
           </div>
           <div *ngIf="row.saleCount == row.saleCutCount">
             <button mat-flat-button class=" tw-text-white tw-ml-1 tw-bg-yellow-500 "
-              (click)="openModalHistoryCutCourse(historycutcourse,row)">ประวัติการเข้าใช้งาน</button>
+              (click)="openModalHistoryCutCourse(historycutcourse,row)">ประวัติการตัดคอร์ส</button>
           </div>
         </div>
       </ng-template>
@@ -177,7 +177,7 @@
         </mat-error>
       </mat-form-field>
 
-      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
+      <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>ยอดรับชำระ</mat-label>
         <input type="number" matInput id="salePayment" name="salePayment" [formControlName]="'salePayment'">
         <mat-error *ngIf="saleForm.get('salePayment').hasError('required')">
@@ -187,7 +187,7 @@
         </mat-error>
       </mat-form-field>
 
-      <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
+      <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>ยอดค้างชำระ</mat-label>
         <input type="number" matInput id="saleOverdue" name="saleOverdue" [formControlName]="'saleOverdue'">
         <mat-error *ngIf="saleForm.get('saleOverdue').hasError('required')">
@@ -196,7 +196,21 @@
           </div>
         </mat-error>
       </mat-form-field>
+
+      <mat-form-field class="tw-w-1/3 tw-px-2 tw-mb-3" appearance="outline">
+        <mat-label>วันที่เข้าใช้บริการ</mat-label>
+        <input [formControlName]="'saleDate'" matInput [matDatepicker]="picker">
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker touchUi #picker></mat-datepicker>
+        <mat-error *ngIf="saleForm.get('saleDate').hasError('required')">
+          <div class="box-error">
+            กรุณาระบุวันที่เข้าใช้บริการ
+          </div>
+        </mat-error>
+      </mat-form-field>
+
     </div>
+
     <mat-form-field class="tw-w-full tw-px-2 tw-mb-3" [formGroup]="saleEmployeeForm" appearance="outline">
       <mat-label>ผู้ปรึกษา</mat-label>
       <mat-select [formControlName]="'empId'" [ngModel]="sales" multiple>
