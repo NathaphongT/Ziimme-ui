@@ -95,8 +95,10 @@ export interface SalePay {
     salePayCourse: string;
     saleExtraPay: string;
     salePayDate: Date;
+    salePayDetail: string;
     salePayBalance: number;
     salePayOver: string;
+    saleLastPayment: string;
     saleId: number;
     cusId: number;
     saleProductId: number;

@@ -60,6 +60,7 @@ export interface SaleList {
   saleOverdue: string;
   saleExtraPay: number;
   salePayOver: string;
+  saleDetail: string;
 }
 
 export interface SaleListEmp {

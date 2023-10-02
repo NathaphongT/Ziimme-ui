@@ -66,12 +66,18 @@
                   <span class="tw-text-base tw-font-semibold tw-rounded-md tw-mr-3">จ่าย:
                     {{group.value[0].saleExtraPay}}</span>
                   <span class="tw-text-base tw-font-semibold tw-rounded-md tw-mr-3">คงค้างชำระ:
-                    {{group.value[0].salePayOver - group.value[0].saleExtraPay}} </span>
+                    {{group.value[0].saleBalance - group.value[0].saleExtraPay}} </span>
                 </div>
+
+                <span class="tw-text-base tw-font-semibold tw-rounded-md tw-mr-3">
+                  รายละเอียด :
+                  <b class="tw-text-red-500">{{group.value[0].saleDetail}}</b>
+                </span>
+
               </div>
 
-              <div *ngIf="group.value[0].saleExtraPay == null">
-
+              <div
+                *ngIf="group.value[0].saleExtraPay == null && group.value[0].saleBalance != group.value[0].salePayment ">
                 <button mat-flat-button class="tw-bg-green-500 tw-text-white tw-mr-1"
                   (click)="openModalPayment(payment, group.value[0])">ชำระเพิ่ม</button>
               </div>
@@ -84,7 +90,12 @@
               </div>
 
               <div
-                *ngIf="group.value[0].saleExtraPay == group.value[0].salePayOver && group.value[0].saleExtraPay != null">
+                *ngIf="group.value[0].saleExtraPay == group.value[0].salePayOver && group.value[0].saleExtraPay != null ">
+                <button mat-flat-button color="primary"
+                  (click)="openModalHistoryPayment(historypayment, group.value[0])">ประวัติการชำระเงิน</button>
+              </div>
+
+              <div *ngIf="group.value[0].saleBalance == group.value[0].salePayment ">
                 <button mat-flat-button color="primary"
                   (click)="openModalHistoryPayment(historypayment, group.value[0])">ประวัติการชำระเงิน</button>
               </div>
@@ -114,7 +125,7 @@
       <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row"
         let-group="group">
         <div class="tw-flex tw-items-center" *ngIf="row?.saleCutCount == null">
-          <b class="tw-text-base tw-font-bold tw-text-red-600">ยังไม่เริ่มใช้บริการ</b>
+          <b class="tw-text-base tw-font-bold tw-text-green-600">ยังไม่เริ่มใช้บริการ</b>
         </div>
         <div class="tw-flex tw-items-center" *ngIf="row?.saleCutCount !== null">
           <div *ngIf="row.saleCount != row.saleCutCount">
@@ -122,8 +133,8 @@
             <b class="tw-text-lg tw-font-bold">{{ row?.saleCutCount }}</b>
             ครั้ง
           </div>
-          <div class="  tw-text-green-500" *ngIf="row.saleCount == row.saleCutCount">
-            <b class="tw-text-base tw-font-bold ">ใช้บริการครบแล้ว</b>
+          <div *ngIf="row.saleCount == row.saleCutCount">
+            <b class="tw-text-base tw-font-bold tw-text-red-600">ใช้บริการครบแล้ว</b>
           </div>
         </div>
       </ng-template>
@@ -224,32 +235,38 @@
       </mat-error>
     </mat-form-field>
 
+    <mat-form-field class="tw-px-2 example-full-width tw-w-full" appearance="outline" [formGroup]="saleForm">
+      <mat-label>รายละเอียด</mat-label>
+      <textarea matInput placeholder="กรอกรายละเอียดการเข้าใช้บริการ" [formControlName]="'saleDetail'"></textarea>
+    </mat-form-field>
 
-    <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
-      <mat-label>รายการสินค้า/บริการ</mat-label>
-      <mat-select [ngModel]="Products" #newUrl>
-        <mat-option *ngFor="let item of (coures$ | async)" [value]="item.courseId">
-          {{item.courseNameTh || item.courseNameEng }} ({{item.courseCode}})
-        </mat-option>
-      </mat-select>
-      <!-- <mat-error *ngIf="saleProductForm.get('courseId').hasError('required')">
-        <div class="box-error">
-          กรุณาระบุสินค้า/บริการ
-        </div>
-      </mat-error> -->
-    </mat-form-field>
-    <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
-      <mat-label>จำนวนครั้ง</mat-label>
-      <input type="number" [ngModel]="Counts" matInput #newUrl2>
-      <!-- <mat-error *ngIf="saleForm.get('saleCount').hasError('required')">
-        <div class="box-error">
-          กรุณาระบุจำนวนครั้ง
-        </div>
-      </mat-error> -->
-    </mat-form-field>
-    <div class="tw-w-full tw-px-1 tw-flex tw-flex-row tw-items-end">
-      <button matSuffix mat-raised-button color="primary" class="tw-p-3 tw-m-1 tw-h-12 "
-        (click)="addURL(newUrl.value,newUrl2.value);">เพิ่มคอร์ส</button>
+    <div class="tw-flex tw-flex-row tw-items-baseline">
+      <mat-form-field class="tw-w-[40%] tw-p-3 tw-mb-3" appearance="outline">
+        <mat-label>รายการสินค้า/บริการ</mat-label>
+        <mat-select [ngModel]="Products" #newUrl>
+          <mat-option *ngFor="let item of (coures$ | async)" [value]="item.courseId">
+            {{item.courseNameTh || item.courseNameEng }} ({{item.courseCode}})
+          </mat-option>
+        </mat-select>
+        <!-- <mat-error *ngIf="saleProductForm.get('courseId').hasError('required')">
+          <div class="box-error">
+            กรุณาระบุสินค้า/บริการ
+          </div>
+        </mat-error> -->
+      </mat-form-field>
+      <mat-form-field class="tw-w-[40%] tw-p-3 tw-mb-3" appearance="outline">
+        <mat-label>จำนวนครั้ง</mat-label>
+        <input type="number" [ngModel]="Counts" matInput #newUrl2>
+        <!-- <mat-error *ngIf="saleForm.get('saleCount').hasError('required')">
+          <div class="box-error">
+            กรุณาระบุจำนวนครั้ง
+          </div>
+        </mat-error> -->
+      </mat-form-field>
+      <div class="tw-w-[20%] tw-px-1">
+        <button matSuffix mat-raised-button color="primary" class="tw-p-3 tw-m-1 tw-h-12 "
+          (click)="addURL(newUrl.value,newUrl2.value);">เพิ่มคอร์ส</button>
+      </div>
     </div>
     <div *ngFor="let item of this.pros; let i = index" class="flex tw-flex-row">
       <mat-form-field class="tw-w-[45%] tw-p-3 tw-mb-3" appearance="outline">
@@ -267,7 +284,7 @@
       <button (click)="removeURL(i)"
         class="tw-w-[10%] tw-bg-red-500 tw-text-white tw-p-3 tw-border-0 tw-font-semibold tw-rounded-lg">Delete</button>
     </div>
-    <div *ngFor="let item of urlData; let i = index" class="flex tw-flex-row">
+    <div *ngFor="let item of urlData; let i = index" class="tw-flex tw-flex-row tw-items-baseline">
       <mat-form-field class="tw-w-[45%] tw-p-3 tw-mb-3" appearance="outline">
         <mat-label>สินค้าและบริการ</mat-label>
         <!-- <mat-label>สินค้าและบริการ : {{i+1}}</mat-label> -->
@@ -343,11 +360,15 @@
         </mat-form-field>
         <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
           <mat-label>พนักงานนวดหน้า</mat-label>
+
           <mat-select [formControlName]="'saleCutTherapist'">
-            <ng-container *ngFor="let item of (employees$ | async)">
-              <mat-option *ngIf="item.empPosition == 3" [value]="item.empId">
-                {{item.empFullname}}
-              </mat-option>
+            <ng-container>
+              <mat-option value="0">-</mat-option>
+              <div *ngFor="let item of (employees$ | async)">
+                <mat-option *ngIf="item.empPosition == 3" [value]="item.empId">
+                  {{item.empFullname}}
+                </mat-option>
+              </div>
             </ng-container>
           </mat-select>
           <mat-error *ngIf="saleCutForm.get('saleCutTherapist').hasError('required')">
@@ -376,8 +397,7 @@
         </mat-form-field>
         <mat-form-field class="tw-px-2 tw-mb-3 example-full-width tw-w-full" appearance="outline">
           <mat-label>รายละเอียด</mat-label>
-          <textarea matInput placeholder="กรอกรายละเอียดการตัดคอร์ส"
-            [formControlName]="'saleCutDetail'">1600 Amphitheatre Pkwy</textarea>
+          <textarea matInput placeholder="กรอกรายละเอียดการตัดคอร์ส" [formControlName]="'saleCutDetail'"></textarea>
         </mat-form-field>
       </div>
     </div>
@@ -399,7 +419,8 @@
   <div class="modal-body">
     <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
       [footerHeight]="50" [rowHeight]="50" [rows]="rowsCutCourse" [loadingIndicator]="isLoading">
-      <ngx-datatable-column name="ครั้งที่" [cellClass]="'cellColumn'">
+      <ngx-datatable-column name="ครั้งที่" [cellClass]="'cellColumn'" [width]="50" [canAutoResize]="false"
+        [sortable]="false">
         <ng-template let-row="row" ngx-datatable-cell-template>
           {{ row?.saleCutCount }}
         </ng-template>
@@ -409,17 +430,19 @@
           {{ row?.saleCutDate | dateTHPipe: 'day' }}
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column name="รายละเอียด" [cellClass]="'cellColumn'">
+      <ngx-datatable-column name="ชื่อคอร์ส" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          {{row?.saleCutDetail}}
+          {{ row?.saleCutCourse}}
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column name="วิตามิน" [cellClass]="'cellColumn'">
+      <ngx-datatable-column name="วิตามิน" [cellClass]="'cellColumn'" [width]="70" [canAutoResize]="false"
+        [sortable]="false">
         <ng-template let-row="row" ngx-datatable-cell-template>
           {{ row?.saleCutVitamin }}
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column name="มาร์คหน้า" [cellClass]="'cellColumn'">
+      <ngx-datatable-column name="มาร์คหน้า" [cellClass]="'cellColumn'" [width]="70" [canAutoResize]="false"
+        [sortable]="false">
         <ng-template let-row="row" ngx-datatable-cell-template>
           {{ row?.saleCutMark }}
         </ng-template>
@@ -429,9 +452,15 @@
           {{getNameEmp(row?.saleCutTherapist)}}
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column name="หมอ" [cellClass]="'cellColumn'">
+      <ngx-datatable-column name="หมอ" [cellClass]="'cellColumn'" [width]="70" [canAutoResize]="false"
+        [sortable]="false">
         <ng-template let-row="row" ngx-datatable-cell-template>
           {{row?.saleCutDoctor}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="รายละเอียด" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <b class="tw-text-red-500">{{row?.saleCutDetail}}</b>
         </ng-template>
       </ngx-datatable-column>
     </ngx-datatable>
@@ -467,6 +496,7 @@
         <mat-label>ยอดค้างชำระ</mat-label>
         <input class="tw-text-black tw-cursor-no-drop" [formControlName]="'salePayOver'" matInput>
       </mat-form-field>
+
       <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
         <mat-label>วันที่รับชำระเงิน</mat-label>
         <input [formControlName]="'salePayDate'" matInput [matDatepicker]="picker">
@@ -487,6 +517,10 @@
           </div>
         </mat-error>
       </mat-form-field>
+      <mat-form-field class="tw-px-2 example-full-width tw-w-full" appearance="outline" [formGroup]="salePayForm">
+        <mat-label>รายละเอียด</mat-label>
+        <textarea matInput placeholder="กรอกรายละเอียดการชำระเงิน" [formControlName]="'salePayDetail'"></textarea>
+      </mat-form-field>
     </div>
     <div class="modal-footer">
       <button mat-raised-button color="primary" (click)="saveSalePay()" [disabled]="!salePayForm.valid">บันทึก</button>
@@ -506,7 +540,17 @@
   <div class="modal-body">
     <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
       [footerHeight]="50" [rowHeight]="50" [rows]="rowsSalepay" [loadingIndicator]="isLoading">
+      <ngx-datatable-column name="วันที่ชำระเงิน" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row?.salePayDate | dateTHPipe: 'day' }}
+        </ng-template>
+      </ngx-datatable-column>
       <ngx-datatable-column name="ชื่อคอร์ส" [cellClass]="'cellColumn'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row?.courseNameTh }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="เลขที่เอกสาร" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
           {{ row?.salePayCourse }}
         </ng-template>
@@ -521,11 +565,12 @@
           {{row?.salePayOver - row?.saleExtraPay}}
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column name="วันที่ชำระเงิน" [cellClass]="'cellColumn'">
+      <ngx-datatable-column name="รายละเอียด" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
-          {{ row?.salePayDate | dateTHPipe: 'day' }}
+          <b class="tw-text-red-500">{{row?.salePayDetail}}</b>
         </ng-template>
       </ngx-datatable-column>
+
     </ngx-datatable>
   </div>
   <div class="modal-footer">
