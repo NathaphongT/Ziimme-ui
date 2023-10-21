@@ -295,6 +295,33 @@ export class SaleService {
     );
   }
 
+  cutDownSale(id: number): Observable<boolean> {
+    return this.sales$.pipe(
+      take(1),
+      switchMap((sales) =>
+        this._httpClient
+          .delete<boolean>(this._apiPath + '/sales_cutdown/' + id)
+          .pipe(
+            map((isDeleted: boolean) => {
+              // Find the index of the deleted category
+              // const index = sales.findIndex(
+              //   (item) => item.saleId === id
+              // );
+
+              // Delete the category
+              // sales.splice(index, 1);
+
+              // Update the sales
+              this._sales.next(sales);
+
+              // Return the deleted status
+              return isDeleted;
+            })
+          )
+      )
+    );
+  }
+
   saveAll(saleNumber, saleBalance, salePayment, saleOverdue, saleDate, saleDetail, cusId, consultantList, courseId = []): Observable<any> {
     return this.saveSale(
       saleNumber,
@@ -318,23 +345,24 @@ export class SaleService {
       take(1),
       switchMap((sales) =>
         this._httpClient
-          .put<Sale>(`${environment.APIURL_LOCAL}/api/v1.0/sales/${id}`,
+          .put<Sale>(`${environment.APIURL_LOCAL}/api/v1.0/sales_cutdown/${id}`,
             data
           )
           .pipe(
             map((updatedSale: Sale) => {
-              // Find the index of the updated sales
-              const index = sales.findIndex(
-                (item) => item.saleId === id
-              );
-
-              // Update the sales
-              sales[index] = updatedSale;
-
-              // Update the sales
-              this._sales.next(sales);
-
-              // Return the updated sales
+              // Ensure that sales is not null and has data
+              if (sales && sales.length > 0) {
+                const index = sales.findIndex((item) => item.saleId === id);
+                if (index !== -1) {
+                  // Update the sales
+                  sales[index] = updatedSale;
+            
+                  // Update the sales
+                  this._sales.next(sales);
+                }
+              }
+            
+              // Return the updated sale
               return updatedSale;
             })
           )

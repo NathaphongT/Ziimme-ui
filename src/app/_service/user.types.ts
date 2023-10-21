@@ -61,6 +61,9 @@ export interface SaleList {
   saleExtraPay: number;
   salePayOver: string;
   saleDetail: string;
+  saleDate: Date;
+  saleCutDownDetail: string;
+  saleStatus: string;
 }
 
 export interface SaleListEmp {

@@ -30,7 +30,7 @@
   </div>
 </div>
 <div class="wrap-body">
-  <ngx-datatable #myTable class="material expandable" [rows]="rows" [groupRowsBy]="'saleNumber'"
+  <ngx-datatable #myTable class="material striped expandable" [rows]="rows" [groupRowsBy]="'saleNumber'"
     [columnMode]="ColumnMode.force" [headerHeight]="60" [footerHeight]="60" [rowHeight]="60" [limit]="4"
     [groupExpansionDefault]="true">
     <ngx-datatable-group-header [rowHeight]="70" #myGroupHeader>
@@ -40,8 +40,12 @@
             <div class="tw-flex tw-items-center  tw-mb-1.5">
               <span class="tw-text-lg tw-font-semibold tw-rounded-md tw-mr-3">
                 เลขที่เอกสาร : {{group.value[0].saleNumber}}</span>
-              <button mat-flat-button color="warn" *ngIf="this.positionMain != 'user'"
-                (click)="openModalConfrimDelete(confrimdelete, group.value[0])">ลบคอร์ส</button>
+              <button mat-flat-button extended color="warn"
+                *ngIf="this.positionMain != 'user' && group.value[0].saleStatus != 'I'"
+                (click)="openModalConfrimDelete(confrimdelete, group.value[0])">
+                <mat-icon>delete</mat-icon>
+                ลบคอร์ส
+              </button>
             </div>
             <div class="tw-flex tw-items-center tw-mb-2">
               <b>พนักงาน : {{group.value[0].empFullname}}</b>
@@ -77,27 +81,45 @@
               </div>
 
               <div
-                *ngIf="group.value[0].saleExtraPay == null && group.value[0].saleBalance != group.value[0].salePayment ">
+                *ngIf="group.value[0].saleExtraPay == null && group.value[0].saleBalance != group.value[0].salePayment && group.value[0].saleStatus != 'I'">
                 <button mat-flat-button class="tw-bg-green-500 tw-text-white tw-mr-1"
-                  (click)="openModalPayment(payment, group.value[0])">ชำระเพิ่ม</button>
-              </div>
-
-              <div *ngIf="group.value[0].saleExtraPay != group.value[0].salePayOver">
-                <button mat-flat-button class="tw-bg-green-500 tw-text-white tw-mr-1"
-                  (click)="openModalPayment(payment, group.value[0])">ชำระเพิ่ม</button>
-                <button mat-flat-button color="primary"
-                  (click)="openModalHistoryPayment(historypayment, group.value[0])">ประวัติการชำระเงิน</button>
+                  (click)="openModalPayment(payment, group.value[0])">
+                  <mat-icon>attach_money</mat-icon>
+                  ชำระเพิ่ม
+                </button>
               </div>
 
               <div
+                *ngIf="group.value[0].saleExtraPay != group.value[0].salePayOver && group.value[0].saleBalance - group.value[0].saleExtraPay !== 0 && group.value[0].saleStatus != 'I'">
+                <button mat-flat-button [matMenuTriggerFor]="menu" class=" tw-text-white tw-ml-1 tw-bg-blue-500">
+                  <mat-icon> monetization_on</mat-icon>
+                  ชำระเงินและประวัติ
+                </button>
+                <mat-menu #menu="matMenu" xPosition="before">
+                  <button mat-menu-item (click)="openModalPayment(payment, group.value[0])">
+                    <mat-icon>attach_money</mat-icon>
+                    ชำระเพิ่ม
+                  </button>
+                  <button mat-menu-item (click)="openModalHistoryPayment(historypayment, group.value[0])">
+                    <mat-icon>apps</mat-icon>
+                    ประวัติการชำระเงิน
+                  </button>
+                </mat-menu>
+              </div>
+
+              <!-- <div
                 *ngIf="group.value[0].saleExtraPay == group.value[0].salePayOver && group.value[0].saleExtraPay != null ">
                 <button mat-flat-button color="primary"
                   (click)="openModalHistoryPayment(historypayment, group.value[0])">ประวัติการชำระเงิน</button>
-              </div>
+              </div> -->
 
-              <div *ngIf="group.value[0].saleBalance == group.value[0].salePayment ">
+              <div
+                *ngIf="group.value[0].saleBalance - group.value[0].saleExtraPay == 0 || group.value[0].saleStatus == 'I'">
                 <button mat-flat-button color="primary"
-                  (click)="openModalHistoryPayment(historypayment, group.value[0])">ประวัติการชำระเงิน</button>
+                  (click)="openModalHistoryPayment(historypayment, group.value[0])">
+                  <mat-icon>apps</mat-icon>
+                  ประวัติการชำระเงิน
+                </button>
               </div>
 
             </div>
@@ -125,16 +147,24 @@
       <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row"
         let-group="group">
         <div class="tw-flex tw-items-center" *ngIf="row?.saleCutCount == null">
-          <b class="tw-text-base tw-font-bold tw-text-green-600">ยังไม่เริ่มใช้บริการ</b>
+          <b class="tw-text-base tw-font-bold tw-text-green-600" *ngIf="row?.saleStatus != 'I'">ยังไม่เริ่มใช้บริการ</b>
+          <div *ngIf="row?.saleStatus == 'I'">
+            <b class="tw-text-base tw-font-bold tw-text-red-600">{{row?.saleCutDownDetail}}</b>
+          </div>
         </div>
         <div class="tw-flex tw-items-center" *ngIf="row?.saleCutCount !== null">
-          <div *ngIf="row.saleCount != row.saleCutCount">
-            ใช้ไป
-            <b class="tw-text-lg tw-font-bold">{{ row?.saleCutCount }}</b>
-            ครั้ง
+          <div *ngIf="row?.saleStatus != 'I'">
+            <div *ngIf="row.saleCount != row.saleCutCount">
+              ใช้ไป
+              <b class="tw-text-lg tw-font-bold">{{ row?.saleCutCount }}</b>
+              ครั้ง
+            </div>
+            <div *ngIf="row.saleCount == row.saleCutCount">
+              <b class="tw-text-base tw-font-bold tw-text-red-500">ใช้บริการครบจำนวนครั้ง</b>
+            </div>
           </div>
-          <div *ngIf="row.saleCount == row.saleCutCount">
-            <b class="tw-text-base tw-font-bold tw-text-red-600">ใช้บริการครบแล้ว</b>
+          <div *ngIf="row?.saleStatus == 'I'">
+            <b class="tw-text-base tw-font-bold tw-text-red-600">{{row?.saleCutDownDetail}}</b>
           </div>
         </div>
       </ng-template>
@@ -142,15 +172,33 @@
     <ngx-datatable-column name="" [sortable]="false" [cellClass]="'cellColumn'" [flexGrow]="3">
       <ng-template class="text-center" let-row="row" ngx-datatable-cell-template>
         <div class="tw-flex">
-          <div *ngIf="row.saleCount != row.saleCutCount">
-            <button mat-flat-button class=" tw-text-white tw-ml-1 tw-bg-blue-500"
-              (click)="openModalCutCourse(cutcourse,row)">ตัดคอร์ส</button>
-            <button mat-flat-button class=" tw-text-white tw-ml-1 tw-bg-yellow-500 "
-              (click)="openModalHistoryCutCourse(historycutcourse,row)">ประวัติการตัดคอร์ส</button>
+          <div *ngIf="row.saleCount != row.saleCutCount && row.saleStatus != 'I'">
+            <button mat-flat-button [matMenuTriggerFor]="menu" class=" tw-text-white tw-ml-1 tw-bg-yellow-500">
+              <mat-icon> bubble_chart</mat-icon>
+              ตัดคอร์ส
+            </button>
+            <button mat-flat-button class=" tw-text-white tw-ml-1 tw-bg-red-500"
+              (click)="openModalCutDown(cutdown, row)">
+              <mat-icon>timer_off</mat-icon>
+              คัสดาวน์
+            </button>
+            <mat-menu #menu="matMenu" xPosition="before">
+              <button mat-menu-item (click)="openModalCutCourse(cutcourse,row)">
+                <mat-icon> scatter_plot</mat-icon>
+                ตัดคอร์ส
+              </button>
+              <button mat-menu-item (click)="openModalHistoryCutCourse(historycutcourse,row)">
+                <mat-icon>apps</mat-icon>
+                ประวัติการตัดคอร์ส
+              </button>
+            </mat-menu>
           </div>
-          <div *ngIf="row.saleCount == row.saleCutCount">
-            <button mat-flat-button class=" tw-text-white tw-ml-1 tw-bg-yellow-500 "
-              (click)="openModalHistoryCutCourse(historycutcourse,row)">ประวัติการตัดคอร์ส</button>
+          <div *ngIf="row.saleCount == row.saleCutCount || row.saleStatus == 'I'">
+            <button mat-flat-button class=" tw-text-white tw-ml-1 tw-bg-gray-500"
+              (click)="openModalHistoryCutCourse(historycutcourse,row)">
+              <mat-icon>apps</mat-icon>
+              ประวัติการตัดคอร์ส
+            </button>
           </div>
         </div>
       </ng-template>
@@ -263,8 +311,8 @@
           </div>
         </mat-error> -->
       </mat-form-field>
-      <div class="tw-w-[20%] tw-px-1">
-        <button matSuffix mat-raised-button color="primary" class="tw-p-3 tw-m-1 tw-h-12 "
+      <div class="tw-w-[20%]">
+        <button matSuffix mat-raised-button color="primary"
           (click)="addURL(newUrl.value,newUrl2.value);">เพิ่มคอร์ส</button>
       </div>
     </div>
@@ -281,8 +329,8 @@
         <input type="text" value="{{item?.saleCount}}" matInput />
       </mat-form-field>
 
-      <button (click)="removeURL(i)"
-        class="tw-w-[10%] tw-bg-red-500 tw-text-white tw-p-3 tw-border-0 tw-font-semibold tw-rounded-lg">Delete</button>
+      <button mat-raised-button color="warn" class="tw-w-[10%]" (click)="removeURL(i)">ลบ</button>
+
     </div>
     <div *ngFor="let item of urlData; let i = index" class="tw-flex tw-flex-row tw-items-baseline">
       <mat-form-field class="tw-w-[45%] tw-p-3 tw-mb-3" appearance="outline">
@@ -299,8 +347,8 @@
           matInput />
       </mat-form-field>
 
-      <button (click)="removeURL(i)"
-        class="tw-w-[10%] tw-bg-red-500 tw-text-white tw-p-3 tw-border-0 tw-font-semibold tw-rounded-lg">ลบ</button>
+      <button mat-raised-button color="warn" class="tw-w-[10%]" (click)="removeURL(i)">ลบ</button>
+
     </div>
 
     <div class="modal-footer">
@@ -417,7 +465,7 @@
     </button>
   </div>
   <div class="modal-body">
-    <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
+    <ngx-datatable #mydatatable class="material" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
       [footerHeight]="50" [rowHeight]="50" [rows]="rowsCutCourse" [loadingIndicator]="isLoading">
       <ngx-datatable-column name="ครั้งที่" [cellClass]="'cellColumn'" [width]="50" [canAutoResize]="false"
         [sortable]="false">
@@ -538,18 +586,45 @@
     </button>
   </div>
   <div class="modal-body">
-    <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
+    <div *ngIf="this.saleDetail" class="tw-p-3 tw-border-solid">
+      <div class="tw-text-center">
+        <b class="tw-text-black tw-text-2xl tw-underline tw-mb-2">ชำระเงินครั้งแรก</b>
+      </div>
+      <div class="tw-flex tw-justify-around">
+        <div class="tw-flex-col">
+          <p class="tw-m-1 tw-font-semibold tw-text-black tw-text-base">วันที่รับชำระเงิน</p>
+          <span>{{ this.saleDetail.saleDate | dateTHPipe: 'day' }}</span>
+        </div>
+        <div>
+          <p class="tw-m-1 tw-font-semibold tw-text-black tw-text-base">เลขที่เอกสาร</p>
+          <span>{{this.saleDetail.saleNumber}}</span>
+        </div>
+        <div>
+          <p class="tw-m-1 tw-font-semibold tw-text-black tw-text-base">ยอดชำระ</p>
+          <span>{{this.saleDetail.salePayment}}</span>
+        </div>
+        <div>
+          <p class="tw-m-1 tw-font-semibold tw-text-black tw-text-base">ยอดคงเหลือ</p>
+          <span>{{this.saleDetail.saleOverdue}}</span>
+        </div>
+        <div>
+          <p class="tw-m-1 tw-font-semibold tw-text-black tw-text-base">รายละเอียด</p>
+          <span class="tw-text-red-500 tw-font-semibold">{{this.saleDetail.saleDetail}}</span>
+        </div>
+      </div>
+    </div>
+    <ngx-datatable #mydatatable class="material" [headerHeight]="50" [limit]="5" [columnMode]="ColumnMode.force"
       [footerHeight]="50" [rowHeight]="50" [rows]="rowsSalepay" [loadingIndicator]="isLoading">
       <ngx-datatable-column name="วันที่ชำระเงิน" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
           {{ row?.salePayDate | dateTHPipe: 'day' }}
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column name="ชื่อคอร์ส" [cellClass]="'cellColumn'">
+      <!-- <ngx-datatable-column name="ชื่อคอร์ส" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
           {{ row?.courseNameTh }}
         </ng-template>
-      </ngx-datatable-column>
+      </ngx-datatable-column> -->
       <ngx-datatable-column name="เลขที่เอกสาร" [cellClass]="'cellColumn'">
         <ng-template let-row="row" ngx-datatable-cell-template>
           {{ row?.salePayCourse }}
@@ -603,6 +678,35 @@
     <div class="modal-footer">
       <button mat-raised-button color="primary" (click)="deleteConfrim()"
         [disabled]="!confrimDelete.valid">ยืนยันรหัสผ่าน</button>
+      <button mat-raised-button color="warn" (click)="ModalList.hide()">ยกเลิก</button>
+    </div>
+  </form>
+</ng-template>
+
+<!--Modal ยืนยันรหัสผ่านการลบข้อมูลการเข้าใช้บริการ-->
+<ng-template #cutdown>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">กรุณาระบุรหัสผ่านของท่าน</h4>
+    <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="ModalList.hide()">
+      <span aria-hidden="true" class="visually-hidden">&times;</span>
+    </button>
+  </div>
+  <form [formGroup]="saleForm">
+    <div class="modal-body">
+      <mat-form-field class="tw-w-full tw-px-2" appearance="outline">
+        <mat-label>ระบุเหตุผลที่ต้องการคัสดาวน์</mat-label>
+        <textarea matInput placeholder="กรอกรายละเอียดการเข้าใช้บริการ"
+          [formControlName]="'saleCutDownDetail'"></textarea>
+        <mat-error *ngIf="saleForm.get('saleCutDownDetail').hasError('required')">
+          <div class="box-error">
+            กรุณาระบุเหตุผลที่ต้องการคัสดาวน์
+          </div>
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="modal-footer">
+      <button mat-raised-button color="primary" (click)="cutDown()" [disabled]="!saleForm.valid">ยืนยันการคัสดาวน์</button>
       <button mat-raised-button color="warn" (click)="ModalList.hide()">ยกเลิก</button>
     </div>
   </form>

@@ -63,8 +63,6 @@ export class ZimViewCustomerComponent implements OnInit {
   courses: Course[] = [];
   branchs: Branch[] = [];
 
-  employ: any;
-
 
   selectedEmployee: number[] = []; // Assuming selectedEmployeeId is a number
   selectedCourse: number[] = []; // Assuming selectedCourseId is a number
@@ -73,6 +71,8 @@ export class ZimViewCustomerComponent implements OnInit {
 
 
   emp_detail = [];
+
+  saleDetail: any;
 
   sales: any;
   Products = '';
@@ -136,6 +136,7 @@ export class ZimViewCustomerComponent implements OnInit {
       saleOverdue: [{ value: '', enabled: !!this.cus_id }, Validators.required],
       saleDate: [{ value: '', enabled: !!this.cus_id }, Validators.required],
       saleDetail: [{ value: '', enabled: !!this.cus_id }],
+      saleCutDownDetail: [{ value: '', enabled: !!this.cus_id }, Validators.required],
       cusId: [this.cus_id],
     });
 
@@ -343,11 +344,13 @@ export class ZimViewCustomerComponent implements OnInit {
       saleProductData,)
       .pipe(
         catchError((err) => {
+          console.log(err);
           Swal.fire({
-            icon: 'error',
-            title: 'เพิ่มข้อมูลไม่สำเร็จ',
+            icon: 'info',
+            title: 'ตรวจพบเลขเอกสารมีในระบบแล้ว',
+            text: "กรุณาตรวจสอบอีกครั้ง !",
             showConfirmButton: false,
-            timer: 2000,
+            timer: 2500,
           });
           return throwError(err);
         })
@@ -360,8 +363,7 @@ export class ZimViewCustomerComponent implements OnInit {
           showConfirmButton: false,
           timer: 2000,
         }).then((result) => {
-          // location.reload();
-
+          window.location.reload();
         });
       });
   }
@@ -489,7 +491,7 @@ export class ZimViewCustomerComponent implements OnInit {
 
       } else {
         this.salePayForm.patchValue({ salePayBalance: this.salePayBalacne })
-        this.salePayForm.patchValue({ saleLastPaymet: this.salePayOderByEx})
+        this.salePayForm.patchValue({ saleLastPaymet: this.salePayOderByEx })
         this.salePayForm.patchValue({ salePayOver: this.salePayOderByOver - this.salePayOderByEx })
       }
     })
@@ -543,11 +545,14 @@ export class ZimViewCustomerComponent implements OnInit {
 
       this.rowsSalepay = res;
 
-      console.log('ประวัติการชำระเงิน : ', this.rowsSalepay);
-
       this.rowsSalepay = [...this.rowsSalepay];
 
       this.isLoading = false;
+    })
+
+    this._serviceSale.getSaleBYIDSale(data.saleId).subscribe(sale => {
+      this.saleDetail = sale;
+      console.log('ข้อมูลขาย', sale);
     })
 
     this.ModalList = this.modalService.show(
@@ -584,7 +589,7 @@ export class ZimViewCustomerComponent implements OnInit {
       Swal.fire({
         title: 'คุณแน่ใจหรือว่าต้องการลบ?',
         text:
-          'คุณสามารถกู้ข้อมูลคอร์สได้!',
+          'คุณไม่สามารถกู้ข้อมูลคอร์สได้!',
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'ยืนยัน',
@@ -619,6 +624,59 @@ export class ZimViewCustomerComponent implements OnInit {
       Object.assign({})
       // Object.assign({}, { class: 'gray modal-lg' })
     );
+  }
+
+  openModalCutDown(cutdown: TemplateRef<any>, data = null) {
+
+    this.saleForm.reset();
+
+    console.log(data);
+
+    this.saleForm.patchValue({ saleId: data?.saleId })
+    this.saleForm.patchValue({ saleNumber: data?.saleNumber })
+    this.saleForm.patchValue({ saleBalance: data?.saleBalance })
+    this.saleForm.patchValue({ salePayment: data?.salePayment })
+    this.saleForm.patchValue({ saleOverdue: data?.saleOverdue })
+    this.saleForm.patchValue({ saleDate: data?.saleDate })
+    this.saleForm.patchValue({ saleDetail: data?.saleDetail })
+
+    this.ModalList = this.modalService.show(
+      cutdown,
+      Object.assign({})
+      // Object.assign({}, { class: 'gray modal-lg' })
+    );
+  }
+
+  cutDown() {
+    let saveData: Sale = this.saleForm.getRawValue();
+
+    console.log(saveData);
+
+    Swal.fire({
+      title: 'คุณแน่ใจหรือว่าต้องการคัสดาวน์?',
+      text:
+        'คุณไม่สามารถกู้ข้อมูลคอร์สได้!',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'ยืนยัน',
+      cancelButtonText: 'ยกเลิก',
+    }).then((result) => {
+      if (result.isConfirmed) {
+
+        this._serviceSale.updateSales(saveData.saleId, saveData).pipe(take(1))
+          .subscribe(() => {
+            Swal.fire({
+              icon: 'success',
+              title: 'คัสดาวน์ข้อมูลสำเร็จ',
+              showConfirmButton: false,
+              timer: 2000,
+            });
+            window.location.reload();
+            this._changeDetectorRef.markForCheck();
+          })
+
+      }
+    });
   }
 
   getNameEmp(id: number) {

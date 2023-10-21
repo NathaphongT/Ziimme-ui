@@ -41,14 +41,14 @@ const NavigationItems = [
         url: 'customer/list',
         classes: 'nav-item',
       },
-      {
-        icon: 'feather icon-calendar',
-        id: 'customers-birthday',
-        title: 'ข้อมูลวันเกิด',
-        type: 'item',
-        url: 'customer/birthday',
-        classes: 'nav-item',
-      },
+      // {
+      //   icon: 'feather icon-calendar',
+      //   id: 'customers-birthday',
+      //   title: 'ข้อมูลวันเกิด',
+      //   type: 'item',
+      //   url: 'customer/birthday',
+      //   classes: 'nav-item',
+      // },
     ],
   },
   {

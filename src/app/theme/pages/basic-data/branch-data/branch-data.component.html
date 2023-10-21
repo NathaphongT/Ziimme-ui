@@ -16,7 +16,7 @@
 </div>
 <div class="wrap-body">
     <div class="container">
-        <ngx-datatable #mydatatable class="bootstrap" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
+        <ngx-datatable #mydatatable class="material" [headerHeight]="50" [limit]="10" [columnMode]="ColumnMode.force"
             [footerHeight]="50" [rowHeight]="50" [rows]="rows" [loadingIndicator]="isLoading" [externalPaging]="true"
             [count]="branchsPagination.length" [offset]="branchsPagination.page" [limit]="branchsPagination.size"
             (page)="setPage($event)" (sort)="sorting($event)">
