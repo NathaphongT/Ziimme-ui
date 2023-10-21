@@ -136,7 +136,7 @@ export class ZimViewCustomerComponent implements OnInit {
       saleOverdue: [{ value: '', enabled: !!this.cus_id }, Validators.required],
       saleDate: [{ value: '', enabled: !!this.cus_id }, Validators.required],
       saleDetail: [{ value: '', enabled: !!this.cus_id }],
-      saleCutDownDetail: [{ value: '', enabled: !!this.cus_id }, Validators.required],
+      saleCutDownDetail: [{ value: '', enabled: !!this.cus_id }],
       cusId: [this.cus_id],
     });
 
