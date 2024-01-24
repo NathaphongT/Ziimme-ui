@@ -390,7 +390,16 @@
         </mat-form-field>
         <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
           <mat-label>วิตามิน</mat-label>
-          <input type="text" matInput [formControlName]="'saleCutVitamin'">
+          <mat-select [formControlName]="'saleCutVitamin'">
+            <ng-container>
+              <mat-option value="0">-</mat-option>
+              <div *ngFor="let vitamin of appJson_V">
+                <mat-option [value]="vitamin">
+                  {{vitamin}}
+                </mat-option>
+              </div>
+            </ng-container>
+          </mat-select>
           <mat-error *ngIf="saleCutForm.get('saleCutVitamin').hasError('required')">
             <div class="box-error">
               กรุณาระบุวิตามิน
@@ -399,13 +408,41 @@
         </mat-form-field>
         <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
           <mat-label>มาร์ค</mat-label>
-          <input type="text" matInput [formControlName]="'saleCutMark'">
+          <mat-select [formControlName]="'saleCutMark'">
+            <ng-container>
+              <mat-option value="0">-</mat-option>
+              <div *ngFor="let vitamin of appJson_M">
+                <mat-option [value]="vitamin">
+                  {{vitamin}}
+                </mat-option>
+              </div>
+            </ng-container>
+          </mat-select>
           <mat-error *ngIf="saleCutForm.get('saleCutMark').hasError('required')">
             <div class="box-error">
               กรุณาระบุมาร์ค
             </div>
           </mat-error>
         </mat-form-field>
+        <!-- <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
+          <mat-label>วิตามิน</mat-label>
+          <input type="text" matInput [formControlName]="'saleCutVitamin'">
+         
+          <mat-error *ngIf="saleCutForm.get('saleCutVitamin').hasError('required')">
+            <div class="box-error">
+              กรุณาระบุวิตามิน
+            </div>
+          </mat-error>
+        </mat-form-field> -->
+        <!-- <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
+          <mat-label>มาร์ค</mat-label>
+          <input type="text" matInput [formControlName]="'saleCutMark'">
+          <mat-error *ngIf="saleCutForm.get('saleCutMark').hasError('required')">
+            <div class="box-error">
+              กรุณาระบุมาร์ค
+            </div>
+          </mat-error>
+        </mat-form-field> -->
         <mat-form-field class="tw-w-1/2 tw-px-2 tw-mb-3" appearance="outline">
           <mat-label>พนักงานนวดหน้า</mat-label>
 

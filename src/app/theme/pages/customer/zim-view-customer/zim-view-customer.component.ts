@@ -12,6 +12,9 @@ import { Branch, Course, SaleCut, SalePay } from '../../basic-data/basic.model';
 import { Employee, Sale } from '@app/_service/main.types';
 import { EmployeeService } from '../../employee/employee.service';
 import { SalePagination } from '@app/_service/pagination.types';
+
+import packageJson from '../../../main.json';
+
 @Component({
   selector: 'app-zim-view-customer',
   templateUrl: './zim-view-customer.component.html',
@@ -19,6 +22,9 @@ import { SalePagination } from '@app/_service/pagination.types';
 })
 export class ZimViewCustomerComponent implements OnInit {
   @ViewChild('myTable') table: any;
+
+  public appJson_V: any = packageJson.vitaminArray;
+  public appJson_M: any = packageJson.markArray;
 
   saleForm: FormGroup;
   saleEmployeeForm: FormGroup;
@@ -387,6 +393,9 @@ export class ZimViewCustomerComponent implements OnInit {
       this.cutOderBy = res
       this.cutOderByID = Object.assign({}, res);
       this.cutOderByAlways = this.cutOderByID[0]?.saleCutCount
+
+      console.log(this.cutOderByAlways + 1);
+
 
       if (this.cutOderBy.length <= 0) {
         this.saleCutForm.patchValue({ saleCutCount: 1 })

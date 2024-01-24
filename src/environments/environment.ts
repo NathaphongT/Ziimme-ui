@@ -4,9 +4,9 @@
 
 export const environment = {
   appVersion: require('../../package.json').version,
-  production: false,
-  // APIURL_LOCAL: "https://ziimmegroup.com/backend",
-  APIURL_LOCAL: "http://localhost:8080/backend",
+  production: true,
+  APIURL_LOCAL: "https://ziimmegroup.com/backend",
+  // APIURL_LOCAL: "http://localhost:8080/backend",
 };
 
 
