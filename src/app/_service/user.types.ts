@@ -74,6 +74,7 @@ export interface SaleListEmp {
   cusBranch: string;
   courseId: string;
   empId: number;
+  empFullname: string;
   saleId: number;
   saleDate: Date;
   courseNameEng: string;
